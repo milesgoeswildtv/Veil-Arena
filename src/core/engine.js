@@ -91,14 +91,17 @@ export function getRoundPhases(round) {
 
 export function beginNextRound(game) {
   if (game.status !== "running") throw new Error("Game is not running.");
-  if (checkWinner(game)) return { round: game.round, phases: [] };
+  if (game.aliveIds.length <= 1) {
+    checkWinner(game);
+    return { round: game.round, phases: [] };
+  }
   game.round++;
   return { round: game.round, phases: getRoundPhases(game.round) };
 }
 
 export function resolveNormalRound(game, rng = Math.random) {
   if (game.status !== "running") throw new Error("Game is not running.");
-  if (game.aliveIds.length <= 1) return { type: "no_op" };
+  if (game.aliveIds.length <= 1) return { type: "no_op", round: game.round, actorIds: [], eliminatedIds: [] };
   const alive = game.aliveIds.map(id => game.players[id]);
   const type = weightedPick(EVENT_WEIGHTS, rng);
   const actorCount = type === "self_elimination" ? 1 : Math.min(alive.length, type === "double_team" ? 3 : 2);
@@ -117,7 +120,6 @@ export function resolveNormalRound(game, rng = Math.random) {
   else if (type === "double_team" && third && rng() < 0.16) knockOut(third.id, "double_team", attacker.id);
 
   game.history.push(result);
-  checkWinner(game);
   return result;
 }
 
@@ -185,7 +187,6 @@ export function resolveCrowdVote(game, rng = Math.random) {
   const result = { type: "crowd_pin", round: game.round, qualifiers, survivorId, eliminatedIds, totals: { ...vote.totals } };
   game.history.push(result);
   game.crowdVote = null;
-  checkWinner(game);
   return result;
 }
 
