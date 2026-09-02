@@ -84,9 +84,15 @@ function resolveNormalBeat(game, rng = Math.random, forcedElimination = false) {
 export function resolveNormalRound(game, rng = Math.random) {
   if (game.status !== "running") throw new Error("Game is not running.");
   if (game.aliveIds.length <= 1) return { type: "normal_round_batch", round: game.round, outcomes: [], eliminatedIds: [] };
+  const startingAlive = game.aliveIds.length;
+  const minimumEliminations = startingAlive > 10 ? 2 : 1;
   const outcomes = []; const eliminatedIds = [];
   for (let i = 0; i < NORMAL_OUTCOMES_PER_ROUND && game.aliveIds.length > 1; i++) {
-    const mustEliminateNow = i === NORMAL_OUTCOMES_PER_ROUND - 1 && eliminatedIds.length === 0;
+    // Above ten players, force enough late beats to guarantee two eliminations.
+    // At ten or fewer, every round still guarantees at least one.
+    const beatsRemaining = NORMAL_OUTCOMES_PER_ROUND - i;
+    const eliminationsNeeded = Math.max(0, minimumEliminations - eliminatedIds.length);
+    const mustEliminateNow = eliminationsNeeded >= beatsRemaining;
     const beat = resolveNormalBeat(game, rng, mustEliminateNow);
     outcomes.push(beat); eliminatedIds.push(...beat.eliminatedIds);
   }
