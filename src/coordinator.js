@@ -7,6 +7,7 @@ import {
   checkWinner,
   specialEventsEnabled
 } from "./core/engine.js";
+import { castSimulatedCrowdVotes } from "./core/simulation.js";
 import { loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
 import { createChannelMessage } from "./discord.js";
 import { getTheme, chooseNarration } from "./themes/index.js";
@@ -81,7 +82,7 @@ function renderRevival(game, theme, result) {
   return `**${theme.labels.revival}**\n${winner} vs ${loser}\n\n${picked.text}\n\n**${winner.toUpperCase()} HAS RETURNED.**`;
 }
 
-function renderCrowdResolution(game, theme, result) {
+function renderCrowdResolution(game, theme, result, simulatedVotes = 0) {
   const winner = name(game, result.survivorId);
   const losers = result.eliminatedIds.map(id => name(game, id));
   const pool = result.qualifiers.length > 2 ? "multiPins" : "pinDuels";
@@ -93,7 +94,8 @@ function renderCrowdResolution(game, theme, result) {
   const eliminatedLine = losers.length === 1
     ? `**${losers[0].toUpperCase()} HAS BEEN ELIMINATED.**`
     : `**ELIMINATED:** ${losers.join(", ")}`;
-  return `**${theme.labels.crowdPin}**\n${picked.text}\n\n${eliminatedLine}\n\n**${winner.toUpperCase()} SURVIVES.**`;
+  const simLine = simulatedVotes ? `\n🧪 **${simulatedVotes} simulated spectator votes were cast.**` : "";
+  return `**${theme.labels.crowdPin}**${simLine}\n${picked.text}\n\n${eliminatedLine}\n\n**${winner.toUpperCase()} SURVIVES.**`;
 }
 
 function winnerMessage(game, theme) {
@@ -142,10 +144,11 @@ export class ArenaCoordinator {
     const theme = getTheme(game.themeId);
 
     if (game.crowdVote?.status === "open") {
+      const simulatedVotes = castSimulatedCrowdVotes(game);
       const result = resolveCrowdVote(game);
       await saveGame(this.env.DB, game);
       await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
-        content: renderCrowdResolution(game, theme, result)
+        content: renderCrowdResolution(game, theme, result, simulatedVotes)
       });
       if (await finishIfNeeded(this.env, game, theme)) return;
       await this.ctx.storage.setAlarm(Date.now() + NORMAL_DELAY_MS);
@@ -180,8 +183,11 @@ export class ArenaCoordinator {
       const vote = openCrowdVote(game);
       if (vote) {
         await saveGame(this.env.DB, game);
+        const simLine = game.testMode?.simulatedCrowd
+          ? "\n\n🧪 **TEST MODE:** simulated spectators will also vote when time expires."
+          : "";
         await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
-          content: `# ${theme.labels.crowdVote}\nSpectators have **30 seconds**. Choose who gets thrown into the Final Scare.\n\nThe top two voting positions enter. Ties at the cutoff pull everyone tied into the fight. **One survives.**`,
+          content: `# ${theme.labels.crowdVote}\nSpectators have **30 seconds**. Choose who gets thrown into the Final Scare.\n\nThe top two voting positions enter. Ties at the cutoff pull everyone tied into the fight. **One survives.**${simLine}`,
           components: [{
             type: 1,
             components: [{ type: 2, style: 4, custom_id: `arena:vote_open:${game.id}:0`, label: "CAST YOUR VOTE", emoji: { name: "👁️" } }]

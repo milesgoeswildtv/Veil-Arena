@@ -17,6 +17,7 @@ import {
   startGame,
   castCrowdVote
 } from "./core/engine.js";
+import { addFakeContestants, setSimulatedCrowd } from "./core/simulation.js";
 import {
   ensureSchema,
   saveGame,
@@ -27,19 +28,19 @@ import {
 import { getTheme } from "./themes/index.js";
 export { ArenaCoordinator } from "./coordinator.js";
 
-function gameIdFrom(customId) {
-  return customId?.split(":")?.[2] || null;
-}
-
 function playerList(game) {
   const players = Object.values(game.players);
   if (!players.length) return "Nobody has entered yet.";
-  return players.map((p, i) => `${i + 1}. **${p.displayName}**`).join("\n");
+  return players.map((p, i) => `${i + 1}. **${p.displayName}**${p.simulated ? " *(sim)*" : ""}`).join("\n");
 }
 
 function registrationMessage(game) {
   const theme = getTheme(game.themeId);
-  return `# ${theme.labels.arena}\nRegistration is open.\n\n${playerList(game)}\n\n**${Object.keys(game.players).length} entered**`;
+  const testBits = [];
+  if (game.testMode?.fakeContestants) testBits.push("simulated contestants");
+  if (game.testMode?.simulatedCrowd) testBits.push("simulated crowd voting");
+  const testLine = testBits.length ? `\n\n🧪 **TEST MODE:** ${testBits.join(" + ")}` : "";
+  return `# ${theme.labels.arena}\nRegistration is open.\n\n${playerList(game)}\n\n**${Object.keys(game.players).length} entered**${testLine}`;
 }
 
 function registrationComponents(game) {
@@ -94,7 +95,8 @@ async function handleArenaCommand(interaction, env) {
   if (!env.DB) return interactionMessage("Arena database is not configured yet.", [], true);
   await ensureSchema(env.DB);
 
-  const sub = interaction.data?.options?.[0]?.name || "status";
+  const subcommand = interaction.data?.options?.[0];
+  const sub = subcommand?.name || "status";
   const channelId = interaction.channel_id;
   const guildId = interaction.guild_id;
   const user = userFromInteraction(interaction);
@@ -117,10 +119,33 @@ async function handleArenaCommand(interaction, env) {
     return interactionMessage("Arena cancelled.", [], true);
   }
 
+  if (sub === "testfill") {
+    if (!game) return interactionMessage("Start an Arena lobby first with `/arena start`.", [], true);
+    if (game.hostId !== user.id) return interactionMessage("Only the Arena host can use test mode.", [], true);
+    if (game.status !== "registration") return interactionMessage("Fake contestants can only be added before the match starts.", [], true);
+    const count = subcommand?.options?.find(option => option.name === "count")?.value ?? 20;
+    const added = addFakeContestants(game, count);
+    await saveGame(env.DB, game);
+    return interactionMessage(`🧪 Added **${added.length} simulated contestants**. The lobby now has **${game.aliveIds.length} players**.`, [], true);
+  }
+
+  if (sub === "testcrowd") {
+    if (!game) return interactionMessage("Start an Arena lobby first with `/arena start`.", [], true);
+    if (game.hostId !== user.id) return interactionMessage("Only the Arena host can use test mode.", [], true);
+    const enabled = Boolean(subcommand?.options?.find(option => option.name === "enabled")?.value);
+    setSimulatedCrowd(game, enabled);
+    await saveGame(env.DB, game);
+    return interactionMessage(`🧪 Simulated crowd voting is now **${enabled ? "ON" : "OFF"}**.`, [], true);
+  }
+
   if (!game) return interactionMessage("There is no active Arena game in this channel.", [], true);
+
   const alive = game.aliveIds.length;
   const eliminated = game.eliminatedIds.length;
-  return interactionMessage(`**Arena status**\nRound: **${game.round}**\nAlive: **${alive}**\nEliminated: **${eliminated}**\nStatus: **${game.status}**`, [], true);
+  const testStatus = game.testMode?.simulatedCrowd || game.testMode?.fakeContestants
+    ? `\nTest mode: **${game.testMode?.fakeContestants ? "fake contestants" : ""}${game.testMode?.fakeContestants && game.testMode?.simulatedCrowd ? " + " : ""}${game.testMode?.simulatedCrowd ? "simulated crowd" : ""}**`
+    : "";
+  return interactionMessage(`**Arena status**\nRound: **${game.round}**\nAlive: **${alive}**\nEliminated: **${eliminated}**\nStatus: **${game.status}**${testStatus}`, [], true);
 }
 
 async function handleComponent(interaction, env) {
@@ -162,7 +187,8 @@ async function handleComponent(interaction, env) {
       await saveGame(env.DB, game);
       await kickCoordinator(env, game.channelId, "kick");
       const theme = getTheme(game.themeId);
-      return interactionUpdate(`# ${theme.labels.arena}\nThe doors close. **${game.aliveIds.length} players** are inside.\n\nThe first round begins now.`, []);
+      const simLine = game.testMode?.simulatedCrowd ? "\n🧪 Simulated spectators are watching too." : "";
+      return interactionUpdate(`# ${theme.labels.arena}\nThe doors close. **${game.aliveIds.length} players** are inside.${simLine}\n\nThe first round begins now.`, []);
     } catch (error) {
       return interactionMessage(error.message, [], true);
     }
