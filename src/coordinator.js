@@ -3,7 +3,8 @@ import {
   resolveNormalRound,
   resolveRevivalPit,
   openCrowdVote,
-  resolveCrowdVote
+  resolveCrowdVote,
+  checkWinner
 } from "./core/engine.js";
 import { loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
 import { createChannelMessage } from "./discord.js";
@@ -29,9 +30,10 @@ function rememberNarration(game, template) {
 }
 
 function genericNormalNarration(game, result) {
-  const actors = result.actorIds.map(id => name(game, id));
+  const actors = (result.actorIds || []).map(id => name(game, id));
   const [a, b, c] = actors;
   const map = {
+    no_op: "The Arena goes unnaturally still.",
     attack: `${a} goes after ${b}. Neither of them looks especially interested in making good decisions.`,
     counter: `${a} makes a move on ${b}. ${b} sees it coming and turns the whole exchange around.`,
     double_team: `${a} and ${b} drag ${c || "someone"} into a deeply unfair situation.`,
@@ -98,6 +100,15 @@ function winnerMessage(game, theme) {
   return `# ${name(game, game.winnerId)} WINS THE ARENA.\nThe lights settle. The chaos stops. One player is left.`;
 }
 
+async function finishIfNeeded(env, game, theme) {
+  checkWinner(game);
+  if (game.status !== "finished") return false;
+  await saveGame(env.DB, game);
+  await recordFinishedGame(env.DB, game);
+  await createChannelMessage(game.channelId, env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) });
+  return true;
+}
+
 export class ArenaCoordinator {
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -135,29 +146,25 @@ export class ArenaCoordinator {
       await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
         content: renderCrowdResolution(game, theme, result)
       });
-      if (game.status === "finished") {
-        await recordFinishedGame(this.env.DB, game);
-        await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) });
-        return;
-      }
+      if (await finishIfNeeded(this.env, game, theme)) return;
       await this.ctx.storage.setAlarm(Date.now() + NORMAL_DELAY_MS);
       return;
     }
 
     const { round, phases } = beginNextRound(game);
-    if (!phases.length) return;
+    if (!phases.length) {
+      if (game.status === "finished") {
+        await saveGame(this.env.DB, game);
+        await recordFinishedGame(this.env.DB, game);
+        await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) });
+      }
+      return;
+    }
 
     const normal = resolveNormalRound(game);
     await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
       content: `**ROUND ${round}**\n${renderNormal(game, theme, normal)}`
     });
-
-    if (game.status === "finished") {
-      await saveGame(this.env.DB, game);
-      await recordFinishedGame(this.env.DB, game);
-      await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) });
-      return;
-    }
 
     if (phases.includes("revival")) {
       const revival = resolveRevivalPit(game);
@@ -179,6 +186,8 @@ export class ArenaCoordinator {
       await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
       return;
     }
+
+    if (await finishIfNeeded(this.env, game, theme)) return;
 
     await saveGame(this.env.DB, game);
     await this.ctx.storage.setAlarm(Date.now() + NORMAL_DELAY_MS);
