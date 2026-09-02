@@ -4,3 +4,11 @@ compatibility_date = "2026-09-01"
 
 [observability]
 enabled = true
+
+[[durable_objects.bindings]]
+name = "ARENA_COORDINATOR"
+class_name = "ArenaCoordinator"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ArenaCoordinator"]
