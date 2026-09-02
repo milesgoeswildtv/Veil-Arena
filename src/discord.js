@@ -130,7 +130,35 @@ export function arenaCommands() {
       options: [
         { name: "start", description: "Open Arena registration.", type: 1 },
         { name: "status", description: "Show the current Arena game.", type: 1 },
-        { name: "cancel", description: "Cancel the current Arena game (host only).", type: 1 }
+        { name: "cancel", description: "Cancel the current Arena game (host only).", type: 1 },
+        {
+          name: "testfill",
+          description: "Add simulated contestants to the current lobby (host only).",
+          type: 1,
+          options: [
+            {
+              name: "count",
+              description: "How many fake contestants to add (default 20, max 50).",
+              type: 4,
+              required: false,
+              min_value: 1,
+              max_value: 50
+            }
+          ]
+        },
+        {
+          name: "testcrowd",
+          description: "Turn simulated spectator voting on or off (host only).",
+          type: 1,
+          options: [
+            {
+              name: "enabled",
+              description: "Whether fake spectators should vote during Crowd Vote.",
+              type: 5,
+              required: true
+            }
+          ]
+        }
       ]
     }
   ];
