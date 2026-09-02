@@ -4,7 +4,8 @@ import {
   resolveRevivalPit,
   openCrowdVote,
   resolveCrowdVote,
-  checkWinner
+  checkWinner,
+  specialEventsEnabled
 } from "./core/engine.js";
 import { loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
 import { createChannelMessage } from "./discord.js";
@@ -166,25 +167,29 @@ export class ArenaCoordinator {
       content: `**ROUND ${round}**\n${renderNormal(game, theme, normal)}`
     });
 
-    if (phases.includes("revival")) {
+    // Final-five lock: once five or fewer remain, the match becomes pure Arena.
+    // No more Revival Pit and no more spectator votes, even if this was a scheduled special round.
+    if (phases.includes("revival") && specialEventsEnabled(game)) {
       const revival = resolveRevivalPit(game);
       await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
         content: renderRevival(game, theme, revival)
       });
     }
 
-    if (phases.includes("crowd_vote") && game.aliveIds.length >= 2) {
-      openCrowdVote(game);
-      await saveGame(this.env.DB, game);
-      await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
-        content: `# ${theme.labels.crowdVote}\nSpectators have **30 seconds**. Choose who gets thrown into the Final Scare.\n\nThe top two voting positions enter. Ties at the cutoff pull everyone tied into the fight. **One survives.**`,
-        components: [{
-          type: 1,
-          components: [{ type: 2, style: 4, custom_id: `arena:vote_open:${game.id}:0`, label: "CAST YOUR VOTE", emoji: { name: "👁️" } }]
-        }]
-      });
-      await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
-      return;
+    if (phases.includes("crowd_vote") && specialEventsEnabled(game)) {
+      const vote = openCrowdVote(game);
+      if (vote) {
+        await saveGame(this.env.DB, game);
+        await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
+          content: `# ${theme.labels.crowdVote}\nSpectators have **30 seconds**. Choose who gets thrown into the Final Scare.\n\nThe top two voting positions enter. Ties at the cutoff pull everyone tied into the fight. **One survives.**`,
+          components: [{
+            type: 1,
+            components: [{ type: 2, style: 4, custom_id: `arena:vote_open:${game.id}:0`, label: "CAST YOUR VOTE", emoji: { name: "👁️" } }]
+          }]
+        });
+        await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
+        return;
+      }
     }
 
     if (await finishIfNeeded(this.env, game, theme)) return;
