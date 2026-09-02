@@ -1,5 +1,13 @@
 import { VQS_HORROR } from "./vibe_queen_slots/horror.js";
+import { VQS_HORROR_SEGMENT_2 } from "./vibe_queen_slots/horror-segment-2.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
+import {
+  PLAYER_KILLS_SEGMENT_2,
+  SELF_KILLS_SEGMENT_2,
+  PIN_DUELS_SEGMENT_2,
+  MULTI_PIN_SEGMENT_2,
+  REVIVAL_DUELS_SEGMENT_2
+} from "../content/base/deaths-segment-2.js";
 
 export const DEFAULT_THEME_ID = "vibe_queen_slots";
 
@@ -13,16 +21,25 @@ const BASE_THEME = {
     crowdVote: "THE CROWD CHOOSES",
     crowdPin: "CROWD PIN"
   },
-  playerKills: PLAYER_KILLS,
-  selfKills: SELF_KILLS,
-  pinDuels: PIN_DUELS,
-  multiPins: MULTI_PIN,
-  revivalDuels: REVIVAL_DUELS
+  playerKills: [...PLAYER_KILLS, ...PLAYER_KILLS_SEGMENT_2],
+  selfKills: [...SELF_KILLS, ...SELF_KILLS_SEGMENT_2],
+  pinDuels: [...PIN_DUELS, ...PIN_DUELS_SEGMENT_2],
+  multiPins: [...MULTI_PIN, ...MULTI_PIN_SEGMENT_2],
+  revivalDuels: [...REVIVAL_DUELS, ...REVIVAL_DUELS_SEGMENT_2]
+};
+
+const VQS_THEME = {
+  ...VQS_HORROR,
+  playerKills: [...VQS_HORROR.playerKills, ...VQS_HORROR_SEGMENT_2.playerKills],
+  selfKills: [...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills],
+  pinDuels: [...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels],
+  multiPins: [...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins],
+  revivalDuels: [...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels]
 };
 
 const THEMES = new Map([
   [BASE_THEME.id, BASE_THEME],
-  [VQS_HORROR.id, VQS_HORROR]
+  [VQS_THEME.id, VQS_THEME]
 ]);
 
 export function getTheme(themeId = DEFAULT_THEME_ID) {
@@ -44,7 +61,7 @@ export function renderTemplate(template, values = {}) {
 
 export function chooseNarration(theme, poolName, values, rng = Math.random, recent = []) {
   const pool = theme?.[poolName] || BASE_THEME[poolName] || [];
-  if (!pool.length) return "The Arena makes its choice.";
+  if (!pool.length) return { template: null, text: "The Arena makes its choice." };
 
   const blocked = new Set(recent.slice(-20));
   const candidates = pool.filter(line => !blocked.has(line));
