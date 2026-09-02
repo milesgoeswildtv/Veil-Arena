@@ -1,6 +1,7 @@
 const EVENT_WEIGHTS = [
-  ["attack", 35], ["counter", 20], ["double_team", 12],
-  ["weapon", 10], ["near_elimination", 13], ["elimination", 10]
+  ["attack", 30], ["counter", 18], ["double_team", 11],
+  ["weapon", 9], ["near_elimination", 12], ["elimination", 14],
+  ["self_elimination", 6]
 ];
 
 const randomIndex = (length, rng = Math.random) => Math.floor(rng() * length);
@@ -100,14 +101,16 @@ export function resolveNormalRound(game, rng = Math.random) {
   if (game.aliveIds.length <= 1) return { type: "no_op" };
   const alive = game.aliveIds.map(id => game.players[id]);
   const type = weightedPick(EVENT_WEIGHTS, rng);
-  const actors = uniqueRandom(alive, Math.min(alive.length, type === "double_team" ? 3 : 2), rng);
+  const actorCount = type === "self_elimination" ? 1 : Math.min(alive.length, type === "double_team" ? 3 : 2);
+  const actors = uniqueRandom(alive, actorCount, rng);
   const [attacker, target, third] = actors;
   const result = { type, round: game.round, actorIds: actors.map(p => p.id), eliminatedIds: [] };
 
   const knockOut = (id, reason, by) => {
     if (eliminate(game, id, reason, by)) result.eliminatedIds.push(id);
   };
-  if (type === "elimination") knockOut(target.id, "normal_round", attacker.id);
+  if (type === "self_elimination") knockOut(attacker.id, "self_elimination", null);
+  else if (type === "elimination") knockOut(target.id, "normal_round", attacker.id);
   else if (type === "near_elimination" && rng() < 0.28) knockOut(target.id, "failed_save", attacker.id);
   else if (type === "weapon" && rng() < 0.18) knockOut(target.id, "weapon_spot", attacker.id);
   else if (type === "counter" && rng() < 0.12) knockOut(attacker.id, "countered", target.id);
