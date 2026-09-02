@@ -9,6 +9,13 @@ import {
   MULTI_PIN_SEGMENT_2,
   REVIVAL_DUELS_SEGMENT_2
 } from "../content/base/deaths-segment-2.js";
+import {
+  PLAYER_KILLS_SEGMENT_3,
+  SELF_KILLS_SEGMENT_3,
+  PIN_DUELS_SEGMENT_3,
+  MULTI_PIN_SEGMENT_3,
+  REVIVAL_DUELS_SEGMENT_3
+} from "../content/base/deaths-segment-3.js";
 
 export const DEFAULT_THEME_ID = "vibe_queen_slots";
 
@@ -22,11 +29,11 @@ const BASE_THEME = {
     crowdVote: "THE CROWD CHOOSES",
     crowdPin: "CROWD PIN"
   },
-  playerKills: [...PLAYER_KILLS, ...PLAYER_KILLS_SEGMENT_2],
-  selfKills: [...SELF_KILLS, ...SELF_KILLS_SEGMENT_2],
-  pinDuels: [...PIN_DUELS, ...PIN_DUELS_SEGMENT_2],
-  multiPins: [...MULTI_PIN, ...MULTI_PIN_SEGMENT_2],
-  revivalDuels: [...REVIVAL_DUELS, ...REVIVAL_DUELS_SEGMENT_2]
+  playerKills: [...PLAYER_KILLS, ...PLAYER_KILLS_SEGMENT_2, ...PLAYER_KILLS_SEGMENT_3],
+  selfKills: [...SELF_KILLS, ...SELF_KILLS_SEGMENT_2, ...SELF_KILLS_SEGMENT_3],
+  pinDuels: [...PIN_DUELS, ...PIN_DUELS_SEGMENT_2, ...PIN_DUELS_SEGMENT_3],
+  multiPins: [...MULTI_PIN, ...MULTI_PIN_SEGMENT_2, ...MULTI_PIN_SEGMENT_3],
+  revivalDuels: [...REVIVAL_DUELS, ...REVIVAL_DUELS_SEGMENT_2, ...REVIVAL_DUELS_SEGMENT_3]
 };
 
 const VQS_THEME = {
