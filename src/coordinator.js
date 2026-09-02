@@ -37,7 +37,8 @@ function genericNormalNarration(game, result) {
     double_team: `${a} and ${b} drag ${c || "someone"} into a deeply unfair situation.`,
     weapon: `${a} finds something in the Arena that was almost certainly not meant to be used like that. ${b} is the unfortunate test subject.`,
     near_elimination: `${b} ends up hanging on by a thread while ${a} tries very hard to make gravity finish the job.`,
-    elimination: `${a} catches ${b} at the worst possible moment.`
+    elimination: `${a} catches ${b} at the worst possible moment.`,
+    self_elimination: `${a} appears to have developed a deeply unfortunate relationship with gravity.`
   };
   return map[result.type] || "The Arena erupts into chaos.";
 }
@@ -47,6 +48,13 @@ function renderNormal(game, theme, result) {
 
   const victimId = result.eliminatedIds[0];
   const victim = name(game, victimId);
+
+  if (result.type === "self_elimination") {
+    const picked = chooseNarration(theme, "selfKills", { victim }, Math.random, recentTemplates(game));
+    rememberNarration(game, picked.template);
+    return `${picked.text}\n\n**${victim.toUpperCase()} HAS ELIMINATED THEMSELF.**`;
+  }
+
   const attackerId = result.actorIds.find(id => id !== victimId) || result.actorIds[0];
   const killer = name(game, attackerId);
   const thirdId = result.actorIds.find(id => id !== victimId && id !== attackerId);
