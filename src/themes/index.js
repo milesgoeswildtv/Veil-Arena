@@ -3,6 +3,7 @@ import { VQS_HORROR_SEGMENT_2 } from "./vibe_queen_slots/horror-segment-2.js";
 import { VQS_HORROR_SEGMENT_3_VIBE_LAIR } from "./vibe_queen_slots/horror-segment-3-vibe-lair.js";
 import { VQS_HORROR_SEGMENT_4 } from "./vibe_queen_slots/horror-segment-4.js";
 import { VQS_HORROR_SEGMENT_5 } from "./vibe_queen_slots/horror-segment-5.js";
+import { VQS_HORROR_COMBINATORIAL } from "./vibe_queen_slots/horror-combinatorial.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
 import { PLAYER_KILLS_SEGMENT_2, SELF_KILLS_SEGMENT_2, PIN_DUELS_SEGMENT_2, MULTI_PIN_SEGMENT_2, REVIVAL_DUELS_SEGMENT_2 } from "../content/base/deaths-segment-2.js";
 import { PLAYER_KILLS_SEGMENT_3, SELF_KILLS_SEGMENT_3, PIN_DUELS_SEGMENT_3, MULTI_PIN_SEGMENT_3, REVIVAL_DUELS_SEGMENT_3 } from "../content/base/deaths-segment-3.js";
@@ -25,11 +26,11 @@ const BASE_THEME = {
 
 const VQS_THEME = {
   ...VQS_HORROR,
-  playerKills: [...VQS_HORROR.playerKills, ...VQS_HORROR_SEGMENT_2.playerKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.playerKills, ...VQS_HORROR_SEGMENT_4.playerKills, ...VQS_HORROR_SEGMENT_5.playerKills],
-  selfKills: [...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.selfKills, ...VQS_HORROR_SEGMENT_4.selfKills, ...VQS_HORROR_SEGMENT_5.selfKills],
-  pinDuels: [...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.pinDuels, ...VQS_HORROR_SEGMENT_4.pinDuels, ...VQS_HORROR_SEGMENT_5.pinDuels],
-  multiPins: [...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.multiPins, ...VQS_HORROR_SEGMENT_4.multiPins, ...VQS_HORROR_SEGMENT_5.multiPins],
-  revivalDuels: [...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.revivalDuels, ...VQS_HORROR_SEGMENT_4.revivalDuels, ...VQS_HORROR_SEGMENT_5.revivalDuels]
+  playerKills: [...VQS_HORROR_COMBINATORIAL.playerKills, ...VQS_HORROR.playerKills, ...VQS_HORROR_SEGMENT_2.playerKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.playerKills, ...VQS_HORROR_SEGMENT_4.playerKills, ...VQS_HORROR_SEGMENT_5.playerKills],
+  selfKills: [...VQS_HORROR_COMBINATORIAL.selfKills, ...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.selfKills, ...VQS_HORROR_SEGMENT_4.selfKills, ...VQS_HORROR_SEGMENT_5.selfKills],
+  pinDuels: [...VQS_HORROR_COMBINATORIAL.pinDuels, ...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.pinDuels, ...VQS_HORROR_SEGMENT_4.pinDuels, ...VQS_HORROR_SEGMENT_5.pinDuels],
+  multiPins: [...VQS_HORROR_COMBINATORIAL.multiPins, ...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.multiPins, ...VQS_HORROR_SEGMENT_4.multiPins, ...VQS_HORROR_SEGMENT_5.multiPins],
+  revivalDuels: [...VQS_HORROR_COMBINATORIAL.revivalDuels, ...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.revivalDuels, ...VQS_HORROR_SEGMENT_4.revivalDuels, ...VQS_HORROR_SEGMENT_5.revivalDuels]
 };
 
 const THEMES = new Map([[BASE_THEME.id, BASE_THEME], [VQS_THEME.id, VQS_THEME]]);
@@ -42,7 +43,7 @@ export function renderTemplate(template, values = {}) {
 export function chooseNarration(theme, poolName, values, rng = Math.random, recent = []) {
   const pool = theme?.[poolName] || BASE_THEME[poolName] || [];
   if (!pool.length) return { template: null, text: "The Arena makes its choice." };
-  const blocked = new Set(recent.slice(-20));
+  const blocked = new Set(recent.slice(-100));
   const candidates = pool.filter(line => !blocked.has(line));
   const source = candidates.length ? candidates : pool;
   const template = source[Math.floor(rng() * source.length)];
