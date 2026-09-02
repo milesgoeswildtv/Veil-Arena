@@ -4,6 +4,8 @@ const EVENT_WEIGHTS = [
   ["self_elimination", 6]
 ];
 
+export const SPECIAL_EVENT_CUTOFF = 5;
+
 const randomIndex = (length, rng = Math.random) => Math.floor(rng() * length);
 const pick = (list, rng = Math.random) => list?.length ? list[randomIndex(list.length, rng)] : null;
 
@@ -82,6 +84,10 @@ export function revive(game, playerId) {
   return true;
 }
 
+export function specialEventsEnabled(game) {
+  return game.aliveIds.length > SPECIAL_EVENT_CUTOFF;
+}
+
 export function getRoundPhases(round) {
   const phases = ["normal"];
   if (round % 3 === 0) phases.push("revival");
@@ -124,6 +130,11 @@ export function resolveNormalRound(game, rng = Math.random) {
 }
 
 export function resolveRevivalPit(game, rng = Math.random) {
+  if (!specialEventsEnabled(game)) {
+    const result = { type: "revival_skipped", round: game.round, reason: "final_five" };
+    game.history.push(result);
+    return result;
+  }
   if (game.eliminatedIds.length < 2) {
     const result = { type: "revival_skipped", round: game.round, reason: "not_enough_eliminated" };
     game.history.push(result);
@@ -139,7 +150,7 @@ export function resolveRevivalPit(game, rng = Math.random) {
 }
 
 export function openCrowdVote(game) {
-  if (game.aliveIds.length < 2) return null;
+  if (!specialEventsEnabled(game)) return null;
   game.crowdVote = {
     round: game.round, status: "open", eligibleIds: [...game.aliveIds],
     votesBySpectator: {}, totals: Object.fromEntries(game.aliveIds.map(id => [id, 0]))
@@ -159,9 +170,6 @@ export function castCrowdVote(game, spectatorId, playerId) {
   return vote;
 }
 
-// Crowd rule: the top TWO player slots qualify. If the second slot is tied,
-// every player sharing that vote total qualifies. Thus 22/22/15 => 2,
-// 22/21/21 => 3, and 22/22/22/22 => 4.
 export function getCrowdQualifiers(totals) {
   const entries = Object.entries(totals)
     .filter(([, votes]) => votes > 0)
