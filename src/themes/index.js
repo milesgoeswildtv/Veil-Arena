@@ -1,5 +1,6 @@
 import { VQS_HORROR } from "./vibe_queen_slots/horror.js";
 import { VQS_HORROR_SEGMENT_2 } from "./vibe_queen_slots/horror-segment-2.js";
+import { VQS_HORROR_SEGMENT_3_VIBE_LAIR } from "./vibe_queen_slots/horror-segment-3-vibe-lair.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
 import {
   PLAYER_KILLS_SEGMENT_2,
@@ -30,11 +31,11 @@ const BASE_THEME = {
 
 const VQS_THEME = {
   ...VQS_HORROR,
-  playerKills: [...VQS_HORROR.playerKills, ...VQS_HORROR_SEGMENT_2.playerKills],
-  selfKills: [...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills],
-  pinDuels: [...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels],
-  multiPins: [...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins],
-  revivalDuels: [...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels]
+  playerKills: [...VQS_HORROR.playerKills, ...VQS_HORROR_SEGMENT_2.playerKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.playerKills],
+  selfKills: [...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.selfKills],
+  pinDuels: [...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.pinDuels],
+  multiPins: [...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.multiPins],
+  revivalDuels: [...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.revivalDuels]
 };
 
 const THEMES = new Map([
