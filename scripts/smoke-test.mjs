@@ -13,6 +13,11 @@ import {
   specialEventsEnabled,
   SPECIAL_EVENT_CUTOFF
 } from "../src/core/engine.js";
+import {
+  addFakeContestants,
+  setSimulatedCrowd,
+  castSimulatedCrowdVotes
+} from "../src/core/simulation.js";
 
 function fakePlayer(id) {
   return { id, username: id, displayName: id.toUpperCase() };
@@ -68,5 +73,21 @@ const revival = resolveRevivalPit(revivalGame, () => 0);
 assert.equal(revival.type, "revival_pit");
 assert.equal(revivalGame.players[revival.winnerId].alive, true);
 assert.equal(revivalGame.aliveIds.length, 7);
+
+// Test mode can populate a lobby and generate synthetic spectator votes.
+const simGame = createGame({ guildId: "g", channelId: "sim", hostId: "host" });
+addPlayer(simGame, fakePlayer("host"));
+const added = addFakeContestants(simGame, 12);
+assert.equal(added.length, 12);
+assert.equal(simGame.aliveIds.length, 13);
+assert.equal(added.every(id => simGame.players[id].simulated === true), true);
+setSimulatedCrowd(simGame, true);
+startGame(simGame);
+openCrowdVote(simGame);
+const fakeVotes = castSimulatedCrowdVotes(simGame, () => 0.5);
+assert.equal(fakeVotes >= 24, true);
+assert.equal(Object.values(simGame.crowdVote.totals).reduce((sum, votes) => sum + votes, 0), fakeVotes);
+const simCrowd = resolveCrowdVote(simGame, () => 0);
+assert.equal(simCrowd.qualifiers.length >= 2, true);
 
 console.log("Arena smoke tests passed.");
