@@ -18,6 +18,7 @@ import {
   castCrowdVote
 } from "./core/engine.js";
 import {
+  ensureSchema,
   saveGame,
   loadGame,
   loadActiveGameForChannel,
@@ -91,6 +92,7 @@ async function kickCoordinator(env, channelId, action = "kick") {
 async function handleArenaCommand(interaction, env) {
   if (!interaction.guild_id) return interactionMessage("Arena can only run inside a server.", [], true);
   if (!env.DB) return interactionMessage("Arena database is not configured yet.", [], true);
+  await ensureSchema(env.DB);
 
   const sub = interaction.data?.options?.[0]?.name || "status";
   const channelId = interaction.channel_id;
@@ -128,6 +130,7 @@ async function handleComponent(interaction, env) {
   const gameId = parts[2];
   const user = userFromInteraction(interaction);
   if (!gameId || !user || !env.DB) return interactionMessage("Arena couldn't read that action.", [], true);
+  await ensureSchema(env.DB);
 
   const game = await loadGame(env.DB, gameId);
   if (!game) return interactionMessage("That Arena game no longer exists.", [], true);
