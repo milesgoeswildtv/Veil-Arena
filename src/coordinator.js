@@ -1,162 +1,18 @@
-import { beginNextRound, resolveNormalRound, resolveRevivalPit, openCrowdVote, resolveCrowdVote, checkWinner, specialEventsEnabled } from "./core/engine.js";
-import { castSimulatedCrowdVotes } from "./core/simulation.js";
-import { loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
-import { createChannelMessage } from "./discord.js";
-import { getTheme, chooseNarration } from "./themes/index.js";
-
-const NORMAL_DELAY_MS = 8000;
-const CROWD_VOTE_MS = 30000;
-const RARE_EVENT_CHANCE = 0.035;
-const name = (game, id) => game.players[id]?.displayName || "Unknown";
-const tag = (game, id) => `**${name(game, id).toUpperCase()}**`;
-function recentTemplates(game) { return game.history.filter(item => item?.narrationTemplate).slice(-150).map(item => item.narrationTemplate); }
-function rememberNarration(game, template) { if (template) game.history.push({ type: "narration_used", narrationTemplate: template, round: game.round }); }
-
-function genericNormalNarration(game, result) {
-  const ids = result.actorIds || [];
-  const a = ids[0] ? tag(game, ids[0]) : "**SOMEONE**";
-  const b = ids[1] ? tag(game, ids[1]) : "**SOMEONE**";
-  const c = ids[2] ? tag(game, ids[2]) : "**SOMEONE**";
-  const map = {
-    no_op: "👁️ The Arena goes unnaturally still.",
-    attack: `⚔️ ${a} attacks ${b}. Both survive the exchange.`,
-    counter: `↩️ ${a} attacks ${b}, but ${b} counters. Both remain in the Arena.`,
-    double_team: `👥 ${a} and ${b} collapse on ${c}. Somehow, everyone survives.`,
-    weapon: `🪓 ${a} finds something deeply questionable and uses it on ${b}. ${b} survives.`,
-    near_elimination: `🫳 ${a} nearly eliminates ${b}, but ${b} hangs on.`,
-    elimination: `💥 ${a} catches ${b} at exactly the wrong moment.`,
-    self_elimination: `💀 ${a} has made an extraordinarily bad decision.`
-  };
-  return map[result.type] || "👁️ The Arena erupts into chaos.";
-}
-
-function themedNormalNarration(game, theme, result) {
-  if (!theme?.normalEvents?.length) return genericNormalNarration(game, result);
-  const ids = result.actorIds || [];
-  const killer = ids[0] ? name(game, ids[0]) : "Someone";
-  const victim = ids[1] ? name(game, ids[1]) : ids[0] ? name(game, ids[0]) : "someone";
-  const useRare = theme.rareEvents?.length && Math.random() < RARE_EVENT_CHANCE;
-  const pool = useRare ? "rareEvents" : "normalEvents";
-  const picked = chooseNarration(theme, pool, { killer, victim, third: ids[2] ? name(game, ids[2]) : "someone else" }, Math.random, recentTemplates(game));
-  rememberNarration(game, picked.template);
-  let prefix = "";
-  if (useRare && theme.id === "full_tilt") prefix = "🎰 **RARE FULL TILT BULLSHIT:** ";
-  if (useRare && theme.id === "vibe_queen_slots") prefix = "📼 **SOMETHING IS VERY FUCKING WRONG:** ";
-  return `${prefix}${picked.text}`;
-}
-
-function renderBeat(game, theme, result, number) {
-  if (!result.eliminatedIds?.length) return `**${number}.** ${themedNormalNarration(game, theme, result)}`;
-  const victimId = result.eliminatedIds[0];
-  const victim = name(game, victimId);
-  if (result.type === "self_elimination") {
-    const picked = chooseNarration(theme, "selfKills", { victim }, Math.random, recentTemplates(game));
-    rememberNarration(game, picked.template);
-    return `**${number}. 💀 SELF-ELIMINATION — ${tag(game, victimId)}**\n${picked.text}\n➡️ **ELIMINATED: ${victim.toUpperCase()}**`;
-  }
-  const attackerId = result.actorIds.find(id => id !== victimId) || result.actorIds[0];
-  const killer = name(game, attackerId);
-  const thirdId = result.actorIds.find(id => id !== victimId && id !== attackerId);
-  const picked = chooseNarration(theme, "playerKills", { killer, victim, third: thirdId ? name(game, thirdId) : "someone else" }, Math.random, recentTemplates(game));
-  rememberNarration(game, picked.template);
-  return `**${number}. ⚔️ ${tag(game, attackerId)} → 💀 ${tag(game, victimId)}**\n${picked.text}\n➡️ **ELIMINATED: ${victim.toUpperCase()} — BY ${killer.toUpperCase()}**`;
-}
-
-function renderRound(game, theme, batch) {
-  const beats = (batch.outcomes || []).map((beat, i) => renderBeat(game, theme, beat, i + 1)).join("\n\n");
-  const eliminated = batch.eliminatedIds?.length ? `\n\n💀 **ROUND ELIMINATIONS: ${batch.eliminatedIds.map(id => name(game, id).toUpperCase()).join(", ")}**` : "";
-  const icon = theme.id === "full_tilt" ? "🎰" : "👻";
-  return `# ${icon} ROUND ${game.round}\n${beats}${eliminated}`;
-}
-
-function renderRevival(game, theme, result) {
-  if (result.type === "revival_skipped") return `# 🕯️ ═══ ${theme.labels.revival} ═══ 🕯️\n**REVIVAL EVENT**\n\nThere aren't two eliminated contestants available.`;
-  const winner = name(game, result.winnerId);
-  const loser = name(game, result.loserId);
-  const picked = chooseNarration(theme, "revivalDuels", { winner, loser }, Math.random, recentTemplates(game));
-  rememberNarration(game, picked.template);
-  return `# 🕯️ ═══ ${theme.labels.revival} ═══ 🕯️\n## ☠️ REVIVAL EVENT ☠️\n\n${tag(game, result.winnerId)}\n### VS\n${tag(game, result.loserId)}\n\n${picked.text}\n\n⚡ **REVIVED: ${winner.toUpperCase()}**\n💀 **REMAINS ELIMINATED: ${loser.toUpperCase()}**\n\n# ${winner.toUpperCase()} HAS RETURNED TO THE ARENA.`;
-}
-
-function renderCrowdResolution(game, theme, result, simulatedVotes = 0) {
-  const winner = name(game, result.survivorId);
-  const losers = result.eliminatedIds.map(id => name(game, id));
-  const pool = result.qualifiers.length > 2 ? "multiPins" : "pinDuels";
-  const picked = chooseNarration(theme, pool, { winner, loser: losers[0] || "someone" }, Math.random, recentTemplates(game));
-  rememberNarration(game, picked.template);
-  const simLine = simulatedVotes ? `\n🧪 **${simulatedVotes} simulated spectator votes were cast.**` : "";
-  return `# 👁️ ═══ ${theme.labels.crowdPin} ═══ 👁️${simLine}\n\n${picked.text}\n\n💀 **ELIMINATED: ${losers.map(x => x.toUpperCase()).join(", ")}**\n⚡ **SURVIVOR: ${winner.toUpperCase()}**`;
-}
-
-function remaining(game) { return `\n\n# ⚔️ ROUND ${game.round} COMPLETE — ${game.aliveIds.length} PLAYER${game.aliveIds.length === 1 ? "" : "S"} REMAIN`; }
-function winnerMessage(game, theme) { if (!game.winnerId) return `**${theme.labels.arena}** ends with nobody left standing.`; return `# 🏆 ${name(game, game.winnerId).toUpperCase()} WINS THE ARENA.\nThe lights settle. The chaos stops. One player is left.`; }
-async function finishIfNeeded(env, game, theme) { checkWinner(game); if (game.status !== "finished") return false; await saveGame(env.DB, game); await recordFinishedGame(env.DB, game); await createChannelMessage(game.channelId, env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) }); return true; }
-
-export class ArenaCoordinator {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
-  async fetch(request) {
-    const body = await request.json().catch(() => ({}));
-    if (body.channelId) await this.ctx.storage.put("channelId", body.channelId);
-    const channelId = body.channelId || await this.ctx.storage.get("channelId");
-    if (!channelId) return new Response("Missing channelId", { status: 400 });
-    if (body.action === "kick") { await this.ctx.storage.setAlarm(Date.now() + 1000); return Response.json({ ok: true }); }
-    if (body.action === "wake") { await this.ctx.storage.setAlarm(Date.now() + 250); return Response.json({ ok: true }); }
-    return Response.json({ ok: true, channelId });
-  }
-
-  async alarm() {
-    const channelId = await this.ctx.storage.get("channelId");
-    if (!channelId || !this.env.DB || !this.env.DISCORD_BOT_TOKEN) return;
-    const game = await loadActiveGameForChannel(this.env.DB, channelId);
-    if (!game || game.status !== "running") return;
-    const theme = getTheme(game.themeId);
-
-    if (game.crowdVote?.status === "open") {
-      const simulatedVotes = castSimulatedCrowdVotes(game);
-      const result = resolveCrowdVote(game);
-      await saveGame(this.env.DB, game);
-      await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: renderCrowdResolution(game, theme, result, simulatedVotes) + remaining(game) });
-      if (await finishIfNeeded(this.env, game, theme)) return;
-      await this.ctx.storage.setAlarm(Date.now() + NORMAL_DELAY_MS);
-      return;
-    }
-
-    const { phases } = beginNextRound(game);
-    if (!phases.length) {
-      if (game.status === "finished") {
-        await saveGame(this.env.DB, game);
-        await recordFinishedGame(this.env.DB, game);
-        await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: winnerMessage(game, theme) });
-      }
-      return;
-    }
-
-    const normal = resolveNormalRound(game);
-    await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: renderRound(game, theme, normal) });
-
-    if (phases.includes("revival") && specialEventsEnabled(game)) {
-      const revival = resolveRevivalPit(game);
-      await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: renderRevival(game, theme, revival) + remaining(game) });
-    } else if (phases.includes("crowd_vote") && specialEventsEnabled(game)) {
-      const vote = openCrowdVote(game);
-      if (vote) {
-        await saveGame(this.env.DB, game);
-        const simLine = game.testMode?.simulatedCrowd ? "\n\n🧪 **TEST MODE:** simulated spectators will also vote when time expires." : "";
-        const voteTitle = theme.id === "full_tilt" ? "THE FINAL BET IS OPEN" : "THE FINAL SCARE IS OPEN";
-        const voteBody = theme.id === "full_tilt" ? "Choose who gets shoved all-in against the crowd's favorite bad decision." : "Choose who gets thrown into the Final Scare.";
-        await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, {
-          content: `# 👁️ ═══ ${theme.labels.crowdVote} ═══ 👁️\n## ${voteTitle}\n\nSpectators have **30 seconds**. ${voteBody}\n\nTop two voting positions enter. A cutoff tie drags everyone tied into the fight. **ONE SURVIVES.**${simLine}`,
-          components: [{ type: 1, components: [{ type: 2, style: 4, custom_id: `arena:vote_open:${game.id}:0`, label: "CAST YOUR VOTE", emoji: { name: "👁️" } }] }]
-        });
-        await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
-        return;
-      }
-    } else {
-      await createChannelMessage(channelId, this.env.DISCORD_BOT_TOKEN, { content: remaining(game).trim() });
-    }
-
-    if (await finishIfNeeded(this.env, game, theme)) return;
-    await saveGame(this.env.DB, game);
-    await this.ctx.storage.setAlarm(Date.now() + NORMAL_DELAY_MS);
-  }
-}
+import {beginNextRound,resolveNormalRound,resolveRevivalPit,openCrowdVote,resolveCrowdVote,checkWinner,specialEventsEnabled} from "./core/engine.js";
+import {castSimulatedCrowdVotes} from "./core/simulation.js";import{loadActiveGameForChannel,saveGame,recordFinishedGame}from"./storage.js";import{createChannelMessage,deleteChannelMessage}from"./discord.js";import{getTheme,chooseNarration}from"./themes/index.js";
+const CROWD_VOTE_MS=30000,RARE_EVENT_CHANCE=.035;const name=(g,id)=>g.players[id]?.displayName||"Unknown";const tag=(g,id)=>`**${name(g,id).toUpperCase()}**`;const delayFor=n=>8000+Math.round(Math.max(0,Math.min(4,n-4))*500);
+function recent(g){return g.history.filter(x=>x?.narrationTemplate).slice(-150).map(x=>x.narrationTemplate)}function remember(g,t){if(t)g.history.push({type:"narration_used",narrationTemplate:t,round:g.round})}
+function normalText(g,t,r){const ids=r.actorIds||[],killer=ids[0]?name(g,ids[0]):"Someone",victim=ids[1]?name(g,ids[1]):killer,useRare=t.rareEvents?.length&&Math.random()<RARE_EVENT_CHANCE,pool=useRare?"rareEvents":"normalEvents",p=chooseNarration(t,pool,{killer,victim,third:ids[2]?name(g,ids[2]):"someone else"},Math.random,recent(g));remember(g,p.template);const prefix=useRare?(t.id==="full_tilt"?"🎰 **RARE FULL TILT BULLSHIT:** ":"📼 **SOMETHING IS VERY FUCKING WRONG:** "):"";return prefix+p.text;}
+function beat(g,t,r,n){if(!r.eliminatedIds?.length)return`**${n}.** ${normalText(g,t,r)}`;const vId=r.eliminatedIds[0],v=name(g,vId);if(r.type==="self_elimination"){const p=chooseNarration(t,"selfKills",{victim:v},Math.random,recent(g));remember(g,p.template);return`**${n}. 💀 SELF-ELIMINATION — ${tag(g,vId)}**\n${p.text}\n➡️ **ELIMINATED: ${v.toUpperCase()}**`;}const aId=r.actorIds.find(id=>id!==vId)||r.actorIds[0],k=name(g,aId),p=chooseNarration(t,"playerKills",{killer:k,victim:v},Math.random,recent(g));remember(g,p.template);return`**${n}. ⚔️ ${tag(g,aId)} → 💀 ${tag(g,vId)}**\n${p.text}\n➡️ **ELIMINATED: ${v.toUpperCase()} — BY ${k.toUpperCase()}**`;}
+function roundText(g,t,b){const body=b.outcomes.map((x,i)=>beat(g,t,x,i+1)).join("\n\n"),elim=b.eliminatedIds.length?`\n\n💀 **ROUND ELIMINATIONS: ${b.eliminatedIds.map(id=>name(g,id).toUpperCase()).join(", ")}**`:"";return`# ${t.id==="full_tilt"?"🎰":"👻"} ROUND ${g.round}\n${body}${elim}\n\n# ⚔️ ${g.aliveIds.length} PLAYER${g.aliveIds.length===1?"":"S"} REMAIN`;}
+function revivalText(g,t,r){if(r.type==="revival_skipped")return`# 🕯️ ${t.labels.revival}\nNot enough eliminated players are available.`;const w=name(g,r.winnerId),l=name(g,r.loserId),p=chooseNarration(t,"revivalDuels",{winner:w,loser:l},Math.random,recent(g));remember(g,p.template);return`# 🕯️ ═══ ${t.labels.revival} ═══ 🕯️\n## ${tag(g,r.winnerId)} VS ${tag(g,r.loserId)}\n${p.text}\n⚡ **REVIVED: ${w.toUpperCase()}**\n💀 **REMAINS ELIMINATED: ${l.toUpperCase()}**\n\n# ⚔️ ${g.aliveIds.length} PLAYERS REMAIN`;}
+function crowdText(g,t,r,sim=0){const w=name(g,r.survivorId),losers=r.eliminatedIds.map(id=>name(g,id)),p=chooseNarration(t,r.qualifiers.length>2?"multiPins":"pinDuels",{winner:w,loser:losers[0]||"someone"},Math.random,recent(g));remember(g,p.template);return`# 👁️ ═══ ${t.labels.crowdPin} ═══ 👁️${sim?`\n🧪 ${sim} simulated votes.`:""}\n${p.text}\n💀 **ELIMINATED: ${losers.map(x=>x.toUpperCase()).join(", ")}**\n⚡ **SURVIVOR: ${w.toUpperCase()}**\n\n# ⚔️ ${g.aliveIds.length} PLAYERS REMAIN`;}
+async function postRound(ctx,channel,token,round,message){const created=await createChannelMessage(channel,token,{content:message});const groups=await ctx.storage.get("roundMessageGroups")||[];groups.push({round,messageIds:[created?.id].filter(Boolean)});while(groups.length>2){const old=groups.shift();for(const id of old.messageIds)await deleteChannelMessage(channel,id,token);}await ctx.storage.put("roundMessageGroups",groups);return created;}
+async function appendRoundMessage(ctx,channel,token,round,message){const created=await createChannelMessage(channel,token,{content:message});const groups=await ctx.storage.get("roundMessageGroups")||[];let group=groups.find(x=>x.round===round);if(!group){group={round,messageIds:[]};groups.push(group);}if(created?.id)group.messageIds.push(created.id);while(groups.length>2){const old=groups.shift();for(const id of old.messageIds)await deleteChannelMessage(channel,id,token);}await ctx.storage.put("roundMessageGroups",groups);return created;}
+function winner(g){return`# 🏆 ${name(g,g.winnerId).toUpperCase()} WINS THE ARENA.\nThe chaos stops. One player is left.`}async function finish(env,g,t){checkWinner(g);if(g.status!=="finished")return false;await saveGame(env.DB,g);await recordFinishedGame(env.DB,g);await createChannelMessage(g.channelId,env.DISCORD_BOT_TOKEN,{content:winner(g)});return true;}
+export class ArenaCoordinator{constructor(ctx,env){this.ctx=ctx;this.env=env;}async fetch(request){const b=await request.json().catch(()=>({}));if(b.channelId)await this.ctx.storage.put("channelId",b.channelId);const c=b.channelId||await this.ctx.storage.get("channelId");if(!c)return new Response("Missing channelId",{status:400});if(b.action==="kick"){await this.ctx.storage.put("roundMessageGroups",[]);await this.ctx.storage.setAlarm(Date.now()+1000);}else if(b.action==="wake")await this.ctx.storage.setAlarm(Date.now()+250);return Response.json({ok:true});}
+async alarm(){const c=await this.ctx.storage.get("channelId");if(!c||!this.env.DB||!this.env.DISCORD_BOT_TOKEN)return;const g=await loadActiveGameForChannel(this.env.DB,c);if(!g||g.status!=="running")return;const t=getTheme(g.themeId);
+if(g.crowdVote?.status==="open"){const sim=castSimulatedCrowdVotes(g),r=resolveCrowdVote(g);await saveGame(this.env.DB,g);await appendRoundMessage(this.ctx,c,this.env.DISCORD_BOT_TOKEN,g.round,crowdText(g,t,r,sim));if(await finish(this.env,g,t))return;await this.ctx.storage.setAlarm(Date.now()+9000);return;}
+const{phases}=beginNextRound(g);if(!phases.length)return;const normal=resolveNormalRound(g);await postRound(this.ctx,c,this.env.DISCORD_BOT_TOKEN,g.round,roundText(g,t,normal));
+if(phases.includes("revival")&&specialEventsEnabled(g)){const r=resolveRevivalPit(g);await appendRoundMessage(this.ctx,c,this.env.DISCORD_BOT_TOKEN,g.round,revivalText(g,t,r));}else if(phases.includes("crowd_vote")&&specialEventsEnabled(g)){const vote=openCrowdVote(g);if(vote){await saveGame(this.env.DB,g);await appendRoundMessage(this.ctx,c,this.env.DISCORD_BOT_TOKEN,g.round,`# 👁️ ═══ ${t.labels.crowdVote} ═══ 👁️\n## ${t.id==="full_tilt"?"THE FINAL BET IS OPEN":"THE FINAL SCARE IS OPEN"}\nSpectators have **30 seconds**. Top two voting positions enter. Cutoff ties join the fight. **ONE SURVIVES.**`,);await this.ctx.storage.setAlarm(Date.now()+CROWD_VOTE_MS);return;}}
+if(await finish(this.env,g,t))return;await saveGame(this.env.DB,g);await this.ctx.storage.setAlarm(Date.now()+delayFor(normal.eventCount));}}
