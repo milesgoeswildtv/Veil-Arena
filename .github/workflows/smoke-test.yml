@@ -28,5 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Check production module syntax
+        run: |
+          node --check src/index.js
+          node --check src/coordinator.js
+          node --check src/core/engine.js
+          node --check src/themes/brawls.js
+
       - name: Run Arena smoke tests
         run: npm test
