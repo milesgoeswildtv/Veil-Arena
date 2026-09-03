@@ -5,6 +5,7 @@ import { VQS_HORROR_SEGMENT_4 } from "./vibe_queen_slots/horror-segment-4.js";
 import { VQS_HORROR_SEGMENT_5 } from "./vibe_queen_slots/horror-segment-5.js";
 import { VQS_HORROR_COMBINATORIAL } from "./vibe_queen_slots/horror-combinatorial.js";
 import { VQS_HORROR_EXPANSION } from "./vibe_queen_slots/horror-expansion.js";
+import { VQS_NORMAL_RARE } from "./vibe_queen_slots/horror-normal-rare.js";
 import { FULL_TILT_GAMBA } from "./full_tilt/gamba.js";
 import { FULL_TILT_EXPANSION } from "./full_tilt/gamba-expansion.js";
 import { FULL_TILT_MEGA } from "./full_tilt/gamba-mega.js";
@@ -34,7 +35,9 @@ const VQS_THEME = {
   selfKills: [...VQS_HORROR_COMBINATORIAL.selfKills, ...VQS_HORROR.selfKills, ...VQS_HORROR_SEGMENT_2.selfKills, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.selfKills, ...VQS_HORROR_SEGMENT_4.selfKills, ...VQS_HORROR_SEGMENT_5.selfKills],
   pinDuels: [...VQS_HORROR_COMBINATORIAL.pinDuels, ...VQS_HORROR.pinDuels, ...VQS_HORROR_SEGMENT_2.pinDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.pinDuels, ...VQS_HORROR_SEGMENT_4.pinDuels, ...VQS_HORROR_SEGMENT_5.pinDuels],
   multiPins: [...VQS_HORROR_COMBINATORIAL.multiPins, ...VQS_HORROR.multiPins, ...VQS_HORROR_SEGMENT_2.multiPins, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.multiPins, ...VQS_HORROR_SEGMENT_4.multiPins, ...VQS_HORROR_SEGMENT_5.multiPins],
-  revivalDuels: [...VQS_HORROR_COMBINATORIAL.revivalDuels, ...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.revivalDuels, ...VQS_HORROR_SEGMENT_4.revivalDuels, ...VQS_HORROR_SEGMENT_5.revivalDuels]
+  revivalDuels: [...VQS_HORROR_COMBINATORIAL.revivalDuels, ...VQS_HORROR.revivalDuels, ...VQS_HORROR_SEGMENT_2.revivalDuels, ...VQS_HORROR_SEGMENT_3_VIBE_LAIR.revivalDuels, ...VQS_HORROR_SEGMENT_4.revivalDuels, ...VQS_HORROR_SEGMENT_5.revivalDuels],
+  normalEvents: VQS_NORMAL_RARE.normalEvents,
+  rareEvents: VQS_NORMAL_RARE.rareEvents
 };
 
 const FULL_TILT_THEME = {

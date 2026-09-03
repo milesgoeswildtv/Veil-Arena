@@ -22,6 +22,7 @@ import {
   castSimulatedCrowdVotes
 } from "../src/core/simulation.js";
 import { VQS_HORROR_COMBINATORIAL_COUNT } from "../src/themes/vibe_queen_slots/horror-combinatorial.js";
+import { VQS_NORMAL_RARE_COUNT } from "../src/themes/vibe_queen_slots/horror-normal-rare.js";
 import { FULL_TILT_MEGA_COUNT } from "../src/themes/full_tilt/gamba-mega.js";
 import { getTheme, themeNarrationCount } from "../src/themes/index.js";
 
@@ -30,7 +31,15 @@ function fakePlayer(id) { return { id, username: id, displayName: id.toUpperCase
 assert.equal(SPECIAL_EVENT_CUTOFF, 5);
 assert.equal(NORMAL_OUTCOMES_PER_ROUND, 4);
 assert.equal(VQS_HORROR_COMBINATORIAL_COUNT >= 10000, true);
+assert.equal(VQS_NORMAL_RARE_COUNT, 2000);
 assert.equal(FULL_TILT_MEGA_COUNT, 5000);
+
+const vqs = getTheme("vibe_queen_slots");
+assert.equal(vqs.id, "vibe_queen_slots");
+assert.equal(themeNarrationCount(vqs) >= 12000, true);
+assert.equal(vqs.normalEvents.length >= 1500, true);
+assert.equal(vqs.rareEvents.length >= 500, true);
+
 const fullTilt = getTheme("full_tilt");
 assert.equal(fullTilt.id, "full_tilt");
 assert.equal(themeNarrationCount(fullTilt) >= 10000, true);
@@ -45,7 +54,6 @@ assert.equal(fullTilt.rareEvents.length >= 500, true);
 assert.deepEqual(getRoundPhases(3), ["normal", "revival"]);
 assert.deepEqual(getRoundPhases(5), ["normal", "crowd_vote"]);
 assert.deepEqual(getRoundPhases(15), ["normal", "revival"]);
-
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 22, c: 15 }), ["a", "b"]);
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 21, c: 21 }), ["a", "b", "c"]);
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 22, c: 22, d: 15 }), ["a", "b", "c"]);
@@ -124,4 +132,4 @@ while (paceGame.aliveIds.length > 1 && guard < 30) {
 assert.equal(paceGame.aliveIds.length, 1);
 assert.equal(paceGame.round <= 20, true);
 
-console.log(`Arena smoke tests passed. Full Tilt narration: ${themeNarrationCount(fullTilt)} outcomes. 20-player deterministic match: ${paceGame.round} rounds.`);
+console.log(`Arena smoke tests passed. VQS narration: ${themeNarrationCount(vqs)}. Full Tilt narration: ${themeNarrationCount(fullTilt)}. 20-player deterministic match: ${paceGame.round} rounds.`);

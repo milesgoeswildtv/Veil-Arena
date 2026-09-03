@@ -39,7 +39,9 @@ function themedNormalNarration(game, theme, result) {
   const pool = useRare ? "rareEvents" : "normalEvents";
   const picked = chooseNarration(theme, pool, { killer, victim, third: ids[2] ? name(game, ids[2]) : "someone else" }, Math.random, recentTemplates(game));
   rememberNarration(game, picked.template);
-  const prefix = useRare ? "🎰 **RARE FULL TILT BULLSHIT:** " : "";
+  let prefix = "";
+  if (useRare && theme.id === "full_tilt") prefix = "🎰 **RARE FULL TILT BULLSHIT:** ";
+  if (useRare && theme.id === "vibe_queen_slots") prefix = "📼 **SOMETHING IS VERY FUCKING WRONG:** ";
   return `${prefix}${picked.text}`;
 }
 
