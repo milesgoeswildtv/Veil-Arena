@@ -40,14 +40,19 @@ function registrationMessage(game) {
   if (game.testMode?.fakeContestants) testBits.push("simulated contestants");
   if (game.testMode?.simulatedCrowd) testBits.push("simulated crowd voting");
   const testLine = testBits.length ? `\n\n🧪 **TEST MODE:** ${testBits.join(" + ")}` : "";
-  return `# ${theme.labels.arena}\nRegistration is open.\n\n${playerList(game)}\n\n**${Object.keys(game.players).length} entered**${testLine}`;
+  const themeLine = `\n🎭 **THEME:** ${theme.displayName}`;
+  return `# ${theme.labels.arena}\nRegistration is open.${themeLine}\n\n${playerList(game)}\n\n**${Object.keys(game.players).length} entered**${testLine}`;
 }
 
 function registrationComponents(game) {
+  const targetTheme = game.themeId === "full_tilt" ? "vibe_queen_slots" : "full_tilt";
+  const themeLabel = targetTheme === "full_tilt" ? "TEST FULL TILT" : "TEST VQS";
+  const themeEmoji = targetTheme === "full_tilt" ? "🎰" : "👻";
   return [
     actionRow(
       button(`arena:join:${game.id}`, "ENTER ARENA", 3, false, "⚔️"),
       button(`arena:leave:${game.id}`, "LEAVE", 2),
+      button(`arena:theme:${game.id}:${targetTheme}`, themeLabel, 2, false, themeEmoji),
       button(`arena:start:${game.id}`, "START", 1, false, "▶️")
     )
   ];
@@ -145,7 +150,7 @@ async function handleArenaCommand(interaction, env) {
   const testStatus = game.testMode?.simulatedCrowd || game.testMode?.fakeContestants
     ? `\nTest mode: **${game.testMode?.fakeContestants ? "fake contestants" : ""}${game.testMode?.fakeContestants && game.testMode?.simulatedCrowd ? " + " : ""}${game.testMode?.simulatedCrowd ? "simulated crowd" : ""}**`
     : "";
-  return interactionMessage(`**Arena status**\nRound: **${game.round}**\nAlive: **${alive}**\nEliminated: **${eliminated}**\nStatus: **${game.status}**${testStatus}`, [], true);
+  return interactionMessage(`**Arena status**\nTheme: **${getTheme(game.themeId).displayName}**\nRound: **${game.round}**\nAlive: **${alive}**\nEliminated: **${eliminated}**\nStatus: **${game.status}**${testStatus}`, [], true);
 }
 
 async function handleComponent(interaction, env) {
@@ -180,6 +185,16 @@ async function handleComponent(interaction, env) {
     }
   }
 
+  if (action === "theme") {
+    if (user.id !== game.hostId) return interactionMessage("Only the Arena host can switch the test theme.", [], true);
+    if (game.status !== "registration") return interactionMessage("Themes can only be switched before the match starts.", [], true);
+    const requested = parts[3];
+    if (!["full_tilt", "vibe_queen_slots"].includes(requested)) return interactionMessage("That Arena theme is not available.", [], true);
+    game.themeId = requested;
+    await saveGame(env.DB, game);
+    return interactionUpdate(registrationMessage(game), registrationComponents(game));
+  }
+
   if (action === "start") {
     if (user.id !== game.hostId) return interactionMessage("Only the Arena host can start the game.", [], true);
     try {
@@ -195,24 +210,17 @@ async function handleComponent(interaction, env) {
   }
 
   if (action === "vote_open") {
-    if (!game.crowdVote || game.crowdVote.status !== "open") {
-      return interactionMessage("The audience vote is closed.", [], true);
-    }
-    if (game.aliveIds.includes(user.id)) {
-      return interactionMessage("You're still fighting. The audience gets this vote.", [], true);
-    }
+    if (!game.crowdVote || game.crowdVote.status !== "open") return interactionMessage("The audience vote is closed.", [], true);
+    if (game.aliveIds.includes(user.id)) return interactionMessage("You're still fighting. The audience gets this vote.", [], true);
     const requestedPage = Number(parts[3] || 0);
     const { rows, page, totalPages } = voteSelect(game, requestedPage);
-    return interactionMessage(`**Choose who enters the Final Scare.**\nPage ${page + 1}/${totalPages}\nYou may change your vote until voting closes.`, rows, true);
+    const voteName = game.themeId === "full_tilt" ? "Final Bet" : "Final Scare";
+    return interactionMessage(`**Choose who enters the ${voteName}.**\nPage ${page + 1}/${totalPages}\nYou may change your vote until voting closes.`, rows, true);
   }
 
   if (action === "vote_cast") {
-    if (!game.crowdVote || game.crowdVote.status !== "open") {
-      return interactionMessage("The audience vote is closed.", [], true);
-    }
-    if (game.aliveIds.includes(user.id)) {
-      return interactionMessage("You're still fighting. The audience gets this vote.", [], true);
-    }
+    if (!game.crowdVote || game.crowdVote.status !== "open") return interactionMessage("The audience vote is closed.", [], true);
+    if (game.aliveIds.includes(user.id)) return interactionMessage("You're still fighting. The audience gets this vote.", [], true);
     const playerId = interaction.data?.values?.[0];
     try {
       castCrowdVote(game, user.id, playerId);
@@ -231,16 +239,9 @@ async function handleDiscord(request, env) {
   const valid = await verifyDiscordRequest(request, env.DISCORD_PUBLIC_KEY, rawBody);
   if (!valid) return new Response("Bad signature", { status: 401 });
   const interaction = JSON.parse(rawBody);
-
-  if (interaction.type === InteractionType.PING) {
-    return jsonResponse({ type: InteractionResponseType.PONG });
-  }
-  if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data?.name === "arena") {
-    return handleArenaCommand(interaction, env);
-  }
-  if (interaction.type === InteractionType.MESSAGE_COMPONENT && interaction.data?.custom_id?.startsWith("arena:")) {
-    return handleComponent(interaction, env);
-  }
+  if (interaction.type === InteractionType.PING) return jsonResponse({ type: InteractionResponseType.PONG });
+  if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data?.name === "arena") return handleArenaCommand(interaction, env);
+  if (interaction.type === InteractionType.MESSAGE_COMPONENT && interaction.data?.custom_id?.startsWith("arena:")) return handleComponent(interaction, env);
   return interactionMessage("Veil doesn't know that Arena action yet.", [], true);
 }
 
@@ -257,28 +258,9 @@ async function handleRegister(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-
-    if (url.pathname === "/health") {
-      return jsonResponse({
-        ok: true,
-        service: "veil-arena",
-        status: "ready",
-        database: Boolean(env.DB),
-        coordinator: Boolean(env.ARENA_COORDINATOR),
-        discordConfigured: Boolean(env.DISCORD_PUBLIC_KEY && env.DISCORD_BOT_TOKEN && env.DISCORD_APPLICATION_ID)
-      });
-    }
-
-    if (url.pathname === "/interactions" && request.method === "POST") {
-      return handleDiscord(request, env);
-    }
-
-    if (url.pathname === "/admin/register" && request.method === "POST") {
-      return handleRegister(request, env);
-    }
-
-    return new Response("Veil Arena is online.", {
-      headers: { "content-type": "text/plain; charset=utf-8" }
-    });
+    if (url.pathname === "/health") return jsonResponse({ ok: true, service: "veil-arena", status: "ready", database: Boolean(env.DB), coordinator: Boolean(env.ARENA_COORDINATOR), discordConfigured: Boolean(env.DISCORD_PUBLIC_KEY && env.DISCORD_BOT_TOKEN && env.DISCORD_APPLICATION_ID) });
+    if (url.pathname === "/interactions" && request.method === "POST") return handleDiscord(request, env);
+    if (url.pathname === "/admin/register" && request.method === "POST") return handleRegister(request, env);
+    return new Response("Veil Arena is online.", { headers: { "content-type": "text/plain; charset=utf-8" } });
   }
 };
