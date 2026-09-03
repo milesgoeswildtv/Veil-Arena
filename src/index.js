@@ -28,8 +28,6 @@ import {
 import { getTheme } from "./themes/index.js";
 export { ArenaCoordinator } from "./coordinator.js";
 
-const TEST_GUILD_ID = "868235267188871189";
-
 function playerList(game) {
   const players = Object.values(game.players);
   if (!players.length) return "Nobody has entered yet.";
@@ -256,18 +254,6 @@ async function handleRegister(request, env) {
   return jsonResponse({ ok: true, commands });
 }
 
-async function handleTestGuildRegister(env) {
-  if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_BOT_TOKEN) {
-    return new Response("Discord credentials are missing.", { status: 500 });
-  }
-  const commands = await registerGuildCommands(env.DISCORD_APPLICATION_ID, TEST_GUILD_ID, env.DISCORD_BOT_TOKEN);
-  const arena = commands?.find?.(command => command.name === "arena");
-  const names = arena?.options?.map?.(option => option.name).join(", ") || "arena";
-  return new Response(`Arena registered to test server. Commands: ${names}\n\nYou can close this page and return to Discord.`, {
-    headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" }
-  });
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -289,12 +275,6 @@ export default {
 
     if (url.pathname === "/admin/register" && request.method === "POST") {
       return handleRegister(request, env);
-    }
-
-    // Temporary test-only convenience route. It can only register the fixed test guild above;
-    // it cannot register arbitrary servers or expose credentials.
-    if (url.pathname === "/test/register-arena" && request.method === "GET") {
-      return handleTestGuildRegister(env);
     }
 
     return new Response("Veil Arena is online.", {
