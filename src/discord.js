@@ -10,5 +10,12 @@ export function userFromInteraction(i){const m=i.member,u=m?.user||i.user;if(!u)
 export async function discordRequest(path,token,init={}){if(!token)throw new Error("DISCORD_BOT_TOKEN is not configured.");const r=await fetch(`${DISCORD_API}${path}`,{...init,headers:{authorization:`Bot ${token}`,"content-type":"application/json",...(init.headers||{})}});if(!r.ok){const t=await r.text();throw new Error(`Discord API ${r.status}: ${t}`);}return r.status===204?null:r.json();}
 export async function createChannelMessage(channelId,token,payload){return discordRequest(`/channels/${channelId}/messages`,token,{method:"POST",body:JSON.stringify({...payload,allowed_mentions:{parse:[]}})});}
 export async function deleteChannelMessage(channelId,messageId,token){if(!messageId)return;try{await discordRequest(`/channels/${channelId}/messages/${messageId}`,token,{method:"DELETE"});}catch(error){console.warn("Arena cleanup could not delete message",messageId,error?.message||error);}}
-export function arenaCommands(){return[{name:"arena",description:"Start and manage an Arena game.",type:1,options:[{name:"start",description:"Open Arena registration.",type:1},{name:"status",description:"Show the current Arena game.",type:1},{name:"cancel",description:"Cancel the current Arena game (host only).",type:1},{name:"testfill",description:"Add simulated contestants to the current lobby (host only).",type:1,options:[{name:"count",description:"How many fake contestants to add (default 20, max 50).",type:4,required:false,min_value:1,max_value:50}]},{name:"testcrowd",description:"Turn simulated spectator voting on or off (host only).",type:1,options:[{name:"enabled",description:"Whether fake spectators should vote during Crowd Vote.",type:5,required:true}]},{name:"testbrawl",description:"Force the next round to be a Mass Brawl (host QA only).",type:1}]}];}
+export function arenaCommands(){return[
+  {name:"arena",description:"Enter the Arena.",type:1,options:[
+    {name:"start",description:"Open Arena registration.",type:1},
+    {name:"rules",description:"Show the Arena rules for 30 seconds.",type:1}
+  ]},
+  {name:"arenastats",description:"View your lifetime Arena stats in this server.",type:1},
+  {name:"arenaleaderboard",description:"View the Arena leaderboard for this server.",type:1}
+];}
 export async function registerGuildCommands(appId,guildId,token){return discordRequest(`/applications/${appId}/guilds/${guildId}/commands`,token,{method:"PUT",body:JSON.stringify(arenaCommands())});}
