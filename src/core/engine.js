@@ -5,7 +5,7 @@ const EVENT_WEIGHTS = [
 ];
 export const SPECIAL_EVENT_CUTOFF = 5;
 export const MIN_NORMAL_OUTCOMES_PER_ROUND = 4;
-export const MAX_NORMAL_OUTCOMES_PER_ROUND = 8;
+export const MAX_NORMAL_OUTCOMES_PER_ROUND = 4;
 const randomIndex=(length,rng=Math.random)=>Math.floor(rng()*length);
 const pick=(list,rng=Math.random)=>list?.length?list[randomIndex(list.length,rng)]:null;
 function uniqueRandom(list,count,rng=Math.random){const pool=[...list],out=[];while(pool.length&&out.length<count)out.push(pool.splice(randomIndex(pool.length,rng),1)[0]);return out;}
