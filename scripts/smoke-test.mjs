@@ -22,17 +22,28 @@ import {
   castSimulatedCrowdVotes
 } from "../src/core/simulation.js";
 import { VQS_HORROR_COMBINATORIAL_COUNT } from "../src/themes/vibe_queen_slots/horror-combinatorial.js";
+import { FULL_TILT_MEGA_COUNT } from "../src/themes/full_tilt/gamba-mega.js";
+import { getTheme, themeNarrationCount } from "../src/themes/index.js";
 
-function fakePlayer(id) {
-  return { id, username: id, displayName: id.toUpperCase() };
-}
+function fakePlayer(id) { return { id, username: id, displayName: id.toUpperCase() }; }
 
 assert.equal(SPECIAL_EVENT_CUTOFF, 5);
 assert.equal(NORMAL_OUTCOMES_PER_ROUND, 4);
 assert.equal(VQS_HORROR_COMBINATORIAL_COUNT >= 10000, true);
+assert.equal(FULL_TILT_MEGA_COUNT, 5000);
+const fullTilt = getTheme("full_tilt");
+assert.equal(fullTilt.id, "full_tilt");
+assert.equal(themeNarrationCount(fullTilt) >= 10000, true);
+assert.equal(fullTilt.playerKills.length >= 7000, true);
+assert.equal(fullTilt.selfKills.length >= 1900, true);
+assert.equal(fullTilt.pinDuels.length >= 1000, true);
+assert.equal(fullTilt.revivalDuels.length >= 1000, true);
+assert.equal(fullTilt.multiPins.length >= 500, true);
+assert.equal(fullTilt.normalEvents.length >= 1000, true);
+assert.equal(fullTilt.rareEvents.length >= 500, true);
+
 assert.deepEqual(getRoundPhases(3), ["normal", "revival"]);
 assert.deepEqual(getRoundPhases(5), ["normal", "crowd_vote"]);
-// Overlap rounds intentionally favor Revival instead of stacking both specials.
 assert.deepEqual(getRoundPhases(15), ["normal", "revival"]);
 
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 22, c: 15 }), ["a", "b"]);
@@ -40,8 +51,6 @@ assert.deepEqual(getCrowdQualifiers({ a: 22, b: 21, c: 21 }), ["a", "b", "c"]);
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 22, c: 22, d: 15 }), ["a", "b", "c"]);
 assert.deepEqual(getCrowdQualifiers({ a: 22, b: 22, c: 22, d: 22 }), ["a", "b", "c", "d"]);
 
-// Every normal round produces four beats unless a winner is reached first,
-// and must eliminate at least one contestant while two or more are alive.
 const roundGame = createGame({ guildId: "g", channelId: "round", hostId: "p1" });
 for (let i = 1; i <= 20; i++) addPlayer(roundGame, fakePlayer(`p${i}`));
 startGame(roundGame);
@@ -52,7 +61,6 @@ assert.equal(batch.outcomes.length, 4);
 assert.equal(batch.eliminatedIds.length >= 1, true);
 assert.equal(roundGame.aliveIds.length <= 19, true);
 
-// Crowd Vote remains active above the final five.
 const game = createGame({ guildId: "g", channelId: "c", hostId: "a" });
 for (const id of ["a", "b", "c", "d", "e", "f"]) addPlayer(game, fakePlayer(id));
 startGame(game);
@@ -65,7 +73,6 @@ assert.equal(crowd.survivorId, "a");
 assert.equal(game.players.b.alive, false);
 assert.equal(game.players.c.alive, false);
 
-// At five remaining, all special events are off.
 const finalFive = createGame({ guildId: "g", channelId: "f5", hostId: "a" });
 for (const id of ["a", "b", "c", "d", "e", "f", "g"]) addPlayer(finalFive, fakePlayer(id));
 startGame(finalFive);
@@ -78,7 +85,6 @@ const skippedRevival = resolveRevivalPit(finalFive, () => 0);
 assert.equal(skippedRevival.type, "revival_skipped");
 assert.equal(skippedRevival.reason, "final_five");
 
-// Revival Pit works normally while six or more remain.
 const revivalGame = createGame({ guildId: "g", channelId: "r", hostId: "a" });
 for (const id of ["a", "b", "c", "d", "e", "f", "g", "h"]) addPlayer(revivalGame, fakePlayer(id));
 startGame(revivalGame);
@@ -90,7 +96,6 @@ assert.equal(revival.type, "revival_pit");
 assert.equal(revivalGame.players[revival.winnerId].alive, true);
 assert.equal(revivalGame.aliveIds.length, 7);
 
-// Test mode can populate a lobby and generate synthetic spectator votes.
 const simGame = createGame({ guildId: "g", channelId: "sim", hostId: "host" });
 addPlayer(simGame, fakePlayer("host"));
 const added = addFakeContestants(simGame, 12);
@@ -106,7 +111,6 @@ assert.equal(Object.values(simGame.crowdVote.totals).reduce((sum, votes) => sum 
 const simCrowd = resolveCrowdVote(simGame, () => 0);
 assert.equal(simCrowd.qualifiers.length >= 2, true);
 
-// Deterministic end-to-end pacing sanity: a 20-player game cannot drift remotely close to 83 rounds.
 const paceGame = createGame({ guildId: "g", channelId: "pace", hostId: "p1" });
 for (let i = 1; i <= 20; i++) addPlayer(paceGame, fakePlayer(`p${i}`));
 startGame(paceGame);
@@ -120,4 +124,4 @@ while (paceGame.aliveIds.length > 1 && guard < 30) {
 assert.equal(paceGame.aliveIds.length, 1);
 assert.equal(paceGame.round <= 20, true);
 
-console.log(`Arena smoke tests passed. 20-player deterministic match finished in ${paceGame.round} rounds.`);
+console.log(`Arena smoke tests passed. Full Tilt narration: ${themeNarrationCount(fullTilt)} outcomes. 20-player deterministic match: ${paceGame.round} rounds.`);
