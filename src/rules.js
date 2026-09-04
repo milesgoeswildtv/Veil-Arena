@@ -16,7 +16,7 @@ Every **7th round** while special events are active, two eliminated players can 
 ## 👁️ THE DEGENS CHOOSE — CROWD VOTE
 Every **5th round** while special events are active, the audience gets involved. **Spectators and eliminated players can press CAST YOUR VOTE and choose who gets thrown into the fight.** Active fighters cannot vote.
 
-The top two voting positions enter. If the cutoff is tied, everybody tied at that position gets dragged in too. **Only one survives.** Crowd Vote takes the entire round.
+The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** Crowd Vote takes the entire round.
 
 Special rounds stop once the Arena reaches the **Final Five**.
 
@@ -43,7 +43,7 @@ Every **7th round** while special events are active, the Veil can open for two e
 ## 👁️ THE AUDIENCE CHOOSES — FINAL SCARE
 Every **5th round** while special events are active, the house turns toward the audience. **Spectators and eliminated players can press CAST YOUR VOTE and choose who gets sent into the Final Scare.** Active fighters cannot vote.
 
-The top two voting positions enter. If the cutoff is tied, every player tied there gets pulled in too. **Only one survives.** The vote takes the entire round.
+The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The vote takes the entire round.
 
 Special rounds stop once the Arena reaches the **Final Five**.
 
