@@ -93,6 +93,18 @@ export async function loadActiveGameForChannel(db, channelId) {
   return row ? JSON.parse(row.state_json) : null;
 }
 
+export async function loadFinishedGameForGuild(db, guildId, offset = 0) {
+  if (!db) throw new Error("D1 binding DB is not configured.");
+  const safeOffset = Math.max(0, Math.floor(Number(offset) || 0));
+  const row = await db.prepare(`
+    SELECT state_json FROM games
+    WHERE guild_id = ? AND status = 'finished'
+    ORDER BY updated_at DESC, created_at DESC
+    LIMIT 1 OFFSET ?
+  `).bind(guildId, safeOffset).first();
+  return row ? JSON.parse(row.state_json) : null;
+}
+
 export async function getGuildConfig(db, guildId) {
   if (!db) throw new Error("D1 binding DB is not configured.");
   const row = await db.prepare("SELECT guild_id, theme_id FROM guild_config WHERE guild_id = ?").bind(guildId).first();
