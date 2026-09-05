@@ -9,6 +9,7 @@ export function button(customId,label,style=2,disabled=false,emoji=null){const c
 export function userFromInteraction(i){const m=i.member,u=m?.user||i.user;if(!u)return null;return{id:u.id,username:u.username,displayName:m?.nick||u.global_name||u.username,avatarUrl:u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`:null};}
 export async function discordRequest(path,token,init={}){if(!token)throw new Error("DISCORD_BOT_TOKEN is not configured.");const r=await fetch(`${DISCORD_API}${path}`,{...init,headers:{authorization:`Bot ${token}`,"content-type":"application/json",...(init.headers||{})}});if(!r.ok){const t=await r.text();throw new Error(`Discord API ${r.status}: ${t}`);}return r.status===204?null:r.json();}
 export async function createChannelMessage(channelId,token,payload){return discordRequest(`/channels/${channelId}/messages`,token,{method:"POST",body:JSON.stringify({...payload,allowed_mentions:{parse:[]}})});}
+export async function createChannelTextFile(channelId,token,filename,text,content=""){if(!token)throw new Error("DISCORD_BOT_TOKEN is not configured.");const form=new FormData();form.append("payload_json",JSON.stringify({content,allowed_mentions:{parse:[]},attachments:[{id:0,filename,description:"Arena match narration log"}]}));form.append("files[0]",new Blob([String(text||"")],{type:"text/plain;charset=utf-8"}),filename);const r=await fetch(`${DISCORD_API}/channels/${channelId}/messages`,{method:"POST",headers:{authorization:`Bot ${token}`},body:form});if(!r.ok){const t=await r.text();throw new Error(`Discord API ${r.status}: ${t}`);}return r.json();}
 export async function deleteChannelMessage(channelId,messageId,token){if(!messageId)return;try{await discordRequest(`/channels/${channelId}/messages/${messageId}`,token,{method:"DELETE"});}catch(error){console.warn("Arena cleanup could not delete message",messageId,error?.message||error);}}
 export function arenaCommands(){return[
   {name:"arena",description:"Enter the Arena.",type:1,options:[
@@ -16,6 +17,9 @@ export function arenaCommands(){return[
     {name:"rules",description:"Show the Arena rules for 30 seconds.",type:1}
   ]},
   {name:"arenastats",description:"View your lifetime Arena stats in this server.",type:1},
-  {name:"arenaleaderboard",description:"View the Arena leaderboard for this server.",type:1}
+  {name:"arenaleaderboard",description:"View the Arena leaderboard for this server.",type:1},
+  {name:"arenalog",description:"Download narration from a completed Arena match.",type:1,options:[
+    {name:"match",description:"1 = latest match, 2 = previous match, etc.",type:4,required:false,min_value:1,max_value:100}
+  ]}
 ];}
 export async function registerGuildCommands(appId,guildId,token){return discordRequest(`/applications/${appId}/guilds/${guildId}/commands`,token,{method:"PUT",body:JSON.stringify(arenaCommands())});}
