@@ -1,10 +1,11 @@
-import { addPlayer, removePlayer, startGame, castCrowdVote } from "./core/engine.js";
+import { addPlayer, startGame } from "./core/engine.js";
 import { ensureSchema, loadGame, saveGame } from "./storage.js";
 import { getTheme } from "./themes/index.js";
 import { userFromTelegram, telegramUserInChat, editTelegramMessage, telegramArenaLauncherKeyboard } from "./telegram.js";
 
 const encoder = new TextEncoder();
 const MAX_INIT_DATA_AGE_SECONDS = 24 * 60 * 60;
+let miniSchemaReady = false;
 
 function bytesToHex(bytes) {
   return [...new Uint8Array(bytes)].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -79,6 +80,21 @@ function json(data, status = 200) {
   });
 }
 
+async function ensureMiniAppSchema(db) {
+  await ensureSchema(db);
+  if (miniSchemaReady) return;
+  await db.prepare(`CREATE TABLE IF NOT EXISTS arena_registrations (
+    game_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    username TEXT,
+    joined_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (game_id, user_id)
+  )`).run();
+  await db.prepare("CREATE INDEX IF NOT EXISTS idx_arena_registrations_game ON arena_registrations(game_id, joined_at)").run();
+  miniSchemaReady = true;
+}
+
 function playerView(game) {
   return Object.values(game.players).map(p => ({
     id: p.id,
@@ -136,11 +152,37 @@ async function authenticatedRequest(request, env) {
   return auth;
 }
 
+async function hydrateRegistrationPlayers(db, game) {
+  if (game.status !== "registration") return game;
+  const rows = await db.prepare(`
+    SELECT user_id, display_name, username
+    FROM arena_registrations
+    WHERE game_id = ?
+    ORDER BY joined_at ASC
+  `).bind(game.id).all();
+  const hydrated = JSON.parse(JSON.stringify(game));
+  for (const row of rows?.results || []) {
+    const id = String(row.user_id);
+    if (hydrated.players[id]) continue;
+    hydrated.players[id] = {
+      id,
+      displayName: row.display_name || row.username || `Telegram ${id}`,
+      username: row.username || null,
+      alive: true,
+      eliminations: 0,
+      revivals: 0,
+      crowdPinsSurvived: 0
+    };
+    if (!hydrated.aliveIds.includes(id)) hydrated.aliveIds.push(id);
+  }
+  return hydrated;
+}
+
 async function loadTelegramGame(env, gameId) {
-  await ensureSchema(env.DB);
+  await ensureMiniAppSchema(env.DB);
   const game = await loadGame(env.DB, gameId);
   if (!game || game.platform !== "telegram" || game.themeId !== "dwallet") throw new Error("That DWallet Arena no longer exists.");
-  return game;
+  return hydrateRegistrationPlayers(env.DB, game);
 }
 
 function assertRequestedGameMatchesLaunch(auth, gameId) {
@@ -155,6 +197,128 @@ function assertChatInstance(game, auth) {
 async function verifyGroupMember(env, game, userId) {
   const ok = await telegramUserInChat(game.channelId, userId, env.TELEGRAM_BOT_TOKEN);
   if (!ok) throw new Error("Only members of this Telegram group can interact with its Arena. Veil should be an admin in the group so membership can be verified reliably.");
+}
+
+async function bindChatInstance(env, game, auth) {
+  if (game.telegramChatInstance) {
+    assertChatInstance(game, auth);
+    return game;
+  }
+  if (!auth.chatInstance) throw new Error("Telegram did not provide the group context. Reopen Arena from its DWallet group message.");
+  await env.DB.prepare(`
+    UPDATE games
+    SET state_json = json_set(state_json, '$.telegramChatInstance', ?), updated_at = CURRENT_TIMESTAMP
+    WHERE id = ? AND json_extract(state_json, '$.telegramChatInstance') IS NULL
+  `).bind(auth.chatInstance, game.id).run();
+  const rebound = await loadTelegramGame(env, game.id);
+  assertChatInstance(rebound, auth);
+  return rebound;
+}
+
+async function registerPlayerAtomic(env, game, user) {
+  if (game.status !== "registration") throw new Error("Registration is closed.");
+  if (game.players[user.id]) return game;
+  const result = await env.DB.prepare(`
+    INSERT OR IGNORE INTO arena_registrations (game_id, user_id, display_name, username)
+    SELECT ?, ?, ?, ?
+    FROM games
+    WHERE id = ? AND status = 'registration'
+  `).bind(game.id, user.id, user.displayName, user.username || null, game.id).run();
+  if (!result?.meta?.changes) {
+    const refreshed = await loadTelegramGame(env, game.id);
+    if (!refreshed.players[user.id]) throw new Error("Registration just closed.");
+    return refreshed;
+  }
+  return loadTelegramGame(env, game.id);
+}
+
+async function leaveRegistrationAtomic(env, game, userId) {
+  if (game.status !== "registration") throw new Error("Registration is closed.");
+  if (userId === game.hostId) throw new Error("The Arena host cannot leave registration.");
+  await env.DB.prepare(`
+    DELETE FROM arena_registrations
+    WHERE game_id = ? AND user_id = ?
+      AND EXISTS (SELECT 1 FROM games WHERE id = ? AND status = 'registration')
+  `).bind(game.id, userId, game.id).run();
+  return loadTelegramGame(env, game.id);
+}
+
+async function startRegistrationAtomic(env, game, userId) {
+  if (userId !== game.hostId) throw new Error("Only the Arena host can start the game.");
+  const claim = await env.DB.prepare(`
+    UPDATE games SET status = 'starting', updated_at = CURRENT_TIMESTAMP
+    WHERE id = ? AND status = 'registration'
+  `).bind(game.id).run();
+  if (!claim?.meta?.changes) throw new Error("Arena is already starting or registration is closed.");
+
+  try {
+    const stored = await loadGame(env.DB, game.id);
+    const hydrated = await hydrateRegistrationPlayers(env.DB, stored);
+    if (game.telegramChatInstance) hydrated.telegramChatInstance = game.telegramChatInstance;
+    startGame(hydrated);
+    await saveGame(env.DB, hydrated);
+    await env.DB.prepare("DELETE FROM arena_registrations WHERE game_id = ?").bind(game.id).run();
+    return hydrated;
+  } catch (error) {
+    await env.DB.prepare(`UPDATE games SET status = 'registration', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'starting'`).bind(game.id).run();
+    throw error;
+  }
+}
+
+function telegramIdPath(root, id) {
+  const safe = String(id || "");
+  if (!/^\d+$/.test(safe)) throw new Error("Invalid Telegram player id.");
+  return `${root}."${safe}"`;
+}
+
+async function castCrowdVoteAtomic(env, game, voterId, targetId) {
+  const vote = game.crowdVote;
+  if (!vote || vote.status !== "open") throw new Error("The community vote is closed.");
+  const now = Date.now();
+  if (vote.closesAt && now >= vote.closesAt) throw new Error("Voting time is up.");
+  if (game.aliveIds.includes(voterId)) throw new Error("You're still fighting. Spectators get this vote.");
+  if (!vote.eligibleIds.includes(targetId) || !game.players[targetId]?.alive) throw new Error("That player is not available for this vote.");
+
+  const previous = vote.votesBySpectator?.[voterId] || null;
+  if (previous === targetId) return game;
+
+  const voterPath = telegramIdPath("$.crowdVote.votesBySpectator", voterId);
+  const targetTotalPath = telegramIdPath("$.crowdVote.totals", targetId);
+  let result;
+  if (previous) {
+    const previousTotalPath = telegramIdPath("$.crowdVote.totals", previous);
+    result = await env.DB.prepare(`
+      UPDATE games
+      SET state_json = json_set(
+        state_json,
+        ?, ?,
+        ?, COALESCE(json_extract(state_json, ?), 0) + 1,
+        ?, MAX(COALESCE(json_extract(state_json, ?), 0) - 1, 0)
+      ), updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'running'
+        AND json_extract(state_json, '$.crowdVote.status') = 'open'
+        AND COALESCE(CAST(json_extract(state_json, '$.crowdVote.closesAt') AS INTEGER), ?) > ?
+    `).bind(
+      voterPath, targetId,
+      targetTotalPath, targetTotalPath,
+      previousTotalPath, previousTotalPath,
+      game.id, now + 1, now
+    ).run();
+  } else {
+    result = await env.DB.prepare(`
+      UPDATE games
+      SET state_json = json_set(
+        state_json,
+        ?, ?,
+        ?, COALESCE(json_extract(state_json, ?), 0) + 1
+      ), updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'running'
+        AND json_extract(state_json, '$.crowdVote.status') = 'open'
+        AND COALESCE(CAST(json_extract(state_json, '$.crowdVote.closesAt') AS INTEGER), ?) > ?
+    `).bind(voterPath, targetId, targetTotalPath, targetTotalPath, game.id, now + 1, now).run();
+  }
+  if (!result?.meta?.changes) throw new Error("Voting time is up.");
+  return loadTelegramGame(env, game.id);
 }
 
 async function updateLauncherForStartedGame(env, game) {
@@ -188,32 +352,23 @@ export async function handleMiniAppAction(request, env, kickCoordinator) {
     const action = String(body.action || "");
     if (!gameId || !action) return json({ ok: false, error: "Missing Arena action." }, 400);
     assertRequestedGameMatchesLaunch(auth, gameId);
-    const game = await loadTelegramGame(env, gameId);
+
+    let game = await loadTelegramGame(env, gameId);
     assertChatInstance(game, auth);
     await verifyGroupMember(env, game, auth.user.id);
-    if (!game.telegramChatInstance && auth.chatInstance) game.telegramChatInstance = auth.chatInstance;
+    game = await bindChatInstance(env, game, auth);
 
     if (action === "join") {
-      addPlayer(game, auth.user);
-      await saveGame(env.DB, game);
+      game = await registerPlayerAtomic(env, game, auth.user);
     } else if (action === "leave") {
-      if (auth.user.id === game.hostId) throw new Error("The Arena host cannot leave registration.");
-      removePlayer(game, auth.user.id);
-      await saveGame(env.DB, game);
+      game = await leaveRegistrationAtomic(env, game, auth.user.id);
     } else if (action === "start") {
-      if (auth.user.id !== game.hostId) throw new Error("Only the Arena host can start the game.");
-      startGame(game);
-      await saveGame(env.DB, game);
+      game = await startRegistrationAtomic(env, game, auth.user.id);
       await updateLauncherForStartedGame(env, game);
       await kickCoordinator(env, game.channelId, "kick", "telegram");
     } else if (action === "vote") {
-      if (!game.crowdVote || game.crowdVote.status !== "open") throw new Error("The community vote is closed.");
-      if (game.crowdVote.closesAt && Date.now() >= game.crowdVote.closesAt) throw new Error("Voting time is up.");
-      if (game.aliveIds.includes(auth.user.id)) throw new Error("You're still fighting. Spectators get this vote.");
       const targetId = String(body.targetId || "");
-      if (!game.players[targetId]?.alive) throw new Error("That player is not available for this vote.");
-      castCrowdVote(game, auth.user.id, targetId);
-      await saveGame(env.DB, game);
+      game = await castCrowdVoteAtomic(env, game, auth.user.id, targetId);
     } else {
       throw new Error("Unknown Arena action.");
     }
@@ -247,7 +402,7 @@ button{appearance:none;border:0;border-radius:14px;padding:13px 15px;font-size:1
 const tg=window.Telegram?.WebApp;const root=document.getElementById('app');
 if(tg){tg.ready();tg.expand();try{tg.requestFullscreen?.()}catch{};try{tg.setHeaderColor?.('#09070f');tg.setBackgroundColor?.('#09070f')}catch{}}
 const initData=tg?.initData||'';const unsafe=tg?.initDataUnsafe||{};const qs=new URLSearchParams(location.search);const start=unsafe.start_param||qs.get('tgWebAppStartParam')||'';const gameId=start.startsWith('arena_')?start.slice(6):'';
-let state=null,busy=false;
+let state=null,busy=false,pollHandle=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=s=>String(s||'').replace(/~~/g,'').replace(/\*\*\*/g,'').replace(/\*\*/g,'').replace(/^#{1,2}\\s+/gm,'').replace(/\\\\\./g,'.');
 const api=async(path,opts={})=>{const r=await fetch(path,{...opts,headers:{'content-type':'application/json','x-telegram-init-data':initData,...(opts.headers||{})}});const j=await r.json().catch(()=>({ok:false,error:'Bad server response'}));if(!j.ok)throw new Error(j.error||'Arena request failed');return j};
@@ -257,14 +412,17 @@ function playerName(id){return state?.players?.find(p=>p.id===id)?.displayName||
 function latestLogs(){return(state?.displayLog||[]).slice().reverse()}
 function render(){if(!state){root.innerHTML='<div class="empty pulse">Syncing Arena…</div>';return}const me=state.viewer;const players=[...(state.players||[])].sort((a,b)=>Number(b.alive)-Number(a.alive)||a.displayName.localeCompare(b.displayName));let html='<div class="top"><div class="brand">DWALLET • VEIL</div><div class="title">'+esc(state.title)+'</div><div class="stats"><div class="stat"><b>'+state.round+'</b><span>ROUND</span></div><div class="stat"><b>'+state.aliveCount+'</b><span>ALIVE</span></div><div class="stat"><b>'+state.playerCount+'</b><span>ENTERED</span></div></div></div>';
 if(state.status==='registration'){html+='<div class="card"><h2>⚔️ Registration Open</h2><div class="muted">Join here. The DWallet group stays clean while Arena runs in this window.</div><div class="actions" style="margin-top:14px">';if(!me.joined)html+='<button onclick="act(\'join\')">ENTER ARENA</button>';else if(!me.isHost)html+='<button class="secondary" onclick="act(\'leave\')">LEAVE</button>';if(me.isHost)html+='<button onclick="act(\'start\')">START ARENA</button>';html+='</div></div>'}
-if(state.crowdVote){const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt||Date.now())-Date.now())/1000));html+='<div class="card"><div class="round">THE CHAT CHOOSES</div><div class="countdown">'+left+'s</div><h2>👁️ Community Showdown</h2>';if(me.canVote){html+='<div class="muted" style="margin-bottom:10px">Tap a player. You can change your vote until the timer ends.</div><div class="voteGrid">';for(const id of state.crowdVote.eligibleIds){const selected=state.crowdVote.voteTargetId===id?' selected':'';html+='<button class="'+selected+'" onclick="vote(\''+esc(id)+'\')">'+esc(playerName(id))+(selected?' ✓':'')+'</button>'}html+='</div>'}else html+='<div class="muted">You are still fighting or voting time has ended. Spectators and eliminated players control this vote.</div>';html+='</div>'}
+if(state.crowdVote){const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt||Date.now())-Date.now())/1000));html+='<div class="card"><div class="round">THE CHAT CHOOSES</div><div class="countdown" id="voteCountdown">'+left+'s</div><h2>👁️ Community Showdown</h2>';if(me.canVote){html+='<div class="muted" style="margin-bottom:10px">Tap a player. You can change your vote until the timer ends.</div><div class="voteGrid">';for(const id of state.crowdVote.eligibleIds){const selected=state.crowdVote.voteTargetId===id?' selected':'';html+='<button class="'+selected+'" onclick="vote(\''+esc(id)+'\')">'+esc(playerName(id))+(selected?' ✓':'')+'</button>'}html+='</div>'}else html+='<div class="muted">You are still fighting or voting time has ended. Spectators and eliminated players control this vote.</div>';html+='</div>'}
 if(state.status==='finished'){html+='<div class="card winner"><div class="crown">🏆</div><h2>'+esc(playerName(state.winnerId))+' WINS</h2><div class="muted">The Arena is closed. The group cooldown has begun.</div></div>'}
 if(state.status!=='registration'&&(state.displayLog||[]).length){html+='<div class="card"><h3>LIVE ARENA</h3>';for(const item of latestLogs()){html+='<div class="player" style="display:block"><div class="round">ROUND '+esc(item.round)+'</div><div class="log">'+esc(clean(item.text))+'</div></div>'}html+='</div>'}
 html+='<div class="card"><h3>'+(state.status==='registration'?'PLAYERS':'ROSTER')+'</h3>';if(!players.length)html+='<div class="empty">Nobody entered yet.</div>';for(const p of players){html+='<div class="player '+(p.alive?'':'dead')+'"><div><div class="name">'+esc(p.displayName)+(p.id===state.hostId?' 👑':'')+'</div><div class="muted" style="font-size:11px">'+p.eliminations+' kills • '+p.revivals+' revives</div></div><span class="tag">'+(p.alive?'ACTIVE':'OUT')+'</span></div>'}html+='</div>';root.innerHTML=html}
 async function refresh(){if(!gameId||!initData){root.innerHTML='<div class="error">Open this Arena from Veil’s button inside the DWallet Telegram group.</div>';return}try{const j=await api('/telegram/miniapp/state?game='+encodeURIComponent(gameId));state=j.state;render()}catch(e){root.innerHTML='<div class="error">'+esc(e.message)+'</div>'}}
+function nextPollDelay(){const jitter=Math.floor(Math.random()*900);if(document.hidden)return 12000+jitter;if(state?.crowdVote)return 1400+jitter;if(state?.status==='registration')return 4200+jitter;if(state?.status==='running')return 3000+jitter;return 10000+jitter}
+async function poll(){await refresh();clearTimeout(pollHandle);pollHandle=setTimeout(poll,nextPollDelay())}
+function tickCountdown(){const el=document.getElementById('voteCountdown');if(!el||!state?.crowdVote?.closesAt)return;const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt)-Date.now())/1000));el.textContent=left+'s'}
 window.act=async action=>{if(busy)return;busy=true;haptic('medium');try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action})});state=j.state;render()}catch(e){notify(e.message)}finally{busy=false}};
 window.vote=async targetId=>{if(busy)return;busy=true;haptic('light');try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action:'vote',targetId})});state=j.state;render()}catch(e){notify(e.message)}finally{busy=false}};
-refresh();setInterval(refresh,1200);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+poll();setInterval(tickCountdown,250);document.addEventListener('visibilitychange',()=>{if(!document.hidden){clearTimeout(pollHandle);poll()}});
 </script>
 </body>
 </html>`;
