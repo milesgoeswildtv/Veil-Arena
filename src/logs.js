@@ -55,9 +55,16 @@ function reconstructedLog(game){
   return rounds.join("\n\n");
 }
 
+function logTitle(game){
+  const theme=getTheme(game.themeId);
+  if(theme.id==="dwallet")return"DWALLET ARENA — MATCH LOG";
+  if(theme.id==="vibe_queen_slots")return"VIBE QUEEN SLOTS — HAUNTED ARENA MATCH LOG";
+  return"FULL TILT ARENA — MATCH LOG";
+}
+
 export function buildArenaLog(game,matchNumber=1){
   const winner=game.winnerId?playerName(game,game.winnerId):"No winner";
-  const header=["FULL TILT ARENA — MATCH LOG",`Match selection: ${matchNumber} (${matchNumber===1?"latest completed":"completed matches ago: "+(matchNumber-1)})`,`Game ID: ${game.id}`,`Players: ${Object.keys(game.players||{}).length}`,`Rounds: ${game.round||0}`,`Winner: ${winner}`,""];
+  const header=[logTitle(game),`Match selection: ${matchNumber} (${matchNumber===1?"latest completed":"completed matches ago: "+(matchNumber-1)})`,`Game ID: ${game.id}`,`Players: ${Object.keys(game.players||{}).length}`,`Rounds: ${game.round||0}`,`Winner: ${winner}`,""];
   const exact=Array.isArray(game.displayLog)&&game.displayLog.length;
   const body=exact?game.displayLog.map(x=>plain(x.text)).join("\n\n"):reconstructedLog(game);
   return header.join("\n")+body+`\n\nWINNER\n${winner.toUpperCase()} WINS THE ARENA.`;
