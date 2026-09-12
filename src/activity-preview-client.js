@@ -11,6 +11,7 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
   let timers = [];
   let voteTimer = null;
   let sequence = false;
+  let sequenceTimer = null;
 
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
   function clearFx(){
@@ -21,6 +22,11 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
     locationEl.textContent = 'LOCATION // DWALLET HQ';
     sys.textContent = 'SYSTEM NOMINAL';
     hapticEl.textContent = 'IDLE';
+  }
+  function stopSequence(){
+    sequence = false;
+    if (sequenceTimer) clearTimeout(sequenceTimer);
+    sequenceTimer = null;
   }
   function haptic(type){ hapticEl.textContent = type.toUpperCase(); flash('TELEGRAM HAPTIC // ' + type.toUpperCase()); }
   function flash(text){ toast.textContent = text; toast.classList.add('show'); later(() => toast.classList.remove('show'), 900); }
@@ -38,7 +44,7 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
   function brawl(){
     clearFx(); shell.classList.add('lockdown'); locationEl.textContent='LOCATION // HQ LOCKDOWN'; sys.textContent='SECURITY OVERRIDE'; haptic('heavy');
     panel('⚠ DWALLET HQ SECURITY OVERRIDE','MASS BRAWL','Six players have been dragged into the same problem.','<div class="chips"><span class="chip">SAM</span><span class="chip">CREK</span><span class="chip">PEACH</span><span class="chip">KASS</span><span class="chip">RUBY</span><span class="chip">ZERO</span></div>');
-    later(()=>{ overlay.querySelector('.chips').innerHTML='<span class="chip live">SAM</span><span class="chip dead">CREK</span><span class="chip live">PEACH</span><span class="chip dead">KASS</span><span class="chip live">RUBY</span><span class="chip dead">ZERO</span>'; haptic('heavy'); },1400);
+    later(()=>{ const chips=overlay.querySelector('.chips'); if(chips) chips.innerHTML='<span class="chip live">SAM</span><span class="chip dead">CREK</span><span class="chip live">PEACH</span><span class="chip dead">KASS</span><span class="chip live">RUBY</span><span class="chip dead">ZERO</span>'; haptic('heavy'); },1400);
     later(()=>panel('HQ LOCKDOWN // COMPLETE','3 SURVIVORS','The doors unlock. Barely.','<div class="chips"><span class="chip live">SAM</span><span class="chip live">PEACH</span><span class="chip live">RUBY</span></div>'),2600);
   }
   function vote(){
@@ -60,7 +66,7 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
   }
   function crek(){
     clearFx(); locationEl.textContent="LOCATION // CREK'S LAIR"; sys.textContent='MONITOR TAKEOVER'; haptic('medium');
-    const monitors=Array.from({length:9},(_,i)=>'<div class="monitor '+([1,4,7].includes(i)?'hot':'')+'">FEED '+String(i+1).padStart(2,'0')+'<br>'+(i===4?'CREK ME UP':'TRACKING')</div>').join('');
+    const monitors=Array.from({length:9},(_,i)=>'<div class="monitor '+([1,4,7].includes(i)?'hot':'')+'">FEED '+String(i+1).padStart(2,'0')+'<br>'+(i===4?'CREK ME UP':'TRACKING')+'</div>').join('');
     panel('🖥 DWALLET HQ SUBSYSTEM',"CREK'S LAIR",'All feeds have snapped onto the Arena.','<div class="monitorGrid">'+monitors+'</div>');
   }
   function peach(){
@@ -80,10 +86,32 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
     panel('☠ DWALLET HQ // ENDGAME','FINAL FIVE','No revivals. No audience intervention. Nobody is coming to save you.','<div class="chips"><span class="chip live">SAM</span><span class="chip live">PEACH</span><span class="chip live">RUBY</span><span class="chip live">MIA</span><span class="chip live">CREK</span></div>');
   }
   const handlers={normal,brawl,vote,showdown,revival,crek,peach,glitch,final:finalFive};
-  function fx(name){sequence=false;(handlers[name]||normal)();}
+  function fx(name){
+    stopSequence();
+    (handlers[name]||normal)();
+  }
   function runAll(){
-    sequence=true; clearFx(); const steps=[['brawl',0],['vote',4300],['showdown',8500],['revival',11500],['crek',15000],['peach',18000],['glitch',21500],['final',25000]];
-    for(const [name,ms] of steps) later(()=>{if(sequence)(handlers[name]||normal)();},ms);
+    stopSequence();
+    sequence=true;
+    const steps=[
+      ['brawl',4300],
+      ['vote',6500],
+      ['showdown',3600],
+      ['revival',3600],
+      ['crek',3000],
+      ['peach',3800],
+      ['glitch',3600],
+      ['final',5000]
+    ];
+    let index=0;
+    const next=()=>{
+      if(!sequence)return;
+      const [name,duration]=steps[index++];
+      (handlers[name]||normal)();
+      if(index<steps.length) sequenceTimer=setTimeout(next,duration);
+      else sequenceTimer=setTimeout(()=>{sequence=false;sequenceTimer=null;},duration);
+    };
+    next();
   }
   document.querySelectorAll('[data-fx]').forEach(btn=>btn.addEventListener('click',()=>btn.dataset.fx==='all'?runAll():fx(btn.dataset.fx)));
   normal();
