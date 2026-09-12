@@ -109,6 +109,10 @@ function publicState(game, viewer) {
   const vote = game.crowdVote?.status === "open" ? game.crowdVote : null;
   const voteTargetId = vote?.votesBySpectator?.[viewer.id] || null;
   const log = Array.isArray(game.displayLog) ? game.displayLog.slice(-16) : [];
+  const voteOpenedAt = vote
+    ? [...log].reverse().find(item => Number(item?.round) === Number(game.round) && String(item?.text || "").includes(theme.labels.crowdVote))?.at
+    : null;
+  const inferredClosesAt = voteOpenedAt ? Date.parse(voteOpenedAt) + 30000 : null;
   return {
     id: game.id,
     platform: game.platform,
@@ -129,7 +133,7 @@ function publicState(game, viewer) {
     crowdVote: vote ? {
       status: vote.status,
       eligibleIds: vote.eligibleIds,
-      closesAt: vote.closesAt || null,
+      closesAt: vote.closesAt || inferredClosesAt,
       voteTargetId
     } : null,
     viewer: {
