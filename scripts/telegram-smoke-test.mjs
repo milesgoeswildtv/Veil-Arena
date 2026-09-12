@@ -76,7 +76,15 @@ assert(app.includes("DWALLET • VEIL"));
 assert(app.includes("/telegram/miniapp/state"));
 assert(app.includes("/telegram/miniapp/action"));
 assert(app.includes("requestFullscreen"));
-assert(app.includes("Community Showdown"));
+assert(app.includes("COMMUNITY SHOWDOWN"));
+assert(app.includes("HQ LOCKDOWN"));
+assert(app.includes("RECOVERY PROTOCOL"));
+assert(app.includes("FINAL FIVE"));
+assert(app.includes("PEACH CONTROL // ARMED"));
+assert(app.includes("CREK CONTROL WALL // RECORDING"));
+assert(app.includes("notificationOccurred"));
+assert(app.includes("selectionChanged"));
+assert(app.includes("voteRing"));
 
 const hubApp = injectMiniAppHubHtml(app);
 assert(hubApp.includes('data-hub-tab="arena"'));
@@ -135,7 +143,7 @@ const dwLog = buildArenaLog(completed, 1);
 assert(dwLog.startsWith("DWALLET ARENA — MATCH LOG"));
 assert(dwLog.includes("Winner: Host"));
 
-const botToken = "123456:TEST_TOKEN_FOR_LOCAL_SMOKE_ONLY";
+const botToken = "local-smoke-test-token";
 const authDate = Math.floor(Date.now() / 1000);
 const userJson = JSON.stringify({ id: 123456789, first_name: "Arena", username: "arena_test" });
 const unsigned = new URLSearchParams({
