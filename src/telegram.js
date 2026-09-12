@@ -1,5 +1,16 @@
 const API_ROOT = "https://api.telegram.org";
 
+export const TELEGRAM_COMMANDS = [
+  { command: "arena", description: "Open or reopen a DWallet Arena" },
+  { command: "arenastatus", description: "Check the current Arena or cooldown" },
+  { command: "arenarules", description: "View DWallet Arena rules" },
+  { command: "arenahelp", description: "Show all Arena commands" },
+  { command: "arenastats", description: "View your Arena stats" },
+  { command: "arenaleaderboard", description: "View Arena leaders" },
+  { command: "arenahistory", description: "View recent Arena winners" },
+  { command: "arenalog", description: "Download a completed match log" }
+];
+
 function rawChatId(channelId) {
   return String(channelId || "").replace(/^tg:/, "");
 }
@@ -10,6 +21,19 @@ async function telegramRequest(token, method, payload = {}) {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data?.ok === false) {
+    throw new Error(`Telegram ${method} failed: ${data?.description || response.status}`);
+  }
+  return data?.result;
+}
+
+async function telegramMultipartRequest(token, method, form) {
+  if (!token) throw new Error("Telegram bot token is not configured.");
+  const response = await fetch(`${API_ROOT}/bot${token}/${method}`, {
+    method: "POST",
+    body: form
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data?.ok === false) {
@@ -112,6 +136,18 @@ export async function sendTelegramMessage(channelId, token, { text, reply_markup
   return { id: String(result?.message_id || ""), raw: result };
 }
 
+export async function sendTelegramTextFile(channelId, token, filename, content, caption = "") {
+  const form = new FormData();
+  form.set("chat_id", rawChatId(channelId));
+  form.set("document", new Blob([String(content ?? "")], { type: "text/plain;charset=utf-8" }), String(filename || "arena-log.txt"));
+  if (caption) {
+    form.set("caption", discordishToTelegramHtml(String(caption).slice(0, 900)));
+    form.set("parse_mode", "HTML");
+  }
+  const result = await telegramMultipartRequest(token, "sendDocument", form);
+  return { id: String(result?.message_id || ""), raw: result };
+}
+
 export async function editTelegramMessage(channelId, messageId, token, { text, reply_markup = undefined } = {}) {
   const result = await telegramRequest(token, "editMessageText", {
     chat_id: rawChatId(channelId),
@@ -156,11 +192,7 @@ export async function configureTelegramBot(token, webhookUrl, webhookSecret) {
     drop_pending_updates: false
   });
   await telegramRequest(token, "setMyCommands", {
-    commands: [
-      { command: "arena", description: "Open a DWallet Arena" },
-      { command: "arenastats", description: "View your Arena stats" },
-      { command: "arenaleaderboard", description: "View Arena leaders" }
-    ]
+    commands: TELEGRAM_COMMANDS
   });
   return bot;
 }
