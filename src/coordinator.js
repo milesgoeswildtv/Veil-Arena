@@ -10,7 +10,7 @@ import {
 import { castSimulatedCrowdVotes } from "./core/simulation.js";
 import { loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
 import { createChannelMessage, deleteChannelMessage } from "./discord.js";
-import { sendTelegramMessage, deleteTelegramMessage, telegramCrowdVoteKeyboard } from "./telegram.js";
+import { sendTelegramMessage, deleteTelegramMessage } from "./telegram.js";
 import { startArenaCooldown, TELEGRAM_ARENA_COOLDOWN_MS } from "./cooldown.js";
 import { getTheme, chooseNarration } from "./themes/index.js";
 import { buildMassBrawl } from "./themes/brawls.js";
@@ -142,7 +142,7 @@ function crowdOpenText(g, t) {
   if (t.id === "full_tilt") line = "THE FINAL BET IS OPEN";
   if (t.id === "dwallet") {
     line = "THE CHAT VOTE IS OPEN";
-    instruction = "Spectators have **30 seconds**. Tap a player below to vote. The top two voting positions enter a strict **1v1**. **ONE SURVIVES.**";
+    instruction = "Spectators have **30 seconds**. Vote inside the live Arena window. The top two voting positions enter a strict **1v1**. **ONE SURVIVES.**";
   }
   return `👁️ *ROUND ${g.round} — ${t.labels.crowdVote}*\n\n${line}\n${instruction}`;
 }
@@ -196,6 +196,7 @@ async function trimToCurrentRound(ctx, env, platform, channelId, groups, current
 }
 
 async function postRound(ctx, env, platform, channelId, round, message, controls = {}) {
+  if (platform === "telegram") return null;
   let groups = await ctx.storage.get("roundMessageGroups") || [];
   groups = await trimToCurrentRound(ctx, env, platform, channelId, groups, round);
   const created = await sendTransport(env, platform, channelId, message, controls);
@@ -205,6 +206,7 @@ async function postRound(ctx, env, platform, channelId, round, message, controls
 }
 
 async function appendRoundMessage(ctx, env, platform, channelId, round, message, controls = {}) {
+  if (platform === "telegram") return null;
   const created = await sendTransport(env, platform, channelId, message, controls);
   const groups = await ctx.storage.get("roundMessageGroups") || [];
   let group = groups.find(x => x.round === round);
@@ -224,11 +226,12 @@ function winner(g) {
 async function finish(env, g) {
   checkWinner(g);
   if (g.status !== "finished") return false;
-  const msg = winner(g);
-  rememberDisplayed(g, msg);
+  const platform = platformOf(g);
+  const base = winner(g);
+  const msg = platform === "telegram" ? `${base}\n\n⏳ **Next DWallet Arena: 30 minutes.**` : base;
+  rememberDisplayed(g, base);
   await saveGame(env.DB, g);
   await recordFinishedGame(env.DB, g);
-  const platform = platformOf(g);
   await sendTransport(env, platform, g.channelId, msg);
   if (platform === "telegram") {
     await startArenaCooldown(env.DB, g.channelId, TELEGRAM_ARENA_COOLDOWN_MS);
@@ -323,20 +326,18 @@ export class ArenaCoordinator {
         const msg = crowdOpenText(g, t);
         rememberDisplayed(g, msg);
         await saveGame(this.env.DB, g);
-        const controls = platform === "telegram"
-          ? { telegram: telegramCrowdVoteKeyboard(g) }
-          : {
-              discord: [{
-                type: 1,
-                components: [{
-                  type: 2,
-                  style: 4,
-                  custom_id: `arena:vote_open:${g.id}:0`,
-                  label: "CAST YOUR VOTE",
-                  emoji: { name: "👁️" }
-                }]
-              }]
-            };
+        const controls = platform === "telegram" ? {} : {
+          discord: [{
+            type: 1,
+            components: [{
+              type: 2,
+              style: 4,
+              custom_id: `arena:vote_open:${g.id}:0`,
+              label: "CAST YOUR VOTE",
+              emoji: { name: "👁️" }
+            }]
+          }]
+        };
         await postRound(this.ctx, this.env, platform, channelId, g.round, msg, controls);
         await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
         return;
