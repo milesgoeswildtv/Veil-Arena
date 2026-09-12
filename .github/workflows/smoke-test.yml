@@ -31,6 +31,7 @@ jobs:
       - name: Check production module syntax
         run: |
           node --check src/entry.js
+          node --check src/hub.js
           node --check src/index.js
           node --check src/coordinator.js
           node --check src/core/engine.js
