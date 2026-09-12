@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
+    "deploy:test": "wrangler deploy --env test",
     "dev": "wrangler dev",
-    "test": "node scripts/smoke-test.mjs && node scripts/telegram-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs"
+    "dev:test": "wrangler dev --env test",
+    "test": "node scripts/smoke-test.mjs && node scripts/telegram-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/test-mode-smoke-test.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"
