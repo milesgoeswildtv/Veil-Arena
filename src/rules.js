@@ -56,12 +56,17 @@ Special rounds stop once the Arena reaches the **Final Five**.
 After an Arena finishes, that Telegram group has a **30-minute cooldown** before another one can open. The cooldown belongs to the group, not the player.
 
 **COMMANDS**
-\`/arena\` — Open registration and post the live Arena launcher.
-\`/arena rules\` — Post these rules.
+\`/arena\` — Open registration or reopen the active Arena.
+\`/arenastatus\` — Check the live Arena or remaining cooldown.
+\`/arenarules\` — Post these rules. \`/arena rules\` also works.
+\`/arenahelp\` — Show the full command list.
 \`/arenastats\` — View your lifetime Arena record in this Telegram group.
-\`/arenaleaderboard\` — View this group's Arena leaders.
+\`/arenaleaderboard\` — View this group's Arena leaders, including win rate after 3+ games.
+\`/arenahistory\` — View the five most recent completed Arenas.
+\`/arenalog\` — Download the latest completed match narration log.
+\`/arenalog 2\` — Download the previous completed match, etc.
 
-Stats are tracked separately for each Telegram group.`;
+Stats, leaderboards, history and logs are tracked separately for each Telegram group.`;
 
   return`# 👻 VIBE QUEEN SLOTS — THE HAUNTED ARENA
 
