@@ -87,7 +87,7 @@ export async function loadActiveGameForChannel(db, channelId) {
   if (!db) throw new Error("D1 binding DB is not configured.");
   const row = await db.prepare(`
     SELECT state_json FROM games
-    WHERE channel_id = ? AND status IN ('registration', 'running')
+    WHERE channel_id = ? AND status IN ('registration', 'starting', 'running')
     ORDER BY created_at DESC LIMIT 1
   `).bind(channelId).first();
   return row ? JSON.parse(row.state_json) : null;
@@ -193,5 +193,15 @@ export async function loadArenaLeaderboard(db, guildId, limit = 5) {
     `).bind(guildId, limit).all();
     out[key] = result?.results || [];
   }
+
+  const winRate = await db.prepare(`
+    SELECT user_id, display_name, wins, games_played,
+           ROUND((100.0 * wins) / games_played, 1) AS value
+    FROM arena_player_stats
+    WHERE guild_id = ? AND games_played >= 3 AND wins > 0
+    ORDER BY (1.0 * wins / games_played) DESC, wins DESC, games_played DESC, display_name COLLATE NOCASE ASC
+    LIMIT ?
+  `).bind(guildId, limit).all();
+  out.winRate = winRate?.results || [];
   return out;
 }
