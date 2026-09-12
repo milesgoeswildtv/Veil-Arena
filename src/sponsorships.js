@@ -23,7 +23,7 @@ export function normalizeSponsorAwards(raw = {}) {
   const out = {};
   for (const [id, value] of Object.entries(raw || {})) {
     if (!AWARD_IDS.has(id)) continue;
-    const cents = Number.isInteger(value) ? Math.max(0, value) : dollarsToCents(value);
+    const cents = dollarsToCents(value);
     if (cents > 0) out[id] = cents;
   }
   return out;
