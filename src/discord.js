@@ -11,9 +11,18 @@ export async function discordRequest(path,token,init={}){if(!token)throw new Err
 export async function createChannelMessage(channelId,token,payload){return discordRequest(`/channels/${channelId}/messages`,token,{method:"POST",body:JSON.stringify({...payload,allowed_mentions:{parse:[]}})});}
 export async function createChannelTextFile(channelId,token,filename,text,content=""){if(!token)throw new Error("DISCORD_BOT_TOKEN is not configured.");const form=new FormData();form.append("payload_json",JSON.stringify({content,allowed_mentions:{parse:[]},attachments:[{id:0,filename,description:"Arena match narration log"}]}));form.append("files[0]",new Blob([String(text||"")],{type:"text/plain;charset=utf-8"}),filename);const r=await fetch(`${DISCORD_API}/channels/${channelId}/messages`,{method:"POST",headers:{authorization:`Bot ${token}`},body:form});if(!r.ok){const t=await r.text();throw new Error(`Discord API ${r.status}: ${t}`);}return r.json();}
 export async function deleteChannelMessage(channelId,messageId,token){if(!messageId)return;try{await discordRequest(`/channels/${channelId}/messages/${messageId}`,token,{method:"DELETE"});}catch(error){console.warn("Arena cleanup could not delete message",messageId,error?.message||error);}}
+const sponsorAmount=(name,description)=>({name,description,type:10,required:false,min_value:.01,max_value:100000});
 export function arenaCommands(){return[
   {name:"arena",description:"Enter the Arena.",type:1,options:[
     {name:"start",description:"Open Arena registration.",type:1},
+    {name:"sponsor",description:"Sponsor optional cash prizes for the active Arena.",type:1,options:[
+      sponsorAmount("winner","Dollar amount for the Arena winner."),
+      sponsorAmount("runner_up","Dollar amount for the runner-up."),
+      sponsorAmount("most_kills","Dollar amount for most eliminations."),
+      sponsorAmount("most_revivals","Dollar amount for most revivals."),
+      sponsorAmount("most_showdowns","Dollar amount for most Community Showdowns survived."),
+      sponsorAmount("most_mass_brawls","Dollar amount for most Mass Brawls survived.")
+    ]},
     {name:"rules",description:"Show the Arena rules for 30 seconds.",type:1}
   ]},
   {name:"arenastats",description:"View your lifetime Arena stats in this server.",type:1},
