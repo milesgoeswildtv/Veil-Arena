@@ -113,7 +113,7 @@ function publicState(game, viewer) {
     aliveCount: game.aliveIds.length,
     eliminatedCount: game.eliminatedIds.length,
     players: playerView(game),
-    aliveIds: game.alliveIds,
+    aliveIds: game.aliveIds,
     eliminatedIds: game.eliminatedIds,
     displayLog: log,
     crowdVote: vote ? { status: vote.status, eligibleIds: vote.eligibleIds, closesAt, voteTargetId } : null,
