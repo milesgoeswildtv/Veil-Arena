@@ -1,5 +1,5 @@
 name = "veil-arena"
-main = "src/activity-entry.js"
+main = "src/test-entry.js"
 compatibility_date = "2026-09-01"
 keep_vars = true
 
@@ -16,5 +16,23 @@ name = "ARENA_COORDINATOR"
 class_name = "ArenaCoordinator"
 
 [[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ArenaCoordinator"]
+
+[env.test]
+
+[env.test.vars]
+ARENA_TEST_MODE = "true"
+
+[[env.test.d1_databases]]
+binding = "DB"
+database_name = "veil-arena"
+database_id = "3474ca31-36e1-49c3-9901-57bb4eaf6f6c"
+
+[[env.test.durable_objects.bindings]]
+name = "ARENA_COORDINATOR"
+class_name = "ArenaCoordinator"
+
+[[env.test.migrations]]
 tag = "v1"
 new_sqlite_classes = ["ArenaCoordinator"]
