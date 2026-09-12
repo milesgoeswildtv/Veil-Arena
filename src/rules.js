@@ -29,7 +29,12 @@ Stats begin tracking from Arena's official launch.`;
   if(themeId==="dwallet")return`# 💜 DWALLET ARENA — RULES
 
 **WHAT IS ARENA?**
-Arena is a mostly RNG-driven community elimination game. Join from Telegram, then watch the chaos play out until only one player remains.
+Arena is a mostly RNG-driven community elimination game that runs inside Veil's Telegram Mini App. The group chat stays clean while the live match plays in its own Arena window.
+
+**HOW TO PLAY**
+Use \`/arena\` in the DWallet group. Veil posts one Arena launcher. Tap **ENTER / WATCH ARENA** to open the live Arena inside Telegram. The person who opened the Arena is entered automatically and controls **START ARENA**.
+
+Once the match begins, all round narration, eliminations, revivals, roster updates and audience voting happen inside the Arena window. Veil only keeps major Arena announcements in the main Telegram chat.
 
 **NORMAL ROUNDS**
 Each normal round contains **4 events** and guarantees at least **1 elimination**. Matchups, narration and outcomes are driven by chance.
@@ -41,7 +46,7 @@ A rare full-round event. **4–7 players** can get dragged into the same mess an
 Every **7th round** while special events are active, two eliminated players get one shot at returning. **One comes back. One stays out.** Revival takes the entire round.
 
 ## 👁️ THE CHAT CHOOSES — COMMUNITY SHOWDOWN
-Every **5th round** while special events are active, spectators and eliminated players get **30 seconds** to tap a player and vote. Active fighters cannot vote.
+Every **5th round** while special events are active, spectators and eliminated players get **30 seconds** to vote inside the live Arena window. Active fighters cannot vote.
 
 The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The vote takes the entire round.
 
@@ -51,7 +56,7 @@ Special rounds stop once the Arena reaches the **Final Five**.
 After an Arena finishes, that Telegram group has a **30-minute cooldown** before another one can open. The cooldown belongs to the group, not the player.
 
 **COMMANDS**
-\`/arena\` — Open registration for a new Arena.
+\`/arena\` — Open registration and post the live Arena launcher.
 \`/arena rules\` — Post these rules.
 \`/arenastats\` — View your lifetime Arena record in this Telegram group.
 \`/arenaleaderboard\` — View this group's Arena leaders.
