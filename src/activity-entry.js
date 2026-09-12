@@ -111,7 +111,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/activity-preview/app.js") {
+    if (request.method === "GET" && (url.pathname === "/activity-preview/app.js" || url.pathname === "/app.js")) {
       return new Response(ACTIVITY_PREVIEW_CLIENT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" } });
     }
     if (request.method === "GET" && (url.pathname === "/activity-preview" || url.pathname.startsWith("/activity-preview/"))) {
