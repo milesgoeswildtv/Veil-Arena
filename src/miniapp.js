@@ -106,6 +106,50 @@ function playerView(game) {
   }));
 }
 
+function featureView(game, vote) {
+  if (vote) {
+    return {
+      type: "community_vote",
+      eligibleIds: [...vote.eligibleIds],
+      totals: { ...(vote.totals || {}) },
+      closesAt: vote.closesAt || null
+    };
+  }
+  const roundItems = (game.history || []).filter(item => Number(item?.round) === Number(game.round));
+  const findLast = type => [...roundItems].reverse().find(item => item?.type === type);
+  const mass = findLast("mass_brawl");
+  if (mass) {
+    return {
+      type: "mass_brawl",
+      participantIds: [...(mass.participantIds || [])],
+      survivorIds: [...(mass.survivorIds || [])],
+      eliminatedIds: [...(mass.eliminatedIds || [])]
+    };
+  }
+  const revival = findLast("revival_pit");
+  if (revival) {
+    return {
+      type: "revival",
+      selectedIds: [...(revival.selectedIds || [])],
+      winnerId: revival.winnerId || null,
+      loserId: revival.loserId || null
+    };
+  }
+  const revivalSkipped = findLast("revival_skipped");
+  if (revivalSkipped) return { type: "revival_skipped", reason: revivalSkipped.reason || "unknown" };
+  const crowd = findLast("crowd_pin");
+  if (crowd) {
+    return {
+      type: "community_result",
+      qualifierIds: [...(crowd.qualifiers || [])],
+      survivorId: crowd.survivorId || null,
+      eliminatedIds: [...(crowd.eliminatedIds || [])],
+      totals: { ...(crowd.totals || {}) }
+    };
+  }
+  return null;
+}
+
 function publicState(game, viewer) {
   const theme = getTheme(game.themeId);
   const current = game.players[viewer.id] || null;
@@ -115,6 +159,7 @@ function publicState(game, viewer) {
   const voteOpenedAt = vote ? [...log].reverse().find(item => Number(item?.round) === Number(game.round) && String(item?.text || "").includes(theme.labels.crowdVote))?.at : null;
   const inferredClosesAt = voteOpenedAt ? Date.parse(voteOpenedAt) + 30000 : null;
   const closesAt = vote?.closesAt || inferredClosesAt;
+  const aliveCount = game.aliveIds.length;
   return {
     id: game.id,
     platform: game.platform,
@@ -126,13 +171,22 @@ function publicState(game, viewer) {
     hostId: game.hostId,
     winnerId: game.winnerId,
     playerCount: Object.keys(game.players).length,
-    aliveCount: game.aliveIds.length,
+    aliveCount,
     eliminatedCount: game.eliminatedIds.length,
     players: playerView(game),
     aliveIds: game.aliveIds,
     eliminatedIds: game.eliminatedIds,
     displayLog: log,
-    crowdVote: vote ? { status: vote.status, eligibleIds: vote.eligibleIds, closesAt, voteTargetId } : null,
+    finalFive: game.status === "running" && aliveCount <= 5,
+    specialEventsEnabled: game.status === "running" && aliveCount > 5,
+    feature: featureView(game, vote),
+    crowdVote: vote ? {
+      status: vote.status,
+      eligibleIds: vote.eligibleIds,
+      closesAt,
+      voteTargetId,
+      totals: { ...(vote.totals || {}) }
+    } : null,
     viewer: {
       id: viewer.id,
       displayName: viewer.displayName,
@@ -388,41 +442,78 @@ export function miniAppHtml() {
 <title>DWallet Arena</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:dark;--bg:#09070f;--panel:#141020;--panel2:#1d152d;--purple:#9d68ff;--purple2:#cfb3ff;--text:#f7f3ff;--muted:#aaa0bb;--danger:#ff557f;--good:#57e6a5;--line:#302442}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{padding:calc(12px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom))}
-.app{max-width:760px;margin:0 auto}.top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg) 78%,transparent);padding:4px 0 16px}.brand{font-size:12px;letter-spacing:.2em;color:var(--purple2);font-weight:900}.title{font-size:28px;font-weight:950;line-height:1;margin:7px 0 12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px}.stat b{display:block;font-size:20px}.stat span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em}
-.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 12px 32px rgba(0,0,0,.22)}.card h2,.card h3{margin:0 0 10px}.muted{color:var(--muted)}.purple{color:var(--purple2)}.danger{color:var(--danger)}.good{color:var(--good)}
-button{appearance:none;border:0;border-radius:14px;padding:13px 15px;font-size:14px;font-weight:900;background:var(--purple);color:#fff;min-height:46px}button.secondary{background:#292038}button.dangerBtn{background:#512037}button:disabled{opacity:.45}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:120px}.player{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:10px 0}.player:first-child{border-top:0}.name{font-weight:850}.dead .name{text-decoration:line-through;color:#857b90}.tag{font-size:10px;border:1px solid var(--line);border-radius:99px;padding:4px 7px;color:var(--muted)}
-.log{white-space:pre-wrap;line-height:1.44;font-size:14px}.round{font-size:11px;color:var(--purple2);font-weight:900;letter-spacing:.1em;margin-bottom:6px}.voteGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.voteGrid button{background:#251b35;text-align:left;height:auto}.voteGrid button.selected{outline:2px solid var(--purple);background:#352251}.countdown{font-size:30px;font-weight:950}.winner{text-align:center;padding:24px 12px}.winner .crown{font-size:48px}.error{background:#381624;border:1px solid #6e2944;border-radius:14px;padding:12px;margin:10px 0;color:#ffd2df}.empty{text-align:center;color:var(--muted);padding:26px 10px}.pulse{animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.55}}
+:root{color-scheme:dark;--bg:#09070f;--panel:#141020;--panel2:#1d152d;--purple:#9d68ff;--purple2:#cfb3ff;--text:#f7f3ff;--muted:#aaa0bb;--danger:#ff557f;--good:#57e6a5;--warn:#ffd166;--line:#302442;--void:#050308}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{padding:calc(12px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom));overflow-x:hidden;transition:background .45s,filter .45s}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:80;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 4px);mix-blend-mode:screen;opacity:.35}
+.app{max-width:760px;margin:0 auto;position:relative}.top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg) 78%,transparent);padding:4px 0 16px;transition:.35s}.brand{font-size:12px;letter-spacing:.2em;color:var(--purple2);font-weight:900}.location{font-size:10px;letter-spacing:.14em;color:var(--muted);font-weight:900;margin-top:5px}.title{font-size:28px;font-weight:950;line-height:1;margin:7px 0 12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px}.stat b{display:block;font-size:20px}.stat span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 12px 32px rgba(0,0,0,.22);transition:transform .25s,border-color .25s,background .35s}.card h2,.card h3{margin:0 0 10px}.muted{color:var(--muted)}.purple{color:var(--purple2)}.danger{color:var(--danger)}.good{color:var(--good)}.warning{color:var(--warn)}
+button{appearance:none;border:0;border-radius:14px;padding:13px 15px;font-size:14px;font-weight:900;background:var(--purple);color:#fff;min-height:46px;transition:transform .12s,filter .12s,background .2s}button:active{transform:scale(.97)}button.secondary{background:#292038}button.dangerBtn{background:#512037}button:disabled{opacity:.45}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:120px}.player{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:10px 0}.player:first-child{border-top:0}.name{font-weight:850}.dead .name{text-decoration:line-through;color:#857b90}.tag{font-size:10px;border:1px solid var(--line);border-radius:99px;padding:4px 7px;color:var(--muted)}
+.log{white-space:pre-wrap;line-height:1.44;font-size:14px}.round{font-size:11px;color:var(--purple2);font-weight:900;letter-spacing:.1em;margin-bottom:6px}.winner{text-align:center;padding:24px 12px}.winner .crown{font-size:48px}.error{background:#381624;border:1px solid #6e2944;border-radius:14px;padding:12px;margin:10px 0;color:#ffd2df}.empty{text-align:center;color:var(--muted);padding:26px 10px}.pulse{animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.55}}
+.feature{overflow:hidden;position:relative;border-color:#5b3a89}.feature:before{content:"";position:absolute;inset:-50%;background:radial-gradient(circle,rgba(157,104,255,.18),transparent 48%);animation:drift 7s linear infinite;pointer-events:none}.feature>*{position:relative}.featureTitle{font-size:25px;font-weight:1000;letter-spacing:-.025em}.system{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.11em;color:var(--purple2)}
+.voteHeader{display:flex;align-items:center;gap:14px}.ring{--pct:100;width:78px;height:78px;border-radius:50%;background:conic-gradient(var(--purple) calc(var(--pct)*1%),#271c38 0);display:grid;place-items:center;box-shadow:0 0 28px rgba(157,104,255,.28)}.ring:after{content:"";position:absolute;width:60px;height:60px;border-radius:50%;background:var(--panel)}.ring .countdown{position:relative;z-index:1;font-size:25px;font-weight:1000}.voteRows{display:grid;gap:8px;margin-top:14px}.voteRow{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:#171020}.voteBar{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,rgba(157,104,255,.36),rgba(157,104,255,.08));width:0;transition:width .4s}.voteButton{position:relative;z-index:1;width:100%;display:flex;justify-content:space-between;background:transparent;text-align:left}.voteButton.selected{box-shadow:inset 0 0 0 2px var(--purple)}
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:15px 0}.duelist{padding:16px 10px;border:1px solid var(--line);border-radius:15px;text-align:center;font-weight:950;background:#15101e}.duelist.won{border-color:var(--good);box-shadow:0 0 24px rgba(87,230,165,.18)}.duelist.lost{text-decoration:line-through;color:#8e8098;border-color:#55243a;transform:translateY(8px);opacity:.7}.vs{font-weight:1000;color:var(--danger)}
+.brawlNames{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}.fighterChip{padding:7px 9px;border:1px solid var(--line);background:#16101f;border-radius:99px;font-size:11px;font-weight:900}.fighterChip.dead{color:#8b7e92;text-decoration:line-through}.fighterChip.survivor{border-color:#356c58;color:#9ff2cd}
+.monitorGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}.monitor{aspect-ratio:1.45;border:1px solid #443258;background:linear-gradient(135deg,#0b0710,#20142c);border-radius:7px;position:relative;overflow:hidden}.monitor:after{content:"LIVE";position:absolute;top:5px;left:5px;font:800 8px ui-monospace;color:#e9d9ff;opacity:.7}.monitor:nth-child(2n){animation:flicker 2.7s infinite}
+.redButtonWrap{text-align:center;margin:15px 0}.redButton{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ff6b7b,#b70f2d 48%,#5d0618 70%);border:8px solid #26141d;box-shadow:0 9px 0 #3d0b18,0 0 32px rgba(255,49,91,.24);display:inline-grid;place-items:center;font-weight:1000;font-size:10px;letter-spacing:.08em;animation:redPulse 1.9s infinite}.redButton.pressed{transform:translateY(7px);box-shadow:0 2px 0 #3d0b18,0 0 45px rgba(255,49,91,.5)}
+#fx{position:fixed;inset:0;z-index:100;pointer-events:none;display:grid;place-items:center;overflow:hidden}.fxCard{max-width:min(92vw,620px);padding:24px 20px;border-radius:20px;background:rgba(8,5,12,.94);border:1px solid #5d4380;box-shadow:0 0 80px rgba(157,104,255,.32);text-align:center;animation:slamIn .35s cubic-bezier(.18,.89,.32,1.28)}.fxCode{font:900 10px ui-monospace;letter-spacing:.18em;color:var(--purple2)}.fxTitle{font-size:31px;font-weight:1000;margin:8px 0}.fxNames{font-weight:900;color:#eadcff}.fxDanger{color:var(--danger)}.fxGood{color:var(--good)}
+body.mode-brawl{background:#0d050b}body.mode-brawl .top{background:linear-gradient(180deg,#0d050b 78%,transparent)}body.mode-revival{filter:saturate(.55)}body.mode-final{background:#050307}body.mode-final .top{background:linear-gradient(180deg,#050307 78%,transparent)}body.mode-glitch .app{animation:microGlitch .22s steps(2,end) 3}.shake{animation:shake .42s both}.screenFlash:after{content:"";position:fixed;inset:0;z-index:95;background:rgba(183,79,255,.2);animation:flash .36s forwards;pointer-events:none}
+.lockdown{border-color:#783552;background:linear-gradient(180deg,#251019,#130a10)}.lockdown .featureTitle{color:#ff98b0}.finalBanner{border:1px solid #6b2d47;background:#1b0b12;padding:12px;border-radius:14px;text-align:center;margin:10px 0}.finalBanner b{display:block;font-size:18px}.reviveGlow{animation:reviveGlow 1.3s ease-out}.eliminateDrop{animation:eliminateDrop .75s ease-in forwards}
+@keyframes drift{to{transform:rotate(360deg)}}@keyframes flicker{0%,95%,100%{opacity:1}96%{opacity:.25}97%{opacity:.9}98%{opacity:.15}}@keyframes redPulse{50%{filter:brightness(1.16);box-shadow:0 9px 0 #3d0b18,0 0 45px rgba(255,49,91,.36)}}@keyframes slamIn{from{opacity:0;transform:scale(1.16)}to{opacity:1;transform:scale(1)}}@keyframes shake{20%{transform:translate(-7px,2px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,3px)}80%{transform:translate(4px,-1px)}}@keyframes flash{to{opacity:0}}@keyframes microGlitch{0%{transform:translate(0)}25%{transform:translate(3px,-1px)}50%{transform:translate(-2px,1px);filter:hue-rotate(25deg)}75%{transform:translate(1px,2px)}100%{transform:translate(0)}}@keyframes reviveGlow{0%{box-shadow:0 0 0 rgba(87,230,165,0)}40%{box-shadow:0 0 40px rgba(87,230,165,.5)}100%{box-shadow:0 0 0 rgba(87,230,165,0)}}@keyframes eliminateDrop{to{transform:translateY(90px) rotate(4deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
+<div id="fx"></div>
 <div id="app" class="app"><div class="empty pulse">Opening DWallet Arena…</div></div>
 <script>
-const tg=window.Telegram?.WebApp;const root=document.getElementById('app');
+const tg=window.Telegram?.WebApp;const root=document.getElementById('app');const fx=document.getElementById('fx');
 if(tg){tg.ready();tg.expand();try{tg.requestFullscreen?.()}catch{};try{tg.setHeaderColor?.('#09070f');tg.setBackgroundColor?.('#09070f')}catch{}}
 const initData=tg?.initData||'';const unsafe=tg?.initDataUnsafe||{};const qs=new URLSearchParams(location.search);const start=unsafe.start_param||qs.get('tgWebAppStartParam')||'';const gameId=start.startsWith('arena_')?start.slice(6):'';
-let state=null,busy=false,pollHandle=null;
+let state=null,busy=false,pollHandle=null,lastFeatureKey='',lastLogKey='',fxTimer=null,previousAlive=[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean=s=>String(s||'').replace(/~~/g,'').replace(/\*\*\*/g,'').replace(/\*\*/g,'').replace(/^#{1,2}\\s+/gm,'').replace(/\\\\\./g,'.');
 const api=async(path,opts={})=>{const r=await fetch(path,{...opts,headers:{'content-type':'application/json','x-telegram-init-data':initData,...(opts.headers||{})}});const j=await r.json().catch(()=>({ok:false,error:'Bad server response'}));if(!j.ok)throw new Error(j.error||'Arena request failed');return j};
-function haptic(type='light'){try{tg?.HapticFeedback?.impactOccurred(type)}catch{}}
+function impact(type='light'){try{tg?.HapticFeedback?.impactOccurred(type)}catch{}}
+function selection(){try{tg?.HapticFeedback?.selectionChanged()}catch{impact('light')}}
+function notification(type='success'){try{tg?.HapticFeedback?.notificationOccurred(type)}catch{impact(type==='error'?'heavy':'medium')}}
 function notify(message){if(tg?.showAlert)tg.showAlert(message);else alert(message)}
 function playerName(id){return state?.players?.find(p=>p.id===id)?.displayName||'Unknown'}
 function latestLogs(){return(state?.displayLog||[]).slice().reverse()}
-function render(){if(!state){root.innerHTML='<div class="empty pulse">Syncing Arena…</div>';return}const me=state.viewer;const players=[...(state.players||[])].sort((a,b)=>Number(b.alive)-Number(a.alive)||a.displayName.localeCompare(b.displayName));let html='<div class="top"><div class="brand">DWALLET • VEIL</div><div class="title">'+esc(state.title)+'</div><div class="stats"><div class="stat"><b>'+state.round+'</b><span>ROUND</span></div><div class="stat"><b>'+state.aliveCount+'</b><span>ALIVE</span></div><div class="stat"><b>'+state.playerCount+'</b><span>ENTERED</span></div></div></div>';
+function latestText(){return clean(latestLogs()[0]?.text||'')}
+function idNames(ids){return(ids||[]).map(playerName)}
+function locationFromState(){const text=(state?.displayLog||[]).slice(-5).map(x=>clean(x.text)).join(' | ').toLowerCase();const spots=[['crek’s lair','CREK’S LAIR'],["crek's lair",'CREK’S LAIR'],['peach’s lair','PEACH’S LAIR'],["peach's lair",'PEACH’S LAIR'],['drop control','DROP CONTROL'],['claim hall','CLAIM HALL'],['dwallet vault','DWALLET VAULT'],['bot basement','BOT BASEMENT'],['server room','SERVER ROOM'],['sticker lab','STICKER LAB'],['community floor','COMMUNITY FLOOR'],['wallet ops','WALLET OPS'],['rooftop relay','ROOFTOP RELAY'],['transaction bay','TRANSACTION BAY'],['degen lounge','DEGEN LOUNGE'],['mod war room','MOD WAR ROOM'],['ledger hall','LEDGER HALL'],['notification nest','NOTIFICATION NEST'],['qr room','QR ROOM'],['drop chamber','DROP CHAMBER'],['treasury','TREASURY']];for(const pair of spots)if(text.includes(pair[0]))return pair[1];return'DWALLET HQ'}
+function featureKey(s){const f=s?.feature;if(!f)return'';if(f.type==='community_vote')return'vote:'+s.round;if(f.type==='mass_brawl')return'brawl:'+s.round+':'+(f.eliminatedIds||[]).join(',');if(f.type==='revival')return'revival:'+s.round+':'+f.winnerId;if(f.type==='community_result')return'community-result:'+s.round+':'+f.survivorId;if(f.type==='revival_skipped')return'revival-skip:'+s.round;return f.type+':'+s.round}
+function showFx(code,title,body='',tone='purple',ms=1700){clearTimeout(fxTimer);fx.innerHTML='<div class="fxCard"><div class="fxCode">'+esc(code)+'</div><div class="fxTitle '+(tone==='danger'?'fxDanger':tone==='good'?'fxGood':'')+'">'+esc(title)+'</div>'+(body?'<div class="fxNames">'+esc(body)+'</div>':'')+'</div>';document.body.classList.add('screenFlash');setTimeout(()=>document.body.classList.remove('screenFlash'),450);fxTimer=setTimeout(()=>{fx.innerHTML=''},ms)}
+function setMode(){document.body.classList.remove('mode-brawl','mode-revival','mode-final','mode-glitch');const type=state?.feature?.type;if(type==='mass_brawl')document.body.classList.add('mode-brawl');if(type==='revival'||type==='revival_skipped')document.body.classList.add('mode-revival');if(state?.finalFive)document.body.classList.add('mode-final');const txt=latestText().toLowerCase();if(txt.includes('dwallet glitch')||txt.includes('do not click')||txt.includes('from later')||txt.includes('haunted'))document.body.classList.add('mode-glitch')}
+function redButtonWanted(){const loc=locationFromState();const feature=state?.feature?.type||'';return loc==='PEACH’S LAIR'||((feature==='community_vote'||feature==='mass_brawl'||feature==='revival')&&Number(state?.round||0)%4===0)}
+function monitorsWanted(){return locationFromState()==='CREK’S LAIR'||(state?.feature?.type==='mass_brawl'&&Number(state?.round||0)%3===0)}
+function featureCard(){const f=state?.feature;if(!f)return'';const loc=locationFromState();let h='<div class="card feature"><div class="system">LOCATION // '+esc(loc)+'</div>';
+if(f.type==='community_vote'){const left=Math.max(0,Math.ceil((Number(state.crowdVote?.closesAt||Date.now())-Date.now())/1000));const pct=Math.max(0,Math.min(100,left/30*100));const totals=state.crowdVote?.totals||{};const max=Math.max(1,...Object.values(totals).map(Number));h+='<div class="voteHeader"><div class="ring" id="voteRing" style="--pct:'+pct+'"><span class="countdown" id="voteCountdown">'+left+'</span></div><div><div class="round">THE CHAT HAS CONTROL</div><div class="featureTitle">👁️ COMMUNITY SHOWDOWN</div></div></div><div class="muted">30 seconds. The top two get ripped into a strict 1v1.</div><div class="voteRows">';for(const id of state.crowdVote.eligibleIds){const votes=Number(totals[id]||0);const width=Math.round(votes/max*100);const selected=state.crowdVote.voteTargetId===id?' selected':'';h+='<div class="voteRow"><div class="voteBar" style="width:'+width+'%"></div><button class="voteButton'+selected+'" '+(state.viewer.canVote?'onclick="vote(\''+esc(id)+'\')"':'disabled')+'><span>'+esc(playerName(id))+(selected?' ✓':'')+'</span><span>'+votes+'</span></button></div>'}h+='</div>'}
+else if(f.type==='community_result'){const q=f.qualifierIds||[];h+='<div class="round">VOTE LOCKED // FINAL 1V1</div><div class="featureTitle">THE CHAT CHOSE</div><div class="duel"><div class="duelist '+(q[0]===f.survivorId?'won':'lost')+'">'+esc(playerName(q[0]))+'</div><div class="vs">VS</div><div class="duelist '+(q[1]===f.survivorId?'won':'lost')+'">'+esc(playerName(q[1]))+'</div></div><div class="good"><b>SURVIVOR: '+esc(playerName(f.survivorId))+'</b></div>'}
+else if(f.type==='revival'){h+='<div class="round">RECOVERY PROTOCOL</div><div class="featureTitle">⚡ SECOND CHANCE</div><div class="duel"><div class="duelist '+(f.selectedIds?.[0]===f.winnerId?'won':'lost')+'">'+esc(playerName(f.selectedIds?.[0]))+'</div><div class="vs">RETURN</div><div class="duelist '+(f.selectedIds?.[1]===f.winnerId?'won':'lost')+'">'+esc(playerName(f.selectedIds?.[1]))+'</div></div><div class="good"><b>STATUS RESTORED: '+esc(playerName(f.winnerId))+'</b></div><div class="danger">RESTORE FAILED: '+esc(playerName(f.loserId))+'</div>'}
+else if(f.type==='revival_skipped'){h+='<div class="round">RECOVERY PROTOCOL</div><div class="featureTitle">⚡ SECOND CHANCE</div><div class="muted">Protocol unavailable. '+esc(f.reason==='final_five'?'Final Five lockdown is active.':'Not enough eliminated players.')+'</div>'}
+else if(f.type==='mass_brawl'){h+='<div class="round">⚠ SECURITY OVERRIDE // HQ LOCKDOWN</div><div class="featureTitle">💥 MASS BRAWL</div><div class="brawlNames">';for(const id of f.participantIds||[]){const dead=(f.eliminatedIds||[]).includes(id),surv=(f.survivorIds||[]).includes(id);h+='<span class="fighterChip '+(dead?'dead':surv?'survivor':'')+'">'+esc(playerName(id))+'</span>'}h+='</div><div class="good"><b>SURVIVORS: '+esc(idNames(f.survivorIds).join(' • '))+'</b></div>'}
+if(monitorsWanted())h+='<div class="monitorGrid"><div class="monitor"></div><div class="monitor"></div><div class="monitor"></div><div class="monitor"></div><div class="monitor"></div><div class="monitor"></div></div><div class="system">CREK CONTROL WALL // RECORDING</div>';
+if(redButtonWanted())h+='<div class="redButtonWrap"><div class="redButton '+(f.type==='community_result'||f.type==='mass_brawl'?'pressed':'')+'">DO NOT<br>PRESS</div><div class="system" style="margin-top:10px">PEACH CONTROL // ARMED</div></div>';
+h+='</div>';return h}
+function detectTransitions(oldState,newState){const newKey=featureKey(newState);if(newKey&&newKey!==lastFeatureKey){lastFeatureKey=newKey;const f=newState.feature;if(f?.type==='community_vote'){notification('warning');showFx('DWALLET HQ // AUTHORITY TRANSFER','THE CHAT HAS CONTROL','30 SECONDS','danger',1900)}else if(f?.type==='mass_brawl'){impact('heavy');setTimeout(()=>impact('rigid'),120);showFx('DWALLET HQ // SECURITY OVERRIDE','HQ LOCKDOWN','MASS BRAWL','danger',1800)}else if(f?.type==='revival'){notification('success');showFx('DWALLET HQ // RECOVERY PROTOCOL','SECOND CHANCE',playerName(f.winnerId)+' RESTORED','good',1900)}else if(f?.type==='community_result'){impact('heavy');notification('success');showFx('COMMUNITY SHOWDOWN // RESULT',playerName(f.survivorId)+' SURVIVES',idNames(f.eliminatedIds).join(', ')+' ELIMINATED','good',1900)}}
+const oldAlive=new Set(oldState?.aliveIds||previousAlive||[]);const newAlive=new Set(newState?.aliveIds||[]);const newlyDead=[...oldAlive].filter(id=>!newAlive.has(id));const revived=[...newAlive].filter(id=>oldState&&!(oldState.aliveIds||[]).includes(id)&&(oldState.eliminatedIds||[]).includes(id));if(newlyDead.length&&!['mass_brawl','community_result'].includes(newState?.feature?.type)){impact('heavy');showFx('DWALLET HQ // PLAYER STATUS','ELIMINATED',newlyDead.map(id=>newState.players.find(p=>p.id===id)?.displayName||id).join(' • '),'danger',1300)}if(revived.length&&newState?.feature?.type!=='revival'){notification('success');showFx('DWALLET HQ // PLAYER STATUS','ACTIVE AGAIN',revived.map(id=>newState.players.find(p=>p.id===id)?.displayName||id).join(' • '),'good',1300)}
+const finalKey='dwallet-final-five:'+gameId;if(newState?.finalFive&&!sessionStorage.getItem(finalKey)){sessionStorage.setItem(finalKey,'1');notification('warning');setTimeout(()=>impact('heavy'),180);showFx('DWALLET HQ // SPECIAL PROTOCOLS DISABLED','FINAL FIVE','NOBODY IS COMING TO SAVE YOU NOW.','danger',2600)}
+const newest=(newState?.displayLog||[]).at(-1);const logKey=newest?(newest.round+':'+newest.at+':'+newest.text):'';if(logKey&&logKey!==lastLogKey){lastLogKey=logKey;const txt=clean(newest.text).toLowerCase();if(txt.includes('dwallet glitch')||txt.includes('do not click')||txt.includes('from later')||txt.includes('haunted')){notification('warning');document.body.classList.add('mode-glitch');showFx('DWALLET HQ // SYSTEM ANOMALY','SIGNAL CORRUPTED','VEIL REFUSES TO ELABORATE','danger',1250)}}previousAlive=[...(newState?.aliveIds||[])]}
+function render(){if(!state){root.innerHTML='<div class="empty pulse">Syncing Arena…</div>';return}setMode();const me=state.viewer;const players=[...(state.players||[])].sort((a,b)=>Number(b.alive)-Number(a.alive)||a.displayName.localeCompare(b.displayName));const loc=locationFromState();let html='<div class="top"><div class="brand">DWALLET • VEIL TERMINAL</div><div class="location">LOCATION // '+esc(loc)+'</div><div class="title">'+esc(state.title)+'</div><div class="stats"><div class="stat"><b>'+state.round+'</b><span>ROUND</span></div><div class="stat"><b>'+state.aliveCount+'</b><span>ALIVE</span></div><div class="stat"><b>'+state.playerCount+'</b><span>ENTERED</span></div></div></div>';
+if(state.finalFive)html+='<div class="finalBanner"><span class="system">DWALLET HQ // LOCKDOWN</span><b>FINAL FIVE</b><span class="danger">SPECIAL PROTOCOLS DISABLED</span></div>';
 if(state.status==='registration'){html+='<div class="card"><h2>⚔️ Registration Open</h2><div class="muted">Join here. The DWallet group stays clean while Arena runs in this window.</div><div class="actions" style="margin-top:14px">';if(!me.joined)html+='<button onclick="act(\'join\')">ENTER ARENA</button>';else if(!me.isHost)html+='<button class="secondary" onclick="act(\'leave\')">LEAVE</button>';if(me.isHost)html+='<button onclick="act(\'start\')">START ARENA</button>';html+='</div></div>'}
-if(state.crowdVote){const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt||Date.now())-Date.now())/1000));html+='<div class="card"><div class="round">THE CHAT CHOOSES</div><div class="countdown" id="voteCountdown">'+left+'s</div><h2>👁️ Community Showdown</h2>';if(me.canVote){html+='<div class="muted" style="margin-bottom:10px">Tap a player. You can change your vote until the timer ends.</div><div class="voteGrid">';for(const id of state.crowdVote.eligibleIds){const selected=state.crowdVote.voteTargetId===id?' selected':'';html+='<button class="'+selected+'" onclick="vote(\''+esc(id)+'\')">'+esc(playerName(id))+(selected?' ✓':'')+'</button>'}html+='</div>'}else html+='<div class="muted">You are still fighting or voting time has ended. Spectators and eliminated players control this vote.</div>';html+='</div>'}
+if(state.status==='running'&&state.feature)html+=featureCard();
 if(state.status==='finished'){html+='<div class="card winner"><div class="crown">🏆</div><h2>'+esc(playerName(state.winnerId))+' WINS</h2><div class="muted">The Arena is closed. The group cooldown has begun.</div></div>'}
 if(state.status!=='registration'&&(state.displayLog||[]).length){html+='<div class="card"><h3>LIVE ARENA</h3>';for(const item of latestLogs()){html+='<div class="player" style="display:block"><div class="round">ROUND '+esc(item.round)+'</div><div class="log">'+esc(clean(item.text))+'</div></div>'}html+='</div>'}
-html+='<div class="card"><h3>'+(state.status==='registration'?'PLAYERS':'ROSTER')+'</h3>';if(!players.length)html+='<div class="empty">Nobody entered yet.</div>';for(const p of players){html+='<div class="player '+(p.alive?'':'dead')+'"><div><div class="name">'+esc(p.displayName)+(p.id===state.hostId?' 👑':'')+'</div><div class="muted" style="font-size:11px">'+p.eliminations+' kills • '+p.revivals+' revives</div></div><span class="tag">'+(p.alive?'ACTIVE':'OUT')+'</span></div>'}html+='</div>';root.innerHTML=html}
-async function refresh(){if(!gameId||!initData){root.innerHTML='<div class="error">Open this Arena from Veil’s button inside the DWallet Telegram group.</div>';return}try{const j=await api('/telegram/miniapp/state?game='+encodeURIComponent(gameId));state=j.state;render()}catch(e){root.innerHTML='<div class="error">'+esc(e.message)+'</div>'}}
-function nextPollDelay(){const jitter=Math.floor(Math.random()*900);if(document.hidden)return 12000+jitter;if(state?.crowdVote)return 1400+jitter;if(state?.status==='registration')return 4200+jitter;if(state?.status==='running')return 3000+jitter;return 10000+jitter}
+html+='<div class="card"><h3>'+(state.status==='registration'?'PLAYERS':'ROSTER')+'</h3>';if(!players.length)html+='<div class="empty">Nobody entered yet.</div>';for(const p of players){const reviveClass=state.feature?.type==='revival'&&state.feature?.winnerId===p.id?' reviveGlow':'';html+='<div class="player '+(p.alive?'':'dead')+reviveClass+'"><div><div class="name">'+esc(p.displayName)+(p.id===state.hostId?' 👑':'')+'</div><div class="muted" style="font-size:11px">'+p.eliminations+' kills • '+p.revivals+' revives</div></div><span class="tag">'+(p.alive?'ACTIVE':'OUT')+'</span></div>'}html+='</div>';root.innerHTML=html}
+async function refresh(){if(!gameId||!initData){root.innerHTML='<div class="error">Open this Arena from Veil’s button inside the DWallet Telegram group.</div>';return}try{const old=state;const j=await api('/telegram/miniapp/state?game='+encodeURIComponent(gameId));state=j.state;detectTransitions(old,state);render()}catch(e){root.innerHTML='<div class="error">'+esc(e.message)+'</div>'}}
+function nextPollDelay(){const jitter=Math.floor(Math.random()*700);if(document.hidden)return 12000+jitter;if(state?.crowdVote)return 1000+jitter;if(state?.status==='registration')return 4200+jitter;if(state?.status==='running')return 2200+jitter;return 10000+jitter}
 async function poll(){await refresh();clearTimeout(pollHandle);pollHandle=setTimeout(poll,nextPollDelay())}
-function tickCountdown(){const el=document.getElementById('voteCountdown');if(!el||!state?.crowdVote?.closesAt)return;const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt)-Date.now())/1000));el.textContent=left+'s'}
-window.act=async action=>{if(busy)return;busy=true;haptic('medium');try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action})});state=j.state;render()}catch(e){notify(e.message)}finally{busy=false}};
-window.vote=async targetId=>{if(busy)return;busy=true;haptic('light');try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action:'vote',targetId})});state=j.state;render()}catch(e){notify(e.message)}finally{busy=false}};
-poll();setInterval(tickCountdown,250);document.addEventListener('visibilitychange',()=>{if(!document.hidden){clearTimeout(pollHandle);poll()}});
+function tickCountdown(){const el=document.getElementById('voteCountdown'),ring=document.getElementById('voteRing');if(!el||!state?.crowdVote?.closesAt)return;const left=Math.max(0,Math.ceil((Number(state.crowdVote.closesAt)-Date.now())/1000));el.textContent=left;if(ring)ring.style.setProperty('--pct',Math.max(0,Math.min(100,left/30*100)));if(left<=5&&left>0&&Date.now()%1000<300)impact(left<=2?'heavy':'light')}
+window.act=async action=>{if(busy)return;busy=true;impact('medium');try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action})});const old=state;state=j.state;detectTransitions(old,state);render()}catch(e){notification('error');notify(e.message)}finally{busy=false}};
+window.vote=async targetId=>{if(busy)return;busy=true;selection();try{const j=await api('/telegram/miniapp/action',{method:'POST',body:JSON.stringify({gameId,action:'vote',targetId})});state=j.state;render()}catch(e){notification('error');notify(e.message)}finally{busy=false}};
+poll();setInterval(tickCountdown,200);document.addEventListener('visibilitychange',()=>{if(!document.hidden){clearTimeout(pollHandle);poll()}});
 </script>
 </body>
 </html>`;
