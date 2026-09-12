@@ -30,6 +30,9 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/test-entry.js
+          node --check src/test-mode.js
+          node --check src/test-panel-client.js
           node --check src/activity-entry.js
           node --check src/activity-preview.js
           node --check src/activity-preview-client.js
@@ -40,6 +43,7 @@ jobs:
           node --check src/index.js
           node --check src/coordinator.js
           node --check src/core/engine.js
+          node --check src/core/simulation.js
           node --check src/storage.js
           node --check src/logs.js
           node --check src/themes/index.js
