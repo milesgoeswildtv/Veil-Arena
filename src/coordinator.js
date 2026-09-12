@@ -14,6 +14,7 @@ import { sendTelegramMessage, deleteTelegramMessage } from "./telegram.js";
 import { startArenaCooldown, TELEGRAM_ARENA_COOLDOWN_MS } from "./cooldown.js";
 import { getTheme, chooseNarration } from "./themes/index.js";
 import { buildMassBrawl } from "./themes/brawls.js";
+import { payoutReportText } from "./sponsorships.js";
 
 const CROWD_VOTE_MS = 30000;
 const RARE_EVENT_CHANCE = 0.035;
@@ -223,16 +224,40 @@ function winner(g) {
   return `🏆 **${name(g, g.winnerId).toUpperCase()} WINS THE ARENA.**\nThe chaos stops. One player is left.`;
 }
 
+function messageChunks(text, limit = 1800) {
+  const sections = String(text || "").split("\n\n");
+  const chunks = [];
+  let current = "";
+  for (const section of sections) {
+    const next = current ? `${current}\n\n${section}` : section;
+    if (next.length <= limit) { current = next; continue; }
+    if (current) chunks.push(current);
+    if (section.length <= limit) current = section;
+    else {
+      for (let i = 0; i < section.length; i += limit) chunks.push(section.slice(i, i + limit));
+      current = "";
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
 async function finish(env, g) {
   checkWinner(g);
   if (g.status !== "finished") return false;
   const platform = platformOf(g);
   const base = winner(g);
+  const payout = payoutReportText(g);
   const msg = platform === "telegram" ? `${base}\n\n⏳ **Next DWallet Arena: 30 minutes.**` : base;
+  g.payoutReport = payout || null;
   rememberDisplayed(g, base);
+  if (payout) rememberDisplayed(g, payout);
   await saveGame(env.DB, g);
   await recordFinishedGame(env.DB, g);
   await sendTransport(env, platform, g.channelId, msg);
+  if (payout) {
+    for (const chunk of messageChunks(payout)) await sendTransport(env, platform, g.channelId, chunk);
+  }
   if (platform === "telegram") {
     await startArenaCooldown(env.DB, g.channelId, TELEGRAM_ARENA_COOLDOWN_MS);
   }
