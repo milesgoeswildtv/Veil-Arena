@@ -9,7 +9,7 @@ import { VQS_NORMAL_RARE } from "./vibe_queen_slots/horror-normal-rare.js";
 import { FULL_TILT_GAMBA } from "./full_tilt/gamba.js";
 import { FULL_TILT_EXPANSION } from "./full_tilt/gamba-expansion.js";
 import { FULL_TILT_MEGA } from "./full_tilt/gamba-mega.js";
-import { DWALLET_THEME } from "./dwallet.js";
+import { DWALLET_THEME } from "./dwallet-hq.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
 import { PLAYER_KILLS_SEGMENT_2, SELF_KILLS_SEGMENT_2, PIN_DUELS_SEGMENT_2, MULTI_PIN_SEGMENT_2, REVIVAL_DUELS_SEGMENT_2 } from "../content/base/deaths-segment-2.js";
 import { PLAYER_KILLS_SEGMENT_3, SELF_KILLS_SEGMENT_3, PIN_DUELS_SEGMENT_3, MULTI_PIN_SEGMENT_3, REVIVAL_DUELS_SEGMENT_3 } from "../content/base/deaths-segment-3.js";
