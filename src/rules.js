@@ -26,6 +26,43 @@ Special rounds stop once the Arena reaches the **Final Five**.
 
 Stats begin tracking from Arena's official launch.`;
 
+  if(themeId==="dwallet")return`# 💜 DWALLET ARENA — RULES
+
+**WHAT IS ARENA?**
+Arena is a mostly RNG-driven community elimination game that runs inside Veil's Telegram Mini App. The group chat stays clean while the live match plays in its own Arena window.
+
+**HOW TO PLAY**
+Use \`/arena\` in the DWallet group. Veil posts one Arena launcher. Tap **ENTER / WATCH ARENA** to open the live Arena inside Telegram. The person who opened the Arena is entered automatically and controls **START ARENA**.
+
+Once the match begins, all round narration, eliminations, revivals, roster updates and audience voting happen inside the Arena window. Veil only keeps major Arena announcements in the main Telegram chat.
+
+**NORMAL ROUNDS**
+Each normal round contains **4 events** and guarantees at least **1 elimination**. Matchups, narration and outcomes are driven by chance.
+
+## 💥 MASS BRAWL
+A rare full-round event. **4–7 players** can get dragged into the same mess and multiple eliminations can happen. Nothing else happens during a Mass Brawl round.
+
+## ⚡ SECOND CHANCE — REVIVAL
+Every **7th round** while special events are active, two eliminated players get one shot at returning. **One comes back. One stays out.** Revival takes the entire round.
+
+## 👁️ THE CHAT CHOOSES — COMMUNITY SHOWDOWN
+Every **5th round** while special events are active, spectators and eliminated players get **30 seconds** to vote inside the live Arena window. Active fighters cannot vote.
+
+The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The vote takes the entire round.
+
+Special rounds stop once the Arena reaches the **Final Five**.
+
+**COOLDOWN**
+After an Arena finishes, that Telegram group has a **30-minute cooldown** before another one can open. The cooldown belongs to the group, not the player.
+
+**COMMANDS**
+\`/arena\` — Open registration and post the live Arena launcher.
+\`/arena rules\` — Post these rules.
+\`/arenastats\` — View your lifetime Arena record in this Telegram group.
+\`/arenaleaderboard\` — View this group's Arena leaders.
+
+Stats are tracked separately for each Telegram group.`;
+
   return`# 👻 VIBE QUEEN SLOTS — THE HAUNTED ARENA
 
 **WHAT IS THE HAUNTED ARENA?**

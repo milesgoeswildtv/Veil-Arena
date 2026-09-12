@@ -33,7 +33,13 @@ jobs:
           node --check src/index.js
           node --check src/coordinator.js
           node --check src/core/engine.js
+          node --check src/themes/index.js
           node --check src/themes/brawls.js
+          node --check src/themes/dwallet.js
+          node --check src/telegram.js
+          node --check src/miniapp.js
+          node --check src/cooldown.js
+          node --check src/rules.js
 
       - name: Run Arena smoke tests
         run: npm test

@@ -9,6 +9,7 @@ import { VQS_NORMAL_RARE } from "./vibe_queen_slots/horror-normal-rare.js";
 import { FULL_TILT_GAMBA } from "./full_tilt/gamba.js";
 import { FULL_TILT_EXPANSION } from "./full_tilt/gamba-expansion.js";
 import { FULL_TILT_MEGA } from "./full_tilt/gamba-mega.js";
+import { DWALLET_THEME } from "./dwallet.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
 import { PLAYER_KILLS_SEGMENT_2, SELF_KILLS_SEGMENT_2, PIN_DUELS_SEGMENT_2, MULTI_PIN_SEGMENT_2, REVIVAL_DUELS_SEGMENT_2 } from "../content/base/deaths-segment-2.js";
 import { PLAYER_KILLS_SEGMENT_3, SELF_KILLS_SEGMENT_3, PIN_DUELS_SEGMENT_3, MULTI_PIN_SEGMENT_3, REVIVAL_DUELS_SEGMENT_3 } from "../content/base/deaths-segment-3.js";
@@ -51,9 +52,41 @@ const FULL_TILT_THEME = {
   rareEvents: FULL_TILT_MEGA.rareEvents
 };
 
-const THEMES = new Map([[BASE_THEME.id, BASE_THEME], [VQS_THEME.id, VQS_THEME], [FULL_TILT_THEME.id, FULL_TILT_THEME]]);
-export function getTheme(themeId = DEFAULT_THEME_ID) { return THEMES.get(themeId) || THEMES.get(DEFAULT_THEME_ID) || BASE_THEME; }
-export function listThemes() { return [...THEMES.values()].map(({ id, displayName, tone }) => ({ id, displayName, tone })); }
-export function renderTemplate(template, values = {}) { return String(template || "").replaceAll("{killer}", values.killer || "Someone").replaceAll("{victim}", values.victim || "someone").replaceAll("{winner}", values.winner || "Someone").replaceAll("{loser}", values.loser || "someone").replaceAll("{third}", values.third || "someone else"); }
-export function chooseNarration(theme, poolName, values, rng = Math.random, recent = []) { const pool = theme?.[poolName] || BASE_THEME[poolName] || []; if (!pool.length) return { template: null, text: "The Arena makes its choice." }; const blocked = new Set(recent.slice(-150)); const candidates = pool.filter(line => !blocked.has(line)); const source = candidates.length ? candidates : pool; const template = source[Math.floor(rng() * source.length)]; return { template, text: renderTemplate(template, values) }; }
-export function themeNarrationCount(theme) { return ["playerKills","selfKills","pinDuels","multiPins","revivalDuels","normalEvents","rareEvents"].reduce((n,key)=>n+(theme?.[key]?.length||0),0); }
+const THEMES = new Map([
+  [BASE_THEME.id, BASE_THEME],
+  [VQS_THEME.id, VQS_THEME],
+  [FULL_TILT_THEME.id, FULL_TILT_THEME],
+  [DWALLET_THEME.id, DWALLET_THEME]
+]);
+
+export function getTheme(themeId = DEFAULT_THEME_ID) {
+  return THEMES.get(themeId) || THEMES.get(DEFAULT_THEME_ID) || BASE_THEME;
+}
+
+export function listThemes() {
+  return [...THEMES.values()].map(({ id, displayName, tone }) => ({ id, displayName, tone }));
+}
+
+export function renderTemplate(template, values = {}) {
+  return String(template || "")
+    .replaceAll("{killer}", values.killer || "Someone")
+    .replaceAll("{victim}", values.victim || "someone")
+    .replaceAll("{winner}", values.winner || "Someone")
+    .replaceAll("{loser}", values.loser || "someone")
+    .replaceAll("{third}", values.third || "someone else");
+}
+
+export function chooseNarration(theme, poolName, values, rng = Math.random, recent = []) {
+  const pool = theme?.[poolName] || BASE_THEME[poolName] || [];
+  if (!pool.length) return { template: null, text: "The Arena makes its choice." };
+  const blocked = new Set(recent.slice(-150));
+  const candidates = pool.filter(line => !blocked.has(line));
+  const source = candidates.length ? candidates : pool;
+  const template = source[Math.floor(rng() * source.length)];
+  return { template, text: renderTemplate(template, values) };
+}
+
+export function themeNarrationCount(theme) {
+  return ["playerKills","selfKills","pinDuels","multiPins","revivalDuels","normalEvents","rareEvents"]
+    .reduce((n,key)=>n+(theme?.[key]?.length||0),0);
+}
