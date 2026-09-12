@@ -49,13 +49,39 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;");
 }
 
+export function decorateDWalletTelegramText(input) {
+  const source = String(input ?? "");
+  const isArena = /dwallet|arena|community showdown|second chance/i.test(source);
+  if (!isArena || source.startsWith("`DWALLET HQ // VEIL TERMINAL`")) return source;
+
+  let text = source;
+  text = text.replace(/^Registration is open\.$/gm, "__REGISTRATION OPEN__");
+  text = text.replace(/^The Arena is running inside the Mini App\.$/gm, "> The Arena is running inside the Mini App.");
+  text = text.replace(/^Open the Arena window to enter or watch\.$/gm, "> Open the Arena window to enter or watch.");
+  text = text.replace(/^Tap below to enter the Arena window\. \*\*All rounds, eliminations, revivals and votes happen inside the Mini App\*\* so this chat stays clean\.$/gm,
+    "> Tap below to enter the Arena window. **All rounds, eliminations, revivals and votes happen inside the Mini App** so this chat stays clean.");
+  text = text.replace(/^The chaos stops\. One player is left\.$/gm, "||The chaos stops. One player is left.||");
+  text = text.replace(/^No Arena is active and the group is off cooldown\. Use `\/arena` to open one\.$/gm,
+    "> No Arena is active and the group is off cooldown. Use `/arena` to open one.");
+
+  return `\`DWALLET HQ // VEIL TERMINAL\`\n${text}`;
+}
+
 export function discordishToTelegramHtml(input) {
   let text = escapeHtml(input);
-  text = text.replace(/^##\s+(.+)$/gm, "<b>$1</b>");
-  text = text.replace(/^#\s+(.+)$/gm, "<b>$1</b>");
+
+  // Telegram-specific extensions used by Arena copy:
+  // __underline__, ||tap-to-reveal spoiler||, > quote, >! expandable quote.
+  text = text.replace(/^&gt;!\s*(.+)$/gm, "<blockquote expandable>$1</blockquote>");
+  text = text.replace(/^&gt;\s*(.+)$/gm, "<blockquote>$1</blockquote>");
+  text = text.replace(/^##\s+(.+)$/gm, "<b><u>$1</u></b>");
+  text = text.replace(/^#\s+(.+)$/gm, "<b><u>$1</u></b>");
   text = text.replace(/~~\*\*\*(.+?)\*\*\*~~/g, "<s><b><i>$1</i></b></s>");
   text = text.replace(/\*\*\*(.+?)\*\*\*/g, "<b><i>$1</i></b>");
   text = text.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  text = text.replace(/__([^_\n]+?)__/g, "<u>$1</u>");
+  text = text.replace(/\|\|([^|\n]+?)\|\|/g, "<tg-spoiler>$1</tg-spoiler>");
+  text = text.replace(/~~([^~\n]+?)~~/g, "<s>$1</s>");
   text = text.replace(/`([^`\n]+)`/g, "<code>$1</code>");
   text = text.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, "<i>$1</i>");
   text = text.replace(/\\\./g, ".");
@@ -126,9 +152,10 @@ export async function telegramUserInChat(channelId, userId, token) {
 }
 
 export async function sendTelegramMessage(channelId, token, { text, reply_markup = undefined } = {}) {
+  const prepared = decorateDWalletTelegramText(text || "");
   const result = await telegramRequest(token, "sendMessage", {
     chat_id: rawChatId(channelId),
-    text: discordishToTelegramHtml(text || ""),
+    text: discordishToTelegramHtml(prepared),
     parse_mode: "HTML",
     disable_web_page_preview: true,
     ...(reply_markup ? { reply_markup } : {})
@@ -141,7 +168,7 @@ export async function sendTelegramTextFile(channelId, token, filename, content, 
   form.set("chat_id", rawChatId(channelId));
   form.set("document", new Blob([String(content ?? "")], { type: "text/plain;charset=utf-8" }), String(filename || "arena-log.txt"));
   if (caption) {
-    form.set("caption", discordishToTelegramHtml(String(caption).slice(0, 900)));
+    form.set("caption", discordishToTelegramHtml(decorateDWalletTelegramText(String(caption).slice(0, 900))));
     form.set("parse_mode", "HTML");
   }
   const result = await telegramMultipartRequest(token, "sendDocument", form);
@@ -149,10 +176,11 @@ export async function sendTelegramTextFile(channelId, token, filename, content, 
 }
 
 export async function editTelegramMessage(channelId, messageId, token, { text, reply_markup = undefined } = {}) {
+  const prepared = decorateDWalletTelegramText(text || "");
   const result = await telegramRequest(token, "editMessageText", {
     chat_id: rawChatId(channelId),
     message_id: Number(messageId),
-    text: discordishToTelegramHtml(text || ""),
+    text: discordishToTelegramHtml(prepared),
     parse_mode: "HTML",
     disable_web_page_preview: true,
     ...(reply_markup ? { reply_markup } : {})
