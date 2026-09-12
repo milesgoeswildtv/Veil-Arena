@@ -14,7 +14,7 @@ The DWallet theme contains exactly **13,000** narration templates across kills, 
 
 DWallet uses a Telegram **Main Mini App** so the group chat does not get flooded by Arena narration.
 
-The Telegram group receives only the Arena launcher/status card and the final winner/cooldown announcement. Registration, live round text, eliminations, Mass Brawls, revivals, roster state and Crowd Votes happen inside the Mini App window. Discord keeps its existing chat-based Arena behavior.
+The Telegram group receives only the Arena launcher/status card and the final winner/cooldown announcement. Registration, live round text, eliminations, Mass Brawls, revivals, roster state and Community Showdown votes happen inside the Mini App window. Discord keeps its existing chat-based Arena behavior.
 
 The Mini App validates Telegram's signed `initData` server-side before trusting the user identity. Interactive actions also verify that the user belongs to the Telegram group, and the Arena binds itself to the verified Telegram chat context after the first interaction.
 
@@ -37,7 +37,7 @@ After deployment, open:
 https://<your-worker-domain>/setup/telegram
 ```
 
-That page shows the exact Mini App URL for the deployed Worker. In Telegram, configure Veil's Main Mini App through:
+In Telegram, configure Veil's Main Mini App through:
 
 ```text
 @BotFather
@@ -48,18 +48,31 @@ That page shows the exact Mini App URL for the deployed Worker. In Telegram, con
 → Enable Mini App
 ```
 
-Set the **Main Mini App URL** to:
+Because BotFather can impose a short URL limit, use the compact Mini App alias:
 
 ```text
-https://<your-worker-domain>/telegram/arena
+https://<your-worker-domain>/tg
 ```
 
-Then return to `/setup/telegram`, enter the existing `ADMIN_SECRET`, and press **REGISTER TELEGRAM**. Veil will register `/telegram/webhook` and publish these bot commands:
+`/tg` serves the same Mini App as `/telegram/arena`.
 
-- `/arena` — create a DWallet Arena and post its Mini App launcher
-- `/arena rules` — show DWallet Arena rules
+Then return to `/setup/telegram`, enter the existing `ADMIN_SECRET`, and press **REGISTER TELEGRAM**. Veil will register `/telegram/webhook` and publish the full command menu.
+
+## DWallet Telegram commands
+
+- `/arena` — create a DWallet Arena or reopen the active one
+- `/arenastatus` — show whether registration is open, a match is live, or the group is on cooldown
+- `/arenarules` — show the DWallet Arena rules; `/arena rules` also works
+- `/arenahelp` — show the full command list and aliases
 - `/arenastats` — show the user's stats for that Telegram group
-- `/arenaleaderboard` — show that Telegram group's leaderboard
+- `/arenaleaderboard` — show that group's leaderboard, including win rate after at least 3 Arenas
+- `/arenahistory` — show the five most recent completed Arenas
+- `/arenalog` — upload the latest completed match narration as a text file
+- `/arenalog 2` — upload the previous completed match; larger numbers go farther back
+
+Convenience aliases also work through `/arena`, including `/arena status`, `/arena stats`, `/arena leaderboard`, `/arena history`, `/arena log 2`, `/arena rules`, and `/arena help`.
+
+Personal stats track Arenas played, wins, losses, win rate, total eliminations, most eliminations in one Arena, total revivals, and Community Showdowns survived. Leaderboards rank Arenas played, wins, win rate, total eliminations, best single-game eliminations, revivals, and Community Showdowns survived.
 
 Add Veil to the DWallet Telegram group and make Veil a **group administrator**. The admin role is recommended because Telegram only guarantees reliable `getChatMember` lookups for other users when the bot is an administrator; Arena uses that check to stop forwarded Mini App links from being used by outsiders.
 
