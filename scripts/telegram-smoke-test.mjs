@@ -4,7 +4,9 @@ import { getTheme, themeNarrationCount } from "../src/themes/index.js";
 import { DWALLET_NARRATION_COUNT } from "../src/themes/dwallet.js";
 import { buildMassBrawl } from "../src/themes/brawls.js";
 import { rulesForTheme } from "../src/rules.js";
+import { buildArenaLog } from "../src/logs.js";
 import {
+  TELEGRAM_COMMANDS,
   telegramRegistrationKeyboard,
   telegramCrowdVoteKeyboard,
   telegramArenaLauncherKeyboard,
@@ -61,6 +63,12 @@ const launcher = telegramArenaLauncherKeyboard(`https://t.me/veil_example?starta
 assert.equal(launcher.inline_keyboard[0][0].text, "⚔️ ENTER / WATCH ARENA");
 assert(launcher.inline_keyboard[0][0].url.includes("mode=fullscreen"));
 
+const commandNames = TELEGRAM_COMMANDS.map(x => x.command);
+for (const required of ["arena", "arenastatus", "arenarules", "arenahelp", "arenastats", "arenaleaderboard", "arenahistory", "arenalog"]) {
+  assert(commandNames.includes(required), `Missing Telegram command: ${required}`);
+}
+assert.equal(new Set(commandNames).size, commandNames.length);
+
 const app = miniAppHtml();
 assert(app.includes("DWALLET • VEIL"));
 assert(app.includes("/telegram/miniapp/state"));
@@ -74,8 +82,12 @@ assert.equal(vote.closesAt - vote.openedAt, 30000);
 
 assert.equal(TELEGRAM_ARENA_COOLDOWN_MS, 30 * 60 * 1000);
 assert.equal(formatCooldown(30 * 60 * 1000), "30m");
-assert(rulesForTheme("dwallet").includes("30-minute cooldown"));
-assert(rulesForTheme("dwallet").includes("THE CHAT CHOOSES"));
+const dwRules = rulesForTheme("dwallet");
+assert(dwRules.includes("30-minute cooldown"));
+assert(dwRules.includes("THE CHAT CHOOSES"));
+assert(dwRules.includes("/arenastatus"));
+assert(dwRules.includes("/arenalog"));
+assert(dwRules.includes("/arenahistory"));
 
 const names = ["A", "B", "C", "D", "E", "F"];
 const survivors = ["A", "C"];
@@ -90,6 +102,17 @@ const formatted = discordishToTelegramHtml("# 💜 DWALLET ARENA\n**Player** vs 
 assert(formatted.includes("<b>💜 DWALLET ARENA</b>"));
 assert(formatted.includes("<b>Player</b>"));
 assert(formatted.includes("<s><b><i>Eliminated</i></b></s>"));
+
+const completed = {
+  ...game,
+  status: "finished",
+  round: 9,
+  winnerId: game.hostId,
+  displayLog: [{ round: 9, text: "🏆 **HOST WINS THE ARENA.**", at: new Date().toISOString() }]
+};
+const dwLog = buildArenaLog(completed, 1);
+assert(dwLog.startsWith("DWALLET ARENA — MATCH LOG"));
+assert(dwLog.includes("Winner: Host"));
 
 // Validate the Telegram WebApp HMAC implementation with a synthetic signed initData payload.
 const botToken = "123456:TEST_TOKEN_FOR_LOCAL_SMOKE_ONLY";
@@ -114,4 +137,4 @@ assert.equal(validated.user.id, "123456789");
 assert.equal(validated.chatType, "supergroup");
 assert.equal(validated.startParam, startParam);
 
-console.log(`Telegram/DWallet Mini App smoke tests passed. DWallet narration: ${DWALLET_NARRATION_COUNT}. Cooldown: ${formatCooldown(TELEGRAM_ARENA_COOLDOWN_MS)}.`);
+console.log(`Telegram/DWallet Mini App smoke tests passed. DWallet narration: ${DWALLET_NARRATION_COUNT}. Commands: ${commandNames.length}. Cooldown: ${formatCooldown(TELEGRAM_ARENA_COOLDOWN_MS)}.`);
