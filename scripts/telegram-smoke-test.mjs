@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createGame, openCrowdVote } from "../src/core/engine.js";
 import { getTheme, themeNarrationCount } from "../src/themes/index.js";
-import { DWALLET_NARRATION_COUNT } from "../src/themes/dwallet.js";
+import { DWALLET_NARRATION_COUNT, DWALLET_HQ_EXPANSION_COUNT } from "../src/themes/dwallet-hq.js";
 import { buildMassBrawl } from "../src/themes/brawls.js";
 import { rulesForTheme } from "../src/rules.js";
 import { buildArenaLog } from "../src/logs.js";
@@ -11,6 +11,7 @@ import {
   telegramCrowdVoteKeyboard,
   telegramArenaLauncherKeyboard,
   telegramArenaStartParam,
+  decorateDWalletTelegramText,
   discordishToTelegramHtml
 } from "../src/telegram.js";
 import { TELEGRAM_ARENA_COOLDOWN_MS, formatCooldown } from "../src/cooldown.js";
@@ -18,15 +19,16 @@ import { miniAppHtml, validateTelegramInitData } from "../src/miniapp.js";
 import { injectMiniAppHubHtml } from "../src/hub.js";
 
 const dw = getTheme("dwallet");
-assert.equal(DWALLET_NARRATION_COUNT, 13000);
-assert.equal(themeNarrationCount(dw), 13000);
-assert.equal(dw.playerKills.length, 5000);
-assert.equal(dw.selfKills.length, 2400);
-assert.equal(dw.pinDuels.length, 1500);
-assert.equal(dw.multiPins.length, 1200);
-assert.equal(dw.revivalDuels.length, 1200);
-assert.equal(dw.normalEvents.length, 1000);
-assert.equal(dw.rareEvents.length, 700);
+assert.equal(DWALLET_HQ_EXPANSION_COUNT, 13000);
+assert.equal(DWALLET_NARRATION_COUNT, 26000);
+assert.equal(themeNarrationCount(dw), 26000);
+assert.equal(dw.playerKills.length, 10000);
+assert.equal(dw.selfKills.length, 4800);
+assert.equal(dw.pinDuels.length, 3000);
+assert.equal(dw.multiPins.length, 2400);
+assert.equal(dw.revivalDuels.length, 2400);
+assert.equal(dw.normalEvents.length, 2000);
+assert.equal(dw.rareEvents.length, 1400);
 assert.equal(dw.id, "dwallet");
 
 const game = createGame({
@@ -108,10 +110,19 @@ assert(dwBrawl.includes("DWallet"));
 assert.notEqual(dwBrawl, vqsBrawl);
 assert.notEqual(dwBrawl, ftBrawl);
 
-const formatted = discordishToTelegramHtml("# 💜 DWALLET ARENA\n**Player** vs ~~***Eliminated***~~");
-assert(formatted.includes("<b>💜 DWALLET ARENA</b>"));
+const decorated = decorateDWalletTelegramText("# 💜 DWALLET ARENA\nRegistration is open.\nThe Arena is running inside the Mini App.");
+assert(decorated.startsWith("`DWALLET HQ // VEIL TERMINAL`"));
+assert(decorated.includes("__REGISTRATION OPEN__"));
+assert(decorated.includes("> The Arena is running inside the Mini App."));
+
+const formatted = discordishToTelegramHtml("# 💜 DWALLET ARENA\n**Player** vs ~~***Eliminated***~~\n__LIVE__\n||classified||\n> HQ feed online\n>! expanded only when tapped");
+assert(formatted.includes("<b><u>💜 DWALLET ARENA</u></b>"));
 assert(formatted.includes("<b>Player</b>"));
 assert(formatted.includes("<s><b><i>Eliminated</i></b></s>"));
+assert(formatted.includes("<u>LIVE</u>"));
+assert(formatted.includes("<tg-spoiler>classified</tg-spoiler>"));
+assert(formatted.includes("<blockquote>HQ feed online</blockquote>"));
+assert(formatted.includes("<blockquote expandable>expanded only when tapped</blockquote>"));
 
 const completed = {
   ...game,
