@@ -15,6 +15,7 @@ import {
 } from "../src/telegram.js";
 import { TELEGRAM_ARENA_COOLDOWN_MS, formatCooldown } from "../src/cooldown.js";
 import { miniAppHtml, validateTelegramInitData } from "../src/miniapp.js";
+import { injectMiniAppHubHtml } from "../src/hub.js";
 
 const dw = getTheme("dwallet");
 assert.equal(DWALLET_NARRATION_COUNT, 13000);
@@ -46,7 +47,6 @@ for (let i = 0; i < 12; i++) {
   game.aliveIds.push(id);
 }
 
-// Legacy callback buttons remain valid as a fallback, but DWallet's primary UI is the Mini App launcher.
 const registration = telegramRegistrationKeyboard(game);
 for (const row of registration.inline_keyboard) {
   for (const button of row) assert(Buffer.byteLength(button.callback_data, "utf8") <= 64);
@@ -75,6 +75,16 @@ assert(app.includes("/telegram/miniapp/state"));
 assert(app.includes("/telegram/miniapp/action"));
 assert(app.includes("requestFullscreen"));
 assert(app.includes("Community Showdown"));
+
+const hubApp = injectMiniAppHubHtml(app);
+assert(hubApp.includes('data-hub-tab="arena"'));
+assert(hubApp.includes('data-hub-tab="stats"'));
+assert(hubApp.includes('data-hub-tab="leaderboard"'));
+assert(hubApp.includes('data-hub-tab="rules"'));
+assert(hubApp.includes("/telegram/miniapp/hub"));
+assert(hubApp.includes("REFRESH STATS"));
+assert(hubApp.includes("REFRESH LEADERBOARD"));
+assert(hubApp.includes("WIN RATE"));
 
 const vote = openCrowdVote(game);
 assert(vote.openedAt > 0);
@@ -114,7 +124,6 @@ const dwLog = buildArenaLog(completed, 1);
 assert(dwLog.startsWith("DWALLET ARENA — MATCH LOG"));
 assert(dwLog.includes("Winner: Host"));
 
-// Validate the Telegram WebApp HMAC implementation with a synthetic signed initData payload.
 const botToken = "123456:TEST_TOKEN_FOR_LOCAL_SMOKE_ONLY";
 const authDate = Math.floor(Date.now() / 1000);
 const userJson = JSON.stringify({ id: 123456789, first_name: "Arena", username: "arena_test" });
