@@ -32,6 +32,9 @@ jobs:
         run: |
           node --check src/activity-entry.js
           node --check src/activity-preview.js
+          node --check src/activity-preview-client.js
+          node --check src/sponsor-panel-client.js
+          node --check src/sponsorships.js
           node --check src/entry.js
           node --check src/hub.js
           node --check src/index.js
