@@ -70,6 +70,37 @@ export function telegramCrowdVoteKeyboard(game) {
   return { inline_keyboard: rows };
 }
 
+export function telegramArenaLauncherKeyboard(url, text = "⚔️ ENTER / WATCH ARENA") {
+  return { inline_keyboard: [[{ text, url }]] };
+}
+
+export function telegramArenaStartParam(gameId) {
+  return `arena_${String(gameId)}`;
+}
+
+export async function telegramBotInfo(token) {
+  return telegramRequest(token, "getMe");
+}
+
+export async function telegramArenaLaunchUrl(token, gameId) {
+  const bot = await telegramBotInfo(token);
+  if (!bot?.username) throw new Error("Telegram bot username is missing.");
+  const start = encodeURIComponent(telegramArenaStartParam(gameId));
+  return `https://t.me/${bot.username}?startapp=${start}&mode=fullscreen`;
+}
+
+export async function telegramUserInChat(channelId, userId, token) {
+  try {
+    const member = await telegramRequest(token, "getChatMember", {
+      chat_id: rawChatId(channelId),
+      user_id: Number(userId)
+    });
+    return !["left", "kicked"].includes(member?.status);
+  } catch {
+    return false;
+  }
+}
+
 export async function sendTelegramMessage(channelId, token, { text, reply_markup = undefined } = {}) {
   const result = await telegramRequest(token, "sendMessage", {
     chat_id: rawChatId(channelId),
@@ -117,6 +148,7 @@ export async function answerTelegramCallback(callbackQueryId, token, text = "") 
 }
 
 export async function configureTelegramBot(token, webhookUrl, webhookSecret) {
+  const bot = await telegramBotInfo(token);
   await telegramRequest(token, "setWebhook", {
     url: webhookUrl,
     secret_token: webhookSecret,
@@ -130,7 +162,7 @@ export async function configureTelegramBot(token, webhookUrl, webhookSecret) {
       { command: "arenaleaderboard", description: "View Arena leaders" }
     ]
   });
-  return true;
+  return bot;
 }
 
 export function telegramWebhookAuthorized(request, expectedSecret) {
