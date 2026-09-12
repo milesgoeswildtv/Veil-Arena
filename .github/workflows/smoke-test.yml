@@ -37,6 +37,7 @@ jobs:
           node --check src/themes/brawls.js
           node --check src/themes/dwallet.js
           node --check src/telegram.js
+          node --check src/miniapp.js
           node --check src/cooldown.js
           node --check src/rules.js
 
