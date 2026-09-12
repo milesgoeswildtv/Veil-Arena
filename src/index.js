@@ -7,21 +7,21 @@ import { FULL_TILT_GUILD_ID,VIBE_QUEEN_GUILD_ID,themeForGuild } from "./server-c
 import { buildArenaLog } from "./logs.js";
 import {
   userFromTelegram,
-  telegramRegistrationKeyboard,
   sendTelegramMessage,
-  editTelegramMessage,
-  answerTelegramCallback,
   configureTelegramBot,
-  telegramWebhookAuthorized
+  telegramWebhookAuthorized,
+  telegramArenaLaunchUrl,
+  telegramArenaLauncherKeyboard
 } from "./telegram.js";
 import { getArenaCooldownRemaining,formatCooldown } from "./cooldown.js";
+import { miniAppHtml,handleMiniAppState,handleMiniAppAction } from "./miniapp.js";
 export { ArenaCoordinator } from "./coordinator.js";
 
 function playerList(game){const players=Object.values(game.players);if(!players.length)return"Nobody has entered yet.";return players.map((p,i)=>`${i+1}. **${p.displayName}**`).join("\n");}
 function registrationMessage(game){const theme=getTheme(game.themeId);return`# ${theme.labels.arena}\nRegistration is open.\n🎭 **SERVER THEME: ${theme.displayName}**\n\n${playerList(game)}\n\n**${Object.keys(game.players).length} entered**`;}
 function registrationComponents(game){return[actionRow(button(`arena:join:${game.id}`,"ENTER ARENA",3,false,"⚔️"),button(`arena:leave:${game.id}`,"LEAVE",2),button(`arena:start:${game.id}`,"START",1,false,"▶️"))];}
 function voteSelect(game,page=0){const per=25,total=Math.max(1,Math.ceil(game.aliveIds.length/per)),safe=Math.max(0,Math.min(page,total-1)),ids=game.aliveIds.slice(safe*per,(safe+1)*per);const select={type:3,custom_id:`arena:vote_cast:${game.id}:${safe}`,placeholder:"Choose a player...",min_values:1,max_values:1,options:ids.map(id=>({label:game.players[id]?.displayName?.slice(0,100)||"Unknown",value:id}))};const rows=[{type:1,components:[select]}];if(total>1)rows.push(actionRow(button(`arena:vote_open:${game.id}:${safe-1}`,"PREV",2,safe===0),button(`arena:vote_open:${game.id}:${safe+1}`,"NEXT",2,safe>=total-1)));return{rows,page:safe,totalPages:total};}
-async function kickCoordinator(env,channelId,action="kick",platform="discord"){if(!env.ARENA_COORDINATOR)return;const id=env.ARENA_COORDINATOR.idFromName(channelId),stub=env.ARENA_COORDINATOR.get(id);await stub.fetch("https://arena.internal/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action,channelId,platform})});}
+export async function kickCoordinator(env,channelId,action="kick",platform="discord"){if(!env.ARENA_COORDINATOR)return;const id=env.ARENA_COORDINATOR.idFromName(channelId),stub=env.ARENA_COORDINATOR.get(id);await stub.fetch("https://arena.internal/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action,channelId,platform})});}
 async function scheduleMessageDelete(env,channelId,messageId,delayMs=30000,platform="discord"){if(!env.ARENA_COORDINATOR||!messageId)return;const id=env.ARENA_COORDINATOR.idFromName(`delete:${platform}:${messageId}`),stub=env.ARENA_COORDINATOR.get(id);await stub.fetch("https://arena.internal/",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({action:"delete_message",channelId,messageId,delayMs,platform})});}
 async function themeIdForGuild(env,guildId){const config=await getGuildConfig(env.DB,guildId),themeId=themeForGuild(guildId,config.theme_id);if(themeId!==config.theme_id)await setGuildTheme(env.DB,guildId,themeId);return themeId;}
 
@@ -35,6 +35,7 @@ async function handleArenaCommand(interaction,env){
   if(sub==="start"){if(game)return interactionMessage("There is already an Arena game active in this channel.",[],true);const themeId=await themeIdForGuild(env,guildId);game=createGame({guildId,channelId,hostId:user.id,themeId,platform:"discord"});addPlayer(game,user);await saveGame(env.DB,game);return interactionMessage(registrationMessage(game),registrationComponents(game));}
   return interactionMessage("Unknown Arena command.",[],true);
 }
+
 function statsText(user,stats){const games=stats?.games_played||0,wins=stats?.wins||0,kills=stats?.total_kills||0,revives=stats?.total_revivals||0,best=stats?.max_kills_single_game||0,crowd=stats?.crowd_survivals||0,rate=games?((wins/games)*100).toFixed(1):"0.0";return`# ⚔️ ${user.displayName}'S ARENA STATS\n\n**Arenas Played:** ${games}\n**Wins:** ${wins}\n**Total Kills:** ${kills}\n**Total Revivals:** ${revives}\n**Most Kills in One Arena:** ${best}\n**Crowd Votes Survived:** ${crowd}\n**Win Rate:** ${rate}%\n\n*Stats track from Arena's official launch in this server.*`;}
 async function handleStatsCommand(interaction,env){if(!interaction.guild_id)return interactionMessage("Arena stats only exist inside a server.",[],true);if(!env.DB)return interactionMessage("Arena database is not configured yet.",[],true);await ensureSchema(env.DB);const user=userFromInteraction(interaction),stats=await loadPlayerStats(env.DB,interaction.guild_id,user.id);return interactionMessage(statsText(user,stats));}
 function boardSection(title,rows){if(!rows?.length)return`**${title}**\nNo records yet.`;return`**${title}**\n${rows.map((r,i)=>`${i+1}. ${r.display_name} — **${r.value}**`).join("\n")}`;}
@@ -57,117 +58,35 @@ async function telegramStartArena(message,env){
   await ensureSchema(env.DB);
   const channelId=telegramScope(chat.id),guildId=channelId;
   const active=await loadActiveGameForChannel(env.DB,channelId);
-  if(active)return sendTelegramMessage(channelId,env.TELEGRAM_BOT_TOKEN,{text:"💜 There is already a DWallet Arena active in this group."});
+  if(active){
+    const controls=active.telegramLaunchUrl?telegramArenaLauncherKeyboard(active.telegramLaunchUrl,"⚔️ OPEN ACTIVE ARENA"):undefined;
+    return sendTelegramMessage(channelId,env.TELEGRAM_BOT_TOKEN,{text:"💜 There is already a DWallet Arena active in this group.",reply_markup:controls});
+  }
   const remaining=await getArenaCooldownRemaining(env.DB,channelId);
   if(remaining>0)return sendTelegramMessage(channelId,env.TELEGRAM_BOT_TOKEN,{text:`⏳ DWallet Arena is cooling down. Try again in **${formatCooldown(remaining)}**.`});
   const game=createGame({guildId,channelId,hostId:user.id,themeId:"dwallet",platform:"telegram"});
   addPlayer(game,user);
   await saveGame(env.DB,game);
-  return sendTelegramMessage(channelId,env.TELEGRAM_BOT_TOKEN,{text:registrationMessage(game),reply_markup:telegramRegistrationKeyboard(game)});
+  const launchUrl=await telegramArenaLaunchUrl(env.TELEGRAM_BOT_TOKEN,game.id);
+  const posted=await sendTelegramMessage(channelId,env.TELEGRAM_BOT_TOKEN,{
+    text:`# 💜 DWALLET ARENA\nRegistration is open. **${user.displayName}** is hosting.\n\nTap below to enter the Arena window. **All rounds, eliminations, revivals and votes happen inside the Mini App** so this chat stays clean.`,
+    reply_markup:telegramArenaLauncherKeyboard(launchUrl)
+  });
+  game.telegramLaunchUrl=launchUrl;
+  game.telegramLauncherMessageId=posted?.id||null;
+  await saveGame(env.DB,game);
+  return posted;
 }
 
-async function telegramRules(message,env){
-  const chat=message.chat;
-  if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena rules are meant for a Telegram group where Arena can run."});
-  return sendTelegramMessage(telegramScope(chat.id),env.TELEGRAM_BOT_TOKEN,{text:rulesForTheme("dwallet")});
-}
-
-async function telegramStats(message,env){
-  const chat=message.chat,user=userFromTelegram(message.from);
-  if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena stats are tracked inside Telegram groups."});
-  if(!user)return null;
-  await ensureSchema(env.DB);
-  const guildId=telegramScope(chat.id),stats=await loadPlayerStats(env.DB,guildId,user.id);
-  return sendTelegramMessage(guildId,env.TELEGRAM_BOT_TOKEN,{text:telegramStatsText(user,stats)});
-}
-
-async function telegramLeaderboard(message,env){
-  const chat=message.chat;
-  if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena leaderboards are tracked inside Telegram groups."});
-  await ensureSchema(env.DB);
-  const guildId=telegramScope(chat.id),board=await loadArenaLeaderboard(env.DB,guildId,5);
-  return sendTelegramMessage(guildId,env.TELEGRAM_BOT_TOKEN,{text:telegramLeaderboardText(board)});
-}
-
-async function handleTelegramMessage(message,env){
-  const cmd=telegramCommand(message?.text||"");
-  if(cmd==="/arena"){
-    const sub=(telegramArgs(message.text)[0]||"").toLowerCase();
-    if(sub==="rules")return telegramRules(message,env);
-    if(!sub||sub==="start")return telegramStartArena(message,env);
-    return sendTelegramMessage(telegramScope(message.chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Use `/arena` to start or `/arena rules` for the rules."});
-  }
-  if(cmd==="/arenastats")return telegramStats(message,env);
-  if(cmd==="/arenaleaderboard")return telegramLeaderboard(message,env);
-  return null;
-}
-
-async function handleTelegramCallback(query,env){
-  const data=String(query?.data||"");
-  if(!data.startsWith("av:"))return;
-  const parts=data.split(":"),action=parts[1],gameId=parts[2],targetId=parts[3],user=userFromTelegram(query.from);
-  if(!gameId||!user){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"Arena couldn't read that action.");return;}
-  await ensureSchema(env.DB);
-  const game=await loadGame(env.DB,gameId);
-  if(!game||game.platform!=="telegram"){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"That Arena no longer exists.");return;}
-  const message=query.message;
-  if(!message?.chat?.id){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"That Arena message is no longer available.");return;}
-  const expectedChannel=telegramScope(message.chat.id);
-  if(game.channelId!==expectedChannel){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"That button belongs to a different Arena.");return;}
-  try{
-    if(action==="j"){
-      addPlayer(game,user);
-      await saveGame(env.DB,game);
-      await editTelegramMessage(game.channelId,message.message_id,env.TELEGRAM_BOT_TOKEN,{text:registrationMessage(game),reply_markup:telegramRegistrationKeyboard(game)});
-      await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"You're in the Arena.");
-      return;
-    }
-    if(action==="l"){
-      if(user.id===game.hostId){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"The host can't leave registration. Start the Arena or leave it open.");return;}
-      removePlayer(game,user.id);
-      await saveGame(env.DB,game);
-      await editTelegramMessage(game.channelId,message.message_id,env.TELEGRAM_BOT_TOKEN,{text:registrationMessage(game),reply_markup:telegramRegistrationKeyboard(game)});
-      await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"You left the Arena.");
-      return;
-    }
-    if(action==="s"){
-      if(user.id!==game.hostId){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"Only the Arena host can start it.");return;}
-      startGame(game);
-      await saveGame(env.DB,game);
-      await kickCoordinator(env,game.channelId,"kick","telegram");
-      const theme=getTheme(game.themeId);
-      await editTelegramMessage(game.channelId,message.message_id,env.TELEGRAM_BOT_TOKEN,{text:`# ${theme.labels.arena}\nRegistration closed. **${game.aliveIds.length} players** are inside.\n\nThe first round begins now.`});
-      await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"Arena started.");
-      return;
-    }
-    if(action==="v"){
-      if(!game.crowdVote||game.crowdVote.status!=="open"){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"The chat vote is closed.");return;}
-      if(game.aliveIds.includes(user.id)){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"You're still fighting. Spectators get this vote.");return;}
-      if(!targetId||!game.players[targetId]){await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"That player is not available.");return;}
-      castCrowdVote(game,user.id,targetId);
-      await saveGame(env.DB,game);
-      await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,`Vote locked on ${game.players[targetId]?.displayName||"Unknown"}. You can change it before time runs out.`);
-      return;
-    }
-    await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,"Unknown Arena action.");
-  }catch(error){
-    await answerTelegramCallback(query.id,env.TELEGRAM_BOT_TOKEN,String(error?.message||"Arena action failed.").slice(0,190));
-  }
-}
-
-async function handleTelegram(request,env){
-  if(!env.TELEGRAM_BOT_TOKEN||!env.TELEGRAM_WEBHOOK_SECRET)return new Response("Telegram is not configured",{status:503});
-  if(!telegramWebhookAuthorized(request,env.TELEGRAM_WEBHOOK_SECRET))return new Response("Bad Telegram webhook secret",{status:401});
-  if(!env.DB)return new Response("Arena database missing",{status:503});
-  const update=await request.json().catch(()=>null);
-  if(!update)return new Response("Bad update",{status:400});
-  if(update.callback_query)await handleTelegramCallback(update.callback_query,env);
-  else if(update.message?.text)await handleTelegramMessage(update.message,env);
-  return jsonResponse({ok:true});
-}
+async function telegramRules(message,env){const chat=message.chat;if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena rules are meant for a Telegram group where Arena can run."});return sendTelegramMessage(telegramScope(chat.id),env.TELEGRAM_BOT_TOKEN,{text:rulesForTheme("dwallet")});}
+async function telegramStats(message,env){const chat=message.chat,user=userFromTelegram(message.from);if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena stats are tracked inside Telegram groups."});if(!user)return null;await ensureSchema(env.DB);const guildId=telegramScope(chat.id),stats=await loadPlayerStats(env.DB,guildId,user.id);return sendTelegramMessage(guildId,env.TELEGRAM_BOT_TOKEN,{text:telegramStatsText(user,stats)});}
+async function telegramLeaderboard(message,env){const chat=message.chat;if(!telegramGroup(chat))return sendTelegramMessage(String(chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Arena leaderboards are tracked inside Telegram groups."});await ensureSchema(env.DB);const guildId=telegramScope(chat.id),board=await loadArenaLeaderboard(env.DB,guildId,5);return sendTelegramMessage(guildId,env.TELEGRAM_BOT_TOKEN,{text:telegramLeaderboardText(board)});}
+async function handleTelegramMessage(message,env){const cmd=telegramCommand(message?.text||"");if(cmd==="/arena"){const sub=(telegramArgs(message.text)[0]||"").toLowerCase();if(sub==="rules")return telegramRules(message,env);if(!sub||sub==="start")return telegramStartArena(message,env);return sendTelegramMessage(telegramScope(message.chat.id),env.TELEGRAM_BOT_TOKEN,{text:"Use `/arena` to start or `/arena rules` for the rules."});}if(cmd==="/arenastats")return telegramStats(message,env);if(cmd==="/arenaleaderboard")return telegramLeaderboard(message,env);return null;}
+async function handleTelegram(request,env){if(!env.TELEGRAM_BOT_TOKEN||!env.TELEGRAM_WEBHOOK_SECRET)return new Response("Telegram is not configured",{status:503});if(!telegramWebhookAuthorized(request,env.TELEGRAM_WEBHOOK_SECRET))return new Response("Bad Telegram webhook secret",{status:401});if(!env.DB)return new Response("Arena database missing",{status:503});const update=await request.json().catch(()=>null);if(!update)return new Response("Bad update",{status:400});if(update.message?.text)await handleTelegramMessage(update.message,env);return jsonResponse({ok:true});}
 
 async function handleRegister(request,env){const provided=request.headers.get("x-admin-secret");if(!env.ADMIN_SECRET||provided!==env.ADMIN_SECRET)return new Response("Unauthorized",{status:401});if(!env.DISCORD_APPLICATION_ID||!env.DISCORD_BOT_TOKEN)return jsonResponse({ok:false,error:"Discord credentials missing"},500);if(!env.DB)return jsonResponse({ok:false,error:"Arena database missing"},500);await ensureSchema(env.DB);const body=await request.json().catch(()=>({}));if(!body.guildId)return jsonResponse({ok:false,error:"guildId required"},400);const themeId=themeForGuild(body.guildId,body.themeId||"vibe_queen_slots");const commands=await registerGuildCommands(env.DISCORD_APPLICATION_ID,body.guildId,env.DISCORD_BOT_TOKEN);await setGuildTheme(env.DB,body.guildId,themeId);return jsonResponse({ok:true,themeId,commands});}
-async function handleTelegramRegister(request,env){const provided=request.headers.get("x-admin-secret");if(!env.ADMIN_SECRET||provided!==env.ADMIN_SECRET)return new Response("Unauthorized",{status:401});if(!env.TELEGRAM_BOT_TOKEN||!env.TELEGRAM_WEBHOOK_SECRET)return jsonResponse({ok:false,error:"Telegram credentials missing"},500);if(!env.DB)return jsonResponse({ok:false,error:"Arena database missing"},500);await ensureSchema(env.DB);const origin=new URL(request.url).origin,webhookUrl=`${origin}/telegram/webhook`;await configureTelegramBot(env.TELEGRAM_BOT_TOKEN,webhookUrl,env.TELEGRAM_WEBHOOK_SECRET);return jsonResponse({ok:true,themeId:"dwallet",webhookUrl,commands:["arena","arenastats","arenaleaderboard"]});}
+async function handleTelegramRegister(request,env){const provided=request.headers.get("x-admin-secret");if(!env.ADMIN_SECRET||provided!==env.ADMIN_SECRET)return new Response("Unauthorized",{status:401});if(!env.TELEGRAM_BOT_TOKEN||!env.TELEGRAM_WEBHOOK_SECRET)return jsonResponse({ok:false,error:"Telegram credentials missing"},500);if(!env.DB)return jsonResponse({ok:false,error:"Arena database missing"},500);await ensureSchema(env.DB);const origin=new URL(request.url).origin,webhookUrl=`${origin}/telegram/webhook`,miniAppUrl=`${origin}/telegram/arena`;const bot=await configureTelegramBot(env.TELEGRAM_BOT_TOKEN,webhookUrl,env.TELEGRAM_WEBHOOK_SECRET);return jsonResponse({ok:true,themeId:"dwallet",botUsername:bot?.username||null,webhookUrl,miniAppUrl,commands:["arena","arenastats","arenaleaderboard"],botFather:"Configure Veil's Main Mini App URL to the miniAppUrl above."});}
 function setupPage({title,guildId,themeId,doneText}){return`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} Arena Setup</title><style>body{font-family:system-ui;margin:0;background:#111;color:#fff;display:grid;place-items:center;min-height:100vh}.card{width:min(92vw,460px);background:#1c1c1c;padding:24px;border-radius:18px}input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:10px;font-size:16px}input{margin:12px 0;background:#0d0d0d;color:#fff;border:1px solid #444}button{border:0;font-weight:700}#out{white-space:pre-wrap;margin-top:14px;color:#ddd}</style></head><body><div class="card"><h1>${title} Arena</h1><p>Enter the Cloudflare ADMIN_SECRET you already know. It is sent directly to your Arena Worker and is not stored by this page.</p><input id="secret" type="password" placeholder="ADMIN_SECRET"><button id="go">REGISTER ARENA</button><div id="out"></div></div><script>go.onclick=async()=>{out.textContent='Registering…';try{const r=await fetch('/admin/register',{method:'POST',headers:{'content-type':'application/json','x-admin-secret':secret.value},body:JSON.stringify({guildId:'${guildId}',themeId:'${themeId}'})});const text=await r.text();out.textContent=r.ok?'✅ ${doneText}':'❌ '+r.status+' '+text}catch(e){out.textContent='❌ '+e.message}}</script></body></html>`;}
-function telegramSetupPage(){return`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>DWallet Telegram Arena Setup</title><style>body{font-family:system-ui;margin:0;background:#111;color:#fff;display:grid;place-items:center;min-height:100vh}.card{width:min(92vw,520px);background:#1c1c1c;padding:24px;border-radius:18px}input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:10px;font-size:16px}input{margin:12px 0;background:#0d0d0d;color:#fff;border:1px solid #444}button{border:0;font-weight:700}#out{white-space:pre-wrap;margin-top:14px;color:#ddd}</style></head><body><div class="card"><h1>💜 DWallet Telegram Arena</h1><p>This registers Veil's Telegram webhook and commands. TELEGRAM_BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET must already exist as Cloudflare Worker secrets.</p><input id="secret" type="password" placeholder="ADMIN_SECRET"><button id="go">REGISTER TELEGRAM</button><div id="out"></div></div><script>go.onclick=async()=>{out.textContent='Registering…';try{const r=await fetch('/admin/telegram/register',{method:'POST',headers:{'x-admin-secret':secret.value}});const text=await r.text();out.textContent=r.ok?'✅ Telegram Arena registered. Add Veil to the DWallet group and use /arena.':'❌ '+r.status+' '+text}catch(e){out.textContent='❌ '+e.message}}</script></body></html>`;}
-export default{async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/health")return jsonResponse({ok:true,service:"veil-arena",status:"ready",database:Boolean(env.DB),coordinator:Boolean(env.ARENA_COORDINATOR),discordConfigured:Boolean(env.DISCORD_PUBLIC_KEY&&env.DISCORD_BOT_TOKEN&&env.DISCORD_APPLICATION_ID),telegramConfigured:Boolean(env.TELEGRAM_BOT_TOKEN&&env.TELEGRAM_WEBHOOK_SECRET)});if(url.pathname==="/setup/full-tilt"&&request.method==="GET")return new Response(setupPage({title:"Full Tilt",guildId:FULL_TILT_GUILD_ID,themeId:"full_tilt",doneText:"Done. Go back to Full Tilt and type /arena."}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/setup/vibe-queen"&&request.method==="GET")return new Response(setupPage({title:"Vibe Queen Slots: After Dark",guildId:VIBE_QUEEN_GUILD_ID,themeId:"vibe_queen_slots",doneText:"Done. Go back to Vibe Queen Slots and type /arena."}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/setup/telegram"&&request.method==="GET")return new Response(telegramSetupPage(),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/interactions"&&request.method==="POST")return handleDiscord(request,env);if(url.pathname==="/telegram/webhook"&&request.method==="POST")return handleTelegram(request,env);if(url.pathname==="/admin/register"&&request.method==="POST")return handleRegister(request,env);if(url.pathname==="/admin/telegram/register"&&request.method==="POST")return handleTelegramRegister(request,env);return new Response("Veil Arena is online.",{headers:{"content-type":"text/plain; charset=utf-8"}});}};
+function telegramSetupPage(origin){const appUrl=`${origin}/telegram/arena`;return`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>DWallet Telegram Arena Setup</title><style>body{font-family:system-ui;margin:0;background:#111;color:#fff;display:grid;place-items:center;min-height:100vh}.card{width:min(92vw,560px);background:#1c1c1c;padding:24px;border-radius:18px}input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:10px;font-size:16px}input{margin:12px 0;background:#0d0d0d;color:#fff;border:1px solid #444}button{border:0;font-weight:700}.url{word-break:break-all;background:#0d0d0d;padding:10px;border-radius:10px;color:#cdb3ff}#out{white-space:pre-wrap;margin-top:14px;color:#ddd}</style></head><body><div class="card"><h1>💜 DWallet Telegram Arena</h1><p>1. Make sure TELEGRAM_BOT_TOKEN and TELEGRAM_WEBHOOK_SECRET are Worker secrets.</p><p>2. In BotFather: <b>/mybots → Veil → Bot Settings → Configure Mini App → Enable Mini App</b>, then use this as the Main Mini App URL:</p><div class="url">${appUrl}</div><p>3. Register Veil's webhook and commands here:</p><input id="secret" type="password" placeholder="ADMIN_SECRET"><button id="go">REGISTER TELEGRAM</button><div id="out"></div></div><script>go.onclick=async()=>{out.textContent='Registering…';try{const r=await fetch('/admin/telegram/register',{method:'POST',headers:{'x-admin-secret':secret.value}});const j=await r.json();out.textContent=r.ok?'✅ Telegram registered. Bot: @'+(j.botUsername||'unknown')+'\nMini App: '+j.miniAppUrl+'\n\nNow add Veil to the DWallet group and run /arena.':'❌ '+r.status+' '+JSON.stringify(j)}catch(e){out.textContent='❌ '+e.message}}</script></body></html>`;}
+
+export default{async fetch(request,env){const url=new URL(request.url);if(url.pathname==="/health")return jsonResponse({ok:true,service:"veil-arena",status:"ready",database:Boolean(env.DB),coordinator:Boolean(env.ARENA_COORDINATOR),discordConfigured:Boolean(env.DISCORD_PUBLIC_KEY&&env.DISCORD_BOT_TOKEN&&env.DISCORD_APPLICATION_ID),telegramConfigured:Boolean(env.TELEGRAM_BOT_TOKEN&&env.TELEGRAM_WEBHOOK_SECRET),miniApp:true});if(url.pathname==="/setup/full-tilt"&&request.method==="GET")return new Response(setupPage({title:"Full Tilt",guildId:FULL_TILT_GUILD_ID,themeId:"full_tilt",doneText:"Done. Go back to Full Tilt and type /arena."}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/setup/vibe-queen"&&request.method==="GET")return new Response(setupPage({title:"Vibe Queen Slots: After Dark",guildId:VIBE_QUEEN_GUILD_ID,themeId:"vibe_queen_slots",doneText:"Done. Go back to Vibe Queen Slots and type /arena."}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/setup/telegram"&&request.method==="GET")return new Response(telegramSetupPage(url.origin),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});if(url.pathname==="/telegram/arena"&&request.method==="GET")return new Response(miniAppHtml(),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store","content-security-policy":"default-src 'self' https://telegram.org; script-src 'self' 'unsafe-inline' https://telegram.org; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https:; frame-ancestors https://web.telegram.org https://*.telegram.org"}});if(url.pathname==="/telegram/miniapp/state"&&request.method==="GET")return handleMiniAppState(request,env);if(url.pathname==="/telegram/miniapp/action"&&request.method==="POST")return handleMiniAppAction(request,env,kickCoordinator);if(url.pathname==="/interactions"&&request.method==="POST")return handleDiscord(request,env);if(url.pathname==="/telegram/webhook"&&request.method==="POST")return handleTelegram(request,env);if(url.pathname==="/admin/register"&&request.method==="POST")return handleRegister(request,env);if(url.pathname==="/admin/telegram/register"&&request.method==="POST")return handleTelegramRegister(request,env);return new Response("Veil Arena is online.",{headers:{"content-type":"text/plain; charset=utf-8"}});}};
