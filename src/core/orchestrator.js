@@ -20,7 +20,7 @@ const esc = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const themeIcon = theme => theme.id === "full_tilt" ? "🎰" : theme.id === "dwallet" ? "💜" : "👻";
 
 function delayFor(isBrawl, rng) {
-  const base = isBrawl ? 14_000 : 12_000;
+  const base = isBrawl ? 19_000 : 17_000;
   return base + Math.floor(rng() * 2_001);
 }
 
