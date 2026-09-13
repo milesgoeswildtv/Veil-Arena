@@ -57,6 +57,14 @@ assert(cleanEntry.includes("__VEIL_MARK_CLIENT_STARTED__"));
 assert(cleanEntry.includes("__VEIL_MARK_CLIENT_ERROR__"));
 assert(!cleanEntry.includes("FORCED window.parent + * AND RESENT"));
 
+const runtimeFix = readFileSync(new URL("../src/activity-browser-runtime-fix-entry.js", import.meta.url), "utf8");
+assert(runtimeFix.includes('BUILD = "20260913-20"'));
+assert(runtimeFix.includes('INNER_BUILD = "20260913-19"'));
+assert(runtimeFix.includes("var __name = globalThis.__name"));
+assert(runtimeFix.includes("Object.defineProperty(target, \"name\""));
+assert(runtimeFix.includes("x-veil-browser-runtime-fix"));
+assert(runtimeFix.includes('from "./activity-clean-entry.js"'));
+
 const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
 assert(bootstrapEntry.includes('url.pathname === "/activity/oauth/token"'));
 assert(bootstrapEntry.includes('discordBearer("/users/@me"'));
@@ -81,7 +89,7 @@ assert(doctorEntry.includes("/applications/@me"));
 assert(doctorEntry.includes("VERIFY + FORCE REPAIR ACTIVITY"));
 
 const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
-assert(botsEntry.includes('from "./activity-clean-entry.js"'));
+assert(botsEntry.includes('from "./activity-browser-runtime-fix-entry.js"'));
 assert(botsEntry.includes("addFakeContestants"));
 
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
