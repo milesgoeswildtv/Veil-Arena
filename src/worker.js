@@ -1,5 +1,5 @@
 import { handleTelegramRoute } from "./telegram-worker.js";
-import { handleDiscordRoute, ArenaCoordinator } from "./discord-worker.js";
+import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 
 export { ArenaCoordinator };
 
