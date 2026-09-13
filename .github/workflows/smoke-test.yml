@@ -30,6 +30,9 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/veil-worker.js
+          node --check src/telegram-official-worker.js
+          node --check src/telegram-official-miniapp.js
           node --check src/activity-official-entry.js
           node --check src/activity-official-browser.js
           node --check src/activity-official-ui.js
@@ -65,8 +68,5 @@ jobs:
       - name: Run Arena smoke tests
         run: npm test
 
-      - name: Validate production Worker bundle
+      - name: Validate unified production Worker bundle
         run: npx wrangler deploy --dry-run
-
-      - name: Validate Telegram QA Worker bundle
-        run: npx wrangler deploy --dry-run --env test
