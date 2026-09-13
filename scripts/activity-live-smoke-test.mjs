@@ -25,7 +25,12 @@ assert(entry.includes('url.pathname === "/activity/action"'));
 assert(entry.includes('url.pathname === "/activity/oauth/token"'));
 assert(entry.includes('activitybot:'));
 
+const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
+assert(resetEntry.includes('ABORT / RESET ARENA'));
+assert(resetEntry.includes('body.action === "abort"'));
+assert(resetEntry.includes('status === "cancelled"'));
+
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-live-entry.js"'));
+assert(wrangler.includes('main = "src/activity-reset-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
