@@ -23,10 +23,11 @@ export function arenaCommands(){return[
       sponsorAmount("most_showdowns","Dollar amount for most Community Showdowns survived."),
       sponsorAmount("most_mass_brawls","Dollar amount for most Mass Brawls survived.")
     ]},
-    {name:"payout",description:"Host only: pay the Arena winner through DWallet.",type:1,options:[
-      {name:"amount",description:"Crypto amount to tip the winner, e.g. 5 or 0.001.",type:3,required:true,min_length:1,max_length:32},
+    {name:"payout",description:"Host only: create a DWallet-funded winner prize.",type:1,options:[
+      {name:"amount",description:"Crypto amount for the winner, e.g. 5 or 0.001.",type:3,required:true,min_length:1,max_length:32},
       {name:"currency",description:"DWallet asset ticker, e.g. USDT, SOL, XRP.",type:3,required:true,min_length:2,max_length:16}
     ]},
+    {name:"fund",description:"Host only: verify your DWallet prize-pot funding.",type:1},
     {name:"bots",description:"Host only: add synthetic contestants during registration.",type:1,options:[
       {name:"amount",description:"How many bots to add (default 10).",type:4,required:false,min_value:1,max_value:50}
     ]},
