@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { createGame } from "../src/core/engine.js";
 import { arenaTestModeEnabled, markNewTestGame } from "../src/test-mode.js";
 import { TEST_PANEL_CLIENT } from "../src/test-panel-client.js";
+import { OFFICIAL_DISCORD_SDK_SOURCE, OFFICIAL_DISCORD_SDK_VERSION } from "../src/generated/discord-sdk-source.js";
 
 assert.equal(arenaTestModeEnabled({ ARENA_TEST_MODE: "true" }), true);
 assert.equal(arenaTestModeEnabled({ ARENA_TEST_MODE: "1" }), true);
@@ -39,31 +40,33 @@ for (const action of [
   assert(TEST_PANEL_CLIENT.includes(action), `QA client missing action ${action}`);
 }
 
+assert.equal(OFFICIAL_DISCORD_SDK_VERSION, "2.5.0");
+assert(OFFICIAL_DISCORD_SDK_SOURCE.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
+
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
 const directEntry = readFileSync(new URL("../src/activity-direct-entry.js", import.meta.url), "utf8");
-const miniSdk = readFileSync(new URL("../src/activity-mini-sdk.js", import.meta.url), "utf8");
 const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
 const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
 const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
 const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
 const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta.url), "utf8");
+const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
 assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
-assert(directEntry.includes('ACTIVITY_BUILD = "20260913-12"'));
-assert(directEntry.includes('/activity/veil-arena-20260913-12.js'));
-assert(directEntry.includes('const DiscordSDK = InlineDiscordSDK'));
-assert(directEntry.includes('DIRECT / NO DYNAMIC IMPORT'));
+assert(directEntry.includes('ACTIVITY_BUILD = "20260913-13"'));
+assert(directEntry.includes('/activity/veil-arena-20260913-13.js'));
+assert(directEntry.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
+assert(directEntry.includes('OFFICIAL SDK / BUNDLED LOCAL'));
+assert(!directEntry.includes('MINI_DISCORD_SDK_SOURCE'));
 assert(directEntry.includes('/applications/@me'));
 assert(directEntry.includes('discord-bot-token'));
 assert(directEntry.includes('correctedEnv'));
 assert(directEntry.includes('1504257112094539798'));
 assert(serverConfig.includes('VEIL_ACTIVITY_TEST_GUILD_ID = "1504257112094539798"'));
-assert(miniSdk.includes('class DiscordSDK'));
-assert(miniSdk.includes('"AUTHORIZE"'));
-assert(miniSdk.includes('"AUTHENTICATE"'));
-assert(miniSdk.includes('"GET_CHANNEL"'));
+assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
+assert(packageJson.includes('"postinstall"'));
 assert(doctorEntry.includes('EMBEDDED_FLAG'));
 assert(doctorEntry.includes('workerApplicationId'));
 assert(doctorEntry.includes('botApplicationId'));
