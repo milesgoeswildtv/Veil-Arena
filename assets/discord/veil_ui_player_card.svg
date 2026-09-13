@@ -1,0 +1,329 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <title>Veil UI Player Card</title>
+  <desc>720x360 transparent responsive Veil player card shell for Arena lobbies, active matches, voting, spectating, and results. Includes a protected portrait zone on the left, a large live-text zone on the right, and a lower strip for actions or vote/sponsor information.</desc>
+
+  <metadata>
+    asset: veil_ui_player_card.svg
+    family: veil_ui_panel_frame.svg
+    canvas: 720x360
+    aspect-ratio: 2:1
+    transparent-background: true
+    text: live HTML/CSS only
+    intended-use: player shell for lobby, active game, voting, spectating, results
+    portrait-zone: x=34..220, y=58..302
+    text-zone: x=248..676, y=62..220
+    lower-strip: x=248..676, y=238..302
+    responsive: mobile + desktop
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2F3F5"/>
+      <stop offset="0.18" stop-color="#969AA3"/>
+      <stop offset="0.52" stop-color="#D4D7DD"/>
+      <stop offset="0.78" stop-color="#5A5E68"/>
+      <stop offset="1" stop-color="#B1B5BE"/>
+    </linearGradient>
+
+    <linearGradient id="silverDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C5C9D1"/>
+      <stop offset="1" stop-color="#454A55"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalOuter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1D1F25"/>
+      <stop offset="0.45" stop-color="#090A0E"/>
+      <stop offset="1" stop-color="#15171D"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0C0D11"/>
+      <stop offset="0.55" stop-color="#07080B"/>
+      <stop offset="1" stop-color="#090B0F"/>
+    </linearGradient>
+
+    <linearGradient id="panelWash" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B0D12"/>
+      <stop offset="0.52" stop-color="#05070A"/>
+      <stop offset="1" stop-color="#090B0F"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3E265C"/>
+      <stop offset="0.20" stop-color="#7750A4"/>
+      <stop offset="0.50" stop-color="#A771D3"/>
+      <stop offset="0.80" stop-color="#7750A4"/>
+      <stop offset="1" stop-color="#3E265C"/>
+    </linearGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#F2E3FF" stop-opacity="1"/>
+      <stop offset="0.36" stop-color="#CA94EE" stop-opacity="0.92"/>
+      <stop offset="0.70" stop-color="#7C4DA2" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#5A3676" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="cornerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#BA84E5" stop-opacity="0.24"/>
+      <stop offset="0.55" stop-color="#8A57B6" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#8A57B6" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-120%" width="140%" height="340%">
+      <feGaussianBlur stdDeviation="1.3" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <pattern id="microTexture" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="5" r="0.45" fill="#FFFFFF" opacity="0.024"/>
+      <circle cx="15" cy="13" r="0.35" fill="#C38CEA" opacity="0.018"/>
+      <path d="M7 17l4-1" stroke="#FFFFFF" stroke-width="0.3" opacity="0.014"/>
+    </pattern>
+
+    <clipPath id="avatarClip">
+      <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- transparent exterior -->
+
+  <!-- ambient corner glows -->
+  <ellipse cx="82" cy="78" rx="36" ry="36" fill="url(#cornerGlow)" filter="url(#softGlow)"/>
+  <ellipse cx="638" cy="78" rx="36" ry="36" fill="url(#cornerGlow)" filter="url(#softGlow)"/>
+  <ellipse cx="82" cy="282" rx="36" ry="36" fill="url(#cornerGlow)" filter="url(#softGlow)"/>
+  <ellipse cx="638" cy="282" rx="36" ry="36" fill="url(#cornerGlow)" filter="url(#softGlow)"/>
+
+  <!-- outer player card frame -->
+  <path d="M70 26
+           H298
+           L314 12
+           H406
+           L422 26
+           H650
+           L690 62
+           V134
+           L706 150
+           V210
+           L690 226
+           V298
+           L650 334
+           H422
+           L406 348
+           H314
+           L298 334
+           H70
+           L30 298
+           V226
+           L14 210
+           V150
+           L30 134
+           V62
+           Z"
+        fill="url(#gunmetalOuter)"
+        stroke="url(#silver)"
+        stroke-width="3.4"
+        stroke-linejoin="round"/>
+
+  <!-- structural bevel -->
+  <path d="M81 39
+           H302
+           L317 26
+           H403
+           L418 39
+           H639
+           L676 72
+           V138
+           L691 153
+           V207
+           L676 222
+           V288
+           L639 321
+           H418
+           L403 334
+           H317
+           L302 321
+           H81
+           L44 288
+           V222
+           L29 207
+           V153
+           L44 138
+           V72
+           Z"
+        fill="#0A0B10"
+        stroke="url(#silverDark)"
+        stroke-width="1.9"
+        stroke-linejoin="round"/>
+
+  <!-- main body -->
+  <path d="M94 52
+           H307
+           L320 40
+           H400
+           L413 52
+           H626
+           L660 83
+           V143
+           L673 156
+           V204
+           L660 217
+           V277
+           L626 308
+           H413
+           L400 320
+           H320
+           L307 308
+           H94
+           L60 277
+           V217
+           L47 204
+           V156
+           L60 143
+           V83
+           Z"
+        fill="url(#panelWash)"
+        stroke="#262930"
+        stroke-width="1.9"
+        stroke-linejoin="round"/>
+
+  <!-- avatar module -->
+  <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"
+        fill="#0A0B10"
+        stroke="url(#silver)"
+        stroke-width="2.0"
+        stroke-linejoin="round"/>
+  <path d="M60 82H184L210 108V252L184 278H60L42 262V98Z"
+        fill="url(#gunmetalInner)"
+        stroke="#1C1F26"
+        stroke-width="1.4"
+        stroke-linejoin="round"/>
+  <path d="M68 90H178L200 112V248L178 270H68L50 256V104Z"
+        fill="#05070A"/>
+  <path d="M68 90H178L200 112V248L178 270H68L50 256V104Z"
+        fill="url(#microTexture)" opacity="0.30"/>
+
+  <!-- avatar placeholder rings -->
+  <g clip-path="url(#avatarClip)">
+    <circle cx="126" cy="157" r="50" fill="#08090D" stroke="#2A2D34" stroke-width="1.6"/>
+    <circle cx="126" cy="157" r="34" fill="none" stroke="url(#violetRail)" stroke-width="1.4" opacity="0.72"/>
+    <circle cx="126" cy="142" r="17" fill="#0A0B10" stroke="url(#silver)" stroke-width="1.3"/>
+    <path d="M96 196C101 176 113 167 126 167C139 167 151 176 156 196"
+          fill="none" stroke="url(#silver)" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M91 210H161" stroke="#7750A4" stroke-width="1.1" stroke-linecap="round" opacity="0.40"/>
+  </g>
+
+  <!-- top title/text plate -->
+  <path d="M248 72H654L672 88V132L654 148H248L236 136V84Z"
+        fill="url(#gunmetalInner)"
+        stroke="#20242B"
+        stroke-width="1.5"
+        stroke-linejoin="round"/>
+  <path d="M259 84H642L656 96V124L642 136H259L248 126V94Z"
+        fill="#040509"/>
+  <path d="M259 84H642L656 96V124L642 136H259L248 126V94Z"
+        fill="url(#microTexture)" opacity="0.25"/>
+
+  <!-- text zone body -->
+  <path d="M248 154H654L672 171V220L654 237H248L236 226V165Z"
+        fill="url(#gunmetalInner)"
+        stroke="#20242B"
+        stroke-width="1.5"
+        stroke-linejoin="round"/>
+  <path d="M259 166H642L656 178V214L642 226H259L248 217V177Z"
+        fill="#040509"/>
+  <path d="M259 166H642L656 178V214L642 226H259L248 217V177Z"
+        fill="url(#microTexture)" opacity="0.20"/>
+
+  <!-- lower strip -->
+  <path d="M248 246H654L672 262V292L654 308H248L236 298V256Z"
+        fill="url(#gunmetalInner)"
+        stroke="#20242B"
+        stroke-width="1.5"
+        stroke-linejoin="round"/>
+  <path d="M259 257H642L656 268V286L642 297H259L248 289V265Z"
+        fill="#05070A"/>
+  <path d="M259 257H642L656 268V286L642 297H259L248 289V265Z"
+        fill="url(#microTexture)" opacity="0.18"/>
+
+  <!-- quiet content dividers -->
+  <path d="M272 185H632" stroke="#A3A8B2" stroke-opacity="0.10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M272 278H632" stroke="#A3A8B2" stroke-opacity="0.08" stroke-width="1.0" stroke-linecap="round"/>
+
+  <!-- top and bottom rails -->
+  <path d="M108 68H612" stroke="url(#violetRail)" stroke-width="1.8" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M108 292H612" stroke="url(#violetRail)" stroke-width="1.8" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 80H596" stroke="#B680DB" stroke-opacity="0.12" stroke-width="0.9" stroke-linecap="round"/>
+  <path d="M124 280H596" stroke="#B680DB" stroke-opacity="0.12" stroke-width="0.9" stroke-linecap="round"/>
+
+  <!-- side rails -->
+  <path d="M76 114V246" stroke="url(#violetRail)" stroke-width="1.6" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M644 114V246" stroke="url(#violetRail)" stroke-width="1.6" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M88 122V238" stroke="#B680DB" stroke-opacity="0.10" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M632 122V238" stroke="#B680DB" stroke-opacity="0.10" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- center crest nodes -->
+  <path d="M337 26H383" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round" opacity="0.90"/>
+  <path d="M360 22V90" stroke="url(#violetRail)" stroke-width="2.2" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <circle cx="360" cy="70" r="8" fill="#0A0B0F" stroke="url(#silver)" stroke-width="1.2"/>
+  <circle cx="360" cy="70" r="4.2" fill="url(#violetCore)"/>
+
+  <path d="M337 334H383" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round" opacity="0.90"/>
+  <path d="M360 270V338" stroke="url(#violetRail)" stroke-width="2.2" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <circle cx="360" cy="290" r="8" fill="#0A0B0F" stroke="url(#silver)" stroke-width="1.2"/>
+  <circle cx="360" cy="290" r="4.2" fill="url(#violetCore)"/>
+
+  <!-- corner machinery, simplified from panel frame -->
+  <g aria-label="top-left corner module">
+    <circle cx="78" cy="78" r="20" fill="#07080C" stroke="url(#silver)" stroke-width="2"/>
+    <circle cx="78" cy="78" r="11.5" fill="#06070A" stroke="#695087" stroke-width="1.2"/>
+    <circle cx="78" cy="78" r="4.5" fill="url(#violetCore)"/>
+    <path d="M59 59L38 47L47 68Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M97 59L118 47L109 68Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+
+  <g aria-label="top-right corner module">
+    <circle cx="642" cy="78" r="20" fill="#07080C" stroke="url(#silver)" stroke-width="2"/>
+    <circle cx="642" cy="78" r="11.5" fill="#06070A" stroke="#695087" stroke-width="1.2"/>
+    <circle cx="642" cy="78" r="4.5" fill="url(#violetCore)"/>
+    <path d="M661 59L682 47L673 68Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M623 59L602 47L611 68Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+
+  <g aria-label="bottom-left corner module">
+    <circle cx="78" cy="282" r="20" fill="#07080C" stroke="url(#silver)" stroke-width="2"/>
+    <circle cx="78" cy="282" r="11.5" fill="#06070A" stroke="#695087" stroke-width="1.2"/>
+    <circle cx="78" cy="282" r="4.5" fill="url(#violetCore)"/>
+    <path d="M59 301L38 313L47 292Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M97 301L118 313L109 292Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+
+  <g aria-label="bottom-right corner module">
+    <circle cx="642" cy="282" r="20" fill="#07080C" stroke="url(#silver)" stroke-width="2"/>
+    <circle cx="642" cy="282" r="11.5" fill="#06070A" stroke="#695087" stroke-width="1.2"/>
+    <circle cx="642" cy="282" r="4.5" fill="url(#violetCore)"/>
+    <path d="M661 301L682 313L673 292Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M623 301L602 313L611 292Z" fill="#0F1116" stroke="url(#silver)" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+
+  <!-- compact bracket details -->
+  <g stroke="#BFC3CC" stroke-opacity="0.16" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M102 96H114M102 96V108"/>
+    <path d="M618 96H606M618 96V108"/>
+    <path d="M102 264H114M102 264V252"/>
+    <path d="M618 264H606M618 264V252"/>
+  </g>
+
+  <!-- hidden production guides -->
+  <g opacity="0" pointer-events="none">
+    <rect id="portrait-zone" x="34" y="58" width="186" height="244"/>
+    <rect id="text-zone" x="248" y="62" width="428" height="158"/>
+    <rect id="lower-strip" x="248" y="238" width="428" height="64"/>
+  </g>
+</svg>
