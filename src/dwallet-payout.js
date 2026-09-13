@@ -286,7 +286,7 @@ export async function payArenaWinner(env, game, saveGame) {
   Object.defineProperty(game, "__saveGame", { value: saveGame, configurable: true });
   try {
     if (winner.simulated) {
-      return completeOutgoingTip(
+      return await completeOutgoingTip(
         env,
         game,
         payout,
@@ -295,7 +295,7 @@ export async function payArenaWinner(env, game, saveGame) {
         "refunded"
       );
     }
-    return completeOutgoingTip(
+    return await completeOutgoingTip(
       env,
       game,
       payout,
