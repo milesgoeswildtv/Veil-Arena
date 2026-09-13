@@ -23,6 +23,9 @@ export function arenaCommands(){return[
       sponsorAmount("most_showdowns","Dollar amount for most Community Showdowns survived."),
       sponsorAmount("most_mass_brawls","Dollar amount for most Mass Brawls survived.")
     ]},
+    {name:"bots",description:"Host only: add synthetic contestants during registration.",type:1,options:[
+      {name:"amount",description:"How many bots to add (default 10).",type:4,required:false,min_value:1,max_value:50}
+    ]},
     {name:"rules",description:"Show the Arena rules for 30 seconds.",type:1}
   ]},
   {name:"arenastats",description:"View your lifetime Arena stats in this server.",type:1},
