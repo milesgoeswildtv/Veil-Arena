@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { ACTIVITY_LIVE_CLIENT } from "../src/activity-live-client.js";
 import { liveActivityHtml } from "../src/activity-live.js";
+import { MINI_DISCORD_SDK_SOURCE } from "../src/activity-mini-sdk.js";
 
 new Function(ACTIVITY_LIVE_CLIENT);
+new Function(MINI_DISCORD_SDK_SOURCE.replace("export class DiscordSDK", "class DiscordSDK"));
 const html = liveActivityHtml("123456789012345678");
 assert(html.includes('data-discord-client-id="123456789012345678"'));
 assert(html.includes('/activity/live.js'));
@@ -16,6 +18,14 @@ assert(ACTIVITY_LIVE_CLIENT.includes('FILL TO 12'));
 assert(ACTIVITY_LIVE_CLIENT.includes('ADD 4 TEST BOTS'));
 assert(ACTIVITY_LIVE_CLIENT.includes('START ARENA'));
 assert(ACTIVITY_LIVE_CLIENT.includes('Community Showdown'));
+
+assert(MINI_DISCORD_SDK_SOURCE.includes('export class DiscordSDK'));
+assert(MINI_DISCORD_SDK_SOURCE.includes('Opcodes.HANDSHAKE'));
+assert(MINI_DISCORD_SDK_SOURCE.includes('"AUTHORIZE"'));
+assert(MINI_DISCORD_SDK_SOURCE.includes('"AUTHENTICATE"'));
+assert(MINI_DISCORD_SDK_SOURCE.includes('"GET_CHANNEL"'));
+assert(!MINI_DISCORD_SDK_SOURCE.includes('cdn.jsdelivr.net'));
+assert(!MINI_DISCORD_SDK_SOURCE.includes('esm.sh'));
 
 const entry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 assert(entry.includes('DISCORD_CLIENT_SECRET'));
@@ -47,15 +57,14 @@ assert(bootstrapEntry.includes('CONNECTING TO DISCORD'));
 assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
 assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
 
-const sdkRouteEntry = readFileSync(new URL("../src/activity-sdk-route-fix-entry.js", import.meta.url), "utf8");
-assert(sdkRouteEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
-assert(sdkRouteEntry.includes('content-type": "application/javascript'));
-assert(sdkRouteEntry.includes('/activity/sdk-cdn/npm/'));
-assert(sdkRouteEntry.includes('cdn.jsdelivr.net'));
-assert(sdkRouteEntry.includes('Discord SDK module import timed out after 12 seconds'));
-assert(sdkRouteEntry.includes('20260913-6'));
+const localSdkEntry = readFileSync(new URL("../src/activity-local-sdk-entry.js", import.meta.url), "utf8");
+assert(localSdkEntry.includes('from "./activity-sdk-route-fix-entry.js"'));
+assert(localSdkEntry.includes('MINI_DISCORD_SDK_SOURCE'));
+assert(localSdkEntry.includes('x-veil-sdk-source'));
+assert(localSdkEntry.includes('local-minimal'));
+assert(localSdkEntry.includes('20260913-7'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-sdk-route-fix-entry.js"'));
+assert(wrangler.includes('main = "src/activity-local-sdk-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
