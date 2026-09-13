@@ -43,8 +43,12 @@ assert(html.includes("CLEAN CLIENT STARTING"));
 
 const cleanEntry = readFileSync(new URL("../src/activity-clean-entry.js", import.meta.url), "utf8");
 assert(cleanEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
-assert(cleanEntry.includes('BUILD = "20260913-16"'));
+assert(cleanEntry.includes('BUILD = "20260913-17"'));
 assert(cleanEntry.includes('/activity/veil-clean-${BUILD}.js'));
+assert(cleanEntry.includes('discordsays.com'));
+assert(cleanEntry.includes('APP ID MISMATCH'));
+assert(cleanEntry.includes('DISCORD ACTIVITY PROXY MISSING'));
+assert(cleanEntry.includes('DISCORD PARENT RPC MISSING'));
 assert(cleanEntry.includes('url.pathname === "/api/token"'));
 assert(cleanEntry.includes('"/activity/oauth/token"'));
 assert(cleanEntry.includes('url.pathname === "/activity/clean-health"'));
