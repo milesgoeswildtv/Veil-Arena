@@ -164,7 +164,7 @@ function triggerFx(previous, next) {
 function controls(state) {
   const out = [];
   if (!state.game) {
-    out.push(`<button class="primary" data-action="open">OPEN ARENA</button>`);
+    out.push(`<button class="primary" data-action="open">START NEW GAME</button>`);
     return out.join("");
   }
   if (state.game.status === "registration") {
@@ -176,10 +176,12 @@ function controls(state) {
         out.push(`<button data-action="fill">FILL TO 12</button>`);
       }
       out.push(`<button class="primary" data-action="start">START ARENA</button>`);
-      out.push(`<button class="danger" data-action="abort">ABORT / RESET</button>`);
+      out.push(`<button class="danger" data-action="abort">FORCE CLOSE ACTIVITY</button>`);
     }
-  } else if (state.viewer.isHost && state.game.status === "running") {
-    out.push(`<button class="danger" data-action="abort">ABORT / RESET</button>`);
+  } else if (state.viewer.isHost && ["running", "starting"].includes(state.game.status)) {
+    out.push(`<button class="danger" data-action="abort">FORCE CLOSE ACTIVITY</button>`);
+  } else if (state.viewer.isHost && state.game.status === "finished") {
+    out.push(`<button class="primary" data-action="open">START NEW GAME</button>`);
   }
   return out.join("");
 }
