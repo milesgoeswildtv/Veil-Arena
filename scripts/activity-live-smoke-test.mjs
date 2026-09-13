@@ -69,12 +69,23 @@ const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.me
 assert(botsEntry.includes('from "./activity-direct-entry.js"'));
 assert(botsEntry.includes('addFakeContestants'));
 
+const rpcTraceEntry = readFileSync(new URL("../src/activity-rpc-trace-entry.js", import.meta.url), "utf8");
+assert(rpcTraceEntry.includes('from "./discord-bots-entry.js"'));
+assert(rpcTraceEntry.includes('TRACE_BUILD = "20260913-14"'));
+assert(rpcTraceEntry.includes('/activity/veil-arena-${TRACE_BUILD}.js'));
+assert(rpcTraceEntry.includes('RPC TRACE // 20260913-14'));
+assert(rpcTraceEntry.includes('.discordsays.com'));
+assert(rpcTraceEntry.includes('Application URL Override'));
+assert(rpcTraceEntry.includes('sdk.sourceOrigin = trustedAncestor'));
+assert(rpcTraceEntry.includes('handshake.call(sdk)'));
+assert(rpcTraceEntry.includes('NO RPC MESSAGE RECEIVED FROM DISCORD'));
+
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
 assert(packageJson.includes('"build:discord-sdk"'));
 assert(packageJson.includes('"postinstall"'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
+assert(wrangler.includes('main = "src/activity-rpc-trace-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
