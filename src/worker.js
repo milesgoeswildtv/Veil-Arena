@@ -4,6 +4,7 @@ import { applyTelegramMiniAppAssetBatch2 } from "./telegram-miniapp-assets-batch
 import { applyTelegramMiniAppAssetBatch3 } from "./telegram-miniapp-assets-batch3.js";
 import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
+import { injectVeilSfx } from "./sfx-integration.js";
 
 export { ArenaCoordinator };
 
@@ -53,7 +54,7 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/telegram/app") {
       const telegramHtml = applyTelegramMiniAppAssetBatch2(telegramFxMiniAppHtml());
-      return html(applyTelegramMiniAppAssetBatch3(telegramHtml));
+      return html(injectVeilSfx(applyTelegramMiniAppAssetBatch3(telegramHtml)));
     }
 
     if (url.pathname.startsWith("/telegram/")) {
