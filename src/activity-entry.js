@@ -2,23 +2,58 @@ import app, { ArenaCoordinator } from "./entry.js";
 import { handleActivityPreview } from "./activity-preview.js";
 import { ACTIVITY_PREVIEW_CLIENT } from "./activity-preview-client.js";
 import { SPONSOR_PANEL_CLIENT } from "./sponsor-panel-client.js";
-import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction } from "./discord.js";
-import { ensureSchema, loadActiveGameForChannel, loadGame, saveGame } from "./storage.js";
+import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction, registerGuildCommands } from "./discord.js";
+import { ensureSchema, loadActiveGameForChannel, loadGame, saveGame, setGuildTheme } from "./storage.js";
 import { validateTelegramInitData } from "./miniapp.js";
 import { telegramUserInChat } from "./telegram.js";
 import { upsertSponsorship, sponsorshipSummary } from "./sponsorships.js";
 
 export { ArenaCoordinator };
 
+const DISCORD_ACTIVITY_BUILD = "activity-v3";
+const DISCORD_THEMES = new Set(["dwallet", "full_tilt", "vibe_queen_slots"]);
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
 }
 
+function esc(value = "") {
+  return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
 function cspSafeActivityHtml(source) {
   return String(source)
+    .replace("SYSTEM NOMINAL", "CONTROLS LOADING")
     .replace(/ onclick="fx\('([^']+)'\)"/g, ' data-fx="$1"')
     .replace(/ onclick="runAll\(\)"/g, ' data-fx="all"')
-    .replace(/<script>[\s\S]*?<\/script>/, '<script src="app.js"></script>');
+    .replace(/<script>[\s\S]*?<\/script>/, '<script src="/activity-preview/app.js"></script>');
+}
+
+function discordSetupPage(origin) {
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Veil Discord Arena Setup</title><style>
+body{font-family:system-ui;margin:0;background:#0c0911;color:#fff;display:grid;place-items:center;min-height:100vh;padding:18px}.card{width:min(92vw,580px);background:linear-gradient(180deg,#1c1428,#120d19);border:1px solid #3a2a4d;padding:24px;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.35)}h1{margin-top:0}label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#cfb8e6;margin:12px 0}input,select,button{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;font-size:15px}input,select{background:#0b0810;color:#fff;border:1px solid #463356}button{border:0;background:#8f59f7;color:#fff;font-weight:900;margin-top:8px}.muted{color:#a99bb8;font-size:12px;line-height:1.45}.ok{color:#86efbd}.bad{color:#ff93af}code{background:#0a0710;padding:2px 5px;border-radius:5px}#out{white-space:pre-wrap;margin-top:14px;font-size:13px}</style></head><body><div class="card"><h1>⚔️ Veil Discord Arena Setup</h1><p class="muted">Registers the current Discord command schema for one server. This includes <code>/arena sponsor</code> and all optional dollar award fields.</p>
+<label>Discord Server / Guild ID<input id="guild" inputmode="numeric" placeholder="123456789012345678"></label>
+<label>Arena Theme<select id="theme"><option value="dwallet">DWallet</option><option value="full_tilt">Full Tilt</option><option value="vibe_queen_slots">Vibe Queen Slots</option></select></label>
+<label>Cloudflare ADMIN_SECRET<input id="secret" type="password" placeholder="ADMIN_SECRET" autocomplete="current-password"></label>
+<button id="go">REGISTER / REFRESH DISCORD COMMANDS</button><div id="out" class="muted"></div><p class="muted">Worker: ${esc(origin)}<br>Activity diagnostic: <code>/activity-preview/health</code></p></div><script>(()=>{const go=document.getElementById('go'),out=document.getElementById('out');go.addEventListener('click',async()=>{const guildId=document.getElementById('guild').value.trim(),themeId=document.getElementById('theme').value,secret=document.getElementById('secret').value.trim();if(!/^\d{15,22}$/.test(guildId)){out.className='bad';out.textContent='Enter a valid numeric Discord Guild ID.';return}if(!secret){out.className='bad';out.textContent='Enter ADMIN_SECRET.';return}go.disabled=true;out.className='muted';out.textContent='Registering Discord commands…';try{const r=await fetch('/admin/discord/register',{method:'POST',headers:{'content-type':'application/json','x-admin-secret':secret},body:JSON.stringify({guildId,themeId})});const j=await r.json().catch(()=>({ok:false,error:'Bad server response'}));if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));out.className='ok';out.textContent='✅ Discord commands refreshed. Theme: '+j.themeId+'\n/arena sponsor is now registered for this server.'}catch(e){out.className='bad';out.textContent='❌ '+e.message}finally{go.disabled=false}})})();</script></body></html>`;
+}
+
+async function handleDiscordSetupRegister(request, env) {
+  const provided = request.headers.get("x-admin-secret") || "";
+  if (!env.ADMIN_SECRET || provided !== env.ADMIN_SECRET) return json({ ok: false, error: "ADMIN_SECRET is missing or does not match." }, 401);
+  if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_BOT_TOKEN || !env.DISCORD_PUBLIC_KEY) {
+    return json({ ok: false, error: "Discord credentials are incomplete. Check DISCORD_APPLICATION_ID, DISCORD_BOT_TOKEN, and DISCORD_PUBLIC_KEY." }, 500);
+  }
+  if (!env.DB) return json({ ok: false, error: "Arena database is missing." }, 500);
+  const body = await request.json().catch(() => ({}));
+  const guildId = String(body.guildId || "").trim();
+  const themeId = String(body.themeId || "dwallet").trim();
+  if (!/^\d{15,22}$/.test(guildId)) return json({ ok: false, error: "A valid numeric Discord Guild ID is required." }, 400);
+  if (!DISCORD_THEMES.has(themeId)) return json({ ok: false, error: "Unknown Arena theme." }, 400);
+  await ensureSchema(env.DB);
+  const commands = await registerGuildCommands(env.DISCORD_APPLICATION_ID, guildId, env.DISCORD_BOT_TOKEN);
+  await setGuildTheme(env.DB, guildId, themeId);
+  return json({ ok: true, guildId, themeId, commandsRegistered: Array.isArray(commands) ? commands.length : null });
 }
 
 function sponsorPanelHtml() {
@@ -111,8 +146,11 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    if (request.method === "GET" && url.pathname === "/activity-preview/health") {
+      return json({ ok: true, activity: "DWallet Arena FX Lab", build: DISCORD_ACTIVITY_BUILD, controller: "/activity-preview/app.js", controls: true });
+    }
     if (request.method === "GET" && (url.pathname === "/activity-preview/app.js" || url.pathname === "/app.js")) {
-      return new Response(ACTIVITY_PREVIEW_CLIENT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" } });
+      return new Response(ACTIVITY_PREVIEW_CLIENT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff", "x-arena-activity-build": DISCORD_ACTIVITY_BUILD } });
     }
     if (request.method === "GET" && (url.pathname === "/activity-preview" || url.pathname.startsWith("/activity-preview/"))) {
       const original = await handleActivityPreview();
@@ -120,7 +158,16 @@ export default {
       const headers = new Headers(original.headers);
       headers.set("content-type", "text/html; charset=utf-8");
       headers.set("cache-control", "no-store");
+      headers.set("x-content-type-options", "nosniff");
+      headers.set("x-arena-activity-build", DISCORD_ACTIVITY_BUILD);
       return new Response(html, { status: original.status, headers });
+    }
+
+    if (request.method === "GET" && url.pathname === "/setup/discord") {
+      return new Response(discordSetupPage(url.origin), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
+    }
+    if (request.method === "POST" && url.pathname === "/admin/discord/register") {
+      return handleDiscordSetupRegister(request, env);
     }
 
     if (request.method === "GET" && url.pathname === "/telegram/sponsor/app.js") {
