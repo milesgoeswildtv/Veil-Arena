@@ -11,8 +11,33 @@ export const TELEGRAM_COMMANDS = [
   { command: "arenalog", description: "Download a completed match log" }
 ];
 
-function rawChatId(channelId) {
-  return String(channelId || "").replace(/^tg:/, "");
+export const TELEGRAM_ALLOWED_UPDATES = ["message", "callback_query", "my_chat_member"];
+
+export function rawTelegramChatId(channelId) {
+  return String(channelId ?? "").replace(/^tg:/, "");
+}
+
+export function telegramScope(chatId) {
+  return `tg:${String(chatId)}`;
+}
+
+export function telegramWebhookAuthorized(request, expectedSecret) {
+  if (!expectedSecret) return false;
+  return request.headers.get("x-telegram-bot-api-secret-token") === expectedSecret;
+}
+
+export function userFromTelegram(from) {
+  if (!from?.id) return null;
+  const displayName = [from.first_name, from.last_name].filter(Boolean).join(" ").trim();
+  return {
+    id: String(from.id),
+    username: from.username || null,
+    displayName: displayName || from.username || `Telegram ${from.id}`
+  };
+}
+
+export function isTelegramGroup(chat) {
+  return chat?.type === "group" || chat?.type === "supergroup";
 }
 
 async function telegramRequest(token, method, payload = {}) {
@@ -31,10 +56,7 @@ async function telegramRequest(token, method, payload = {}) {
 
 async function telegramMultipartRequest(token, method, form) {
   if (!token) throw new Error("Telegram bot token is not configured.");
-  const response = await fetch(`${API_ROOT}/bot${token}/${method}`, {
-    method: "POST",
-    body: form
-  });
+  const response = await fetch(`${API_ROOT}/bot${token}/${method}`, { method: "POST", body: form });
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data?.ok === false) {
     throw new Error(`Telegram ${method} failed: ${data?.description || response.status}`);
@@ -43,17 +65,13 @@ async function telegramMultipartRequest(token, method, form) {
 }
 
 function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 export function decorateDWalletTelegramText(input) {
   const source = String(input ?? "");
   const isArena = /dwallet|arena|community showdown|second chance/i.test(source);
   if (!isArena || source.startsWith("`DWALLET HQ // VEIL TERMINAL`")) return source;
-
   let text = source;
   text = text.replace(/^Registration is open\.$/gm, "__REGISTRATION OPEN__");
   text = text.replace(/^The Arena is running inside the Mini App\.$/gm, "> The Arena is running inside the Mini App.");
@@ -63,15 +81,11 @@ export function decorateDWalletTelegramText(input) {
   text = text.replace(/^The chaos stops\. One player is left\.$/gm, "||The chaos stops. One player is left.||");
   text = text.replace(/^No Arena is active and the group is off cooldown\. Use `\/arena` to open one\.$/gm,
     "> No Arena is active and the group is off cooldown. Use `/arena` to open one.");
-
   return `\`DWALLET HQ // VEIL TERMINAL\`\n${text}`;
 }
 
 export function discordishToTelegramHtml(input) {
   let text = escapeHtml(input);
-
-  // Telegram-specific extensions used by Arena copy:
-  // __underline__, ||tap-to-reveal spoiler||, > quote, >! expandable quote.
   text = text.replace(/^&gt;!\s*(.+)$/gm, "<blockquote expandable>$1</blockquote>");
   text = text.replace(/^&gt;\s*(.+)$/gm, "<blockquote>$1</blockquote>");
   text = text.replace(/^##\s+(.+)$/gm, "<b><u>$1</u></b>");
@@ -88,14 +102,47 @@ export function discordishToTelegramHtml(input) {
   return text;
 }
 
-export function userFromTelegram(from) {
-  if (!from?.id) return null;
-  const displayName = [from.first_name, from.last_name].filter(Boolean).join(" ").trim();
-  return {
-    id: String(from.id),
-    username: from.username || null,
-    displayName: displayName || from.username || `Telegram ${from.id}`
-  };
+export async function telegramBotInfo(token) {
+  return telegramRequest(token, "getMe");
+}
+
+export async function telegramWebhookInfo(token) {
+  return telegramRequest(token, "getWebhookInfo");
+}
+
+export async function configureTelegramBot(token, webhookUrl, webhookSecret, { dropPendingUpdates = true } = {}) {
+  const bot = await telegramBotInfo(token);
+  await telegramRequest(token, "deleteWebhook", { drop_pending_updates: Boolean(dropPendingUpdates) });
+  await telegramRequest(token, "setWebhook", {
+    url: webhookUrl,
+    secret_token: webhookSecret,
+    allowed_updates: TELEGRAM_ALLOWED_UPDATES,
+    drop_pending_updates: Boolean(dropPendingUpdates)
+  });
+  await telegramRequest(token, "setMyCommands", { commands: TELEGRAM_COMMANDS });
+  const webhook = await telegramWebhookInfo(token);
+  return { bot, webhook };
+}
+
+export function telegramArenaStartParam(gameId) {
+  const value = `arena_${String(gameId)}`;
+  if (value.length > 64 || !/^[A-Za-z0-9_-]+$/.test(value)) throw new Error("Arena start parameter is invalid for Telegram.");
+  return value;
+}
+
+// Telegram documents Main Mini App direct links as:
+// https://t.me/botusername?startapp=<parameter>
+// When opened from a chat, Telegram supplies chat_type and chat_instance in initData.
+export async function telegramArenaLaunchUrl(token, gameId) {
+  const bot = await telegramBotInfo(token);
+  if (!bot?.username) throw new Error("Telegram bot username is missing.");
+  return `https://t.me/${bot.username}?startapp=${encodeURIComponent(telegramArenaStartParam(gameId))}&mode=fullscreen`;
+}
+
+// In groups we intentionally use a normal URL button pointing at Telegram's direct Mini App link.
+// Bot API web_app buttons are not the group-launch primitive.
+export function telegramArenaLauncherKeyboard(url, text = "⚔️ ENTER / WATCH ARENA") {
+  return { inline_keyboard: [[{ text, url }]] };
 }
 
 export function telegramRegistrationKeyboard(game) {
@@ -120,29 +167,10 @@ export function telegramCrowdVoteKeyboard(game) {
   return { inline_keyboard: rows };
 }
 
-export function telegramArenaLauncherKeyboard(url, text = "⚔️ ENTER / WATCH ARENA") {
-  return { inline_keyboard: [[{ text, url }]] };
-}
-
-export function telegramArenaStartParam(gameId) {
-  return `arena_${String(gameId)}`;
-}
-
-export async function telegramBotInfo(token) {
-  return telegramRequest(token, "getMe");
-}
-
-export async function telegramArenaLaunchUrl(token, gameId) {
-  const bot = await telegramBotInfo(token);
-  if (!bot?.username) throw new Error("Telegram bot username is missing.");
-  const start = encodeURIComponent(telegramArenaStartParam(gameId));
-  return `https://t.me/${bot.username}?startapp=${start}&mode=fullscreen`;
-}
-
 export async function telegramUserInChat(channelId, userId, token) {
   try {
     const member = await telegramRequest(token, "getChatMember", {
-      chat_id: rawChatId(channelId),
+      chat_id: rawTelegramChatId(channelId),
       user_id: Number(userId)
     });
     return !["left", "kicked"].includes(member?.status);
@@ -154,35 +182,23 @@ export async function telegramUserInChat(channelId, userId, token) {
 export async function sendTelegramMessage(channelId, token, { text, reply_markup = undefined } = {}) {
   const prepared = decorateDWalletTelegramText(text || "");
   const result = await telegramRequest(token, "sendMessage", {
-    chat_id: rawChatId(channelId),
+    chat_id: rawTelegramChatId(channelId),
     text: discordishToTelegramHtml(prepared),
     parse_mode: "HTML",
-    disable_web_page_preview: true,
+    link_preview_options: { is_disabled: true },
     ...(reply_markup ? { reply_markup } : {})
   });
-  return { id: String(result?.message_id || ""), raw: result };
-}
-
-export async function sendTelegramTextFile(channelId, token, filename, content, caption = "") {
-  const form = new FormData();
-  form.set("chat_id", rawChatId(channelId));
-  form.set("document", new Blob([String(content ?? "")], { type: "text/plain;charset=utf-8" }), String(filename || "arena-log.txt"));
-  if (caption) {
-    form.set("caption", discordishToTelegramHtml(decorateDWalletTelegramText(String(caption).slice(0, 900))));
-    form.set("parse_mode", "HTML");
-  }
-  const result = await telegramMultipartRequest(token, "sendDocument", form);
   return { id: String(result?.message_id || ""), raw: result };
 }
 
 export async function editTelegramMessage(channelId, messageId, token, { text, reply_markup = undefined } = {}) {
   const prepared = decorateDWalletTelegramText(text || "");
   const result = await telegramRequest(token, "editMessageText", {
-    chat_id: rawChatId(channelId),
+    chat_id: rawTelegramChatId(channelId),
     message_id: Number(messageId),
     text: discordishToTelegramHtml(prepared),
     parse_mode: "HTML",
-    disable_web_page_preview: true,
+    link_preview_options: { is_disabled: true },
     ...(reply_markup ? { reply_markup } : {})
   });
   return { id: String(result?.message_id || messageId), raw: result };
@@ -192,7 +208,7 @@ export async function deleteTelegramMessage(channelId, messageId, token) {
   if (!messageId) return false;
   try {
     await telegramRequest(token, "deleteMessage", {
-      chat_id: rawChatId(channelId),
+      chat_id: rawTelegramChatId(channelId),
       message_id: Number(messageId)
     });
     return true;
@@ -211,21 +227,14 @@ export async function answerTelegramCallback(callbackQueryId, token, text = "") 
   return true;
 }
 
-export async function configureTelegramBot(token, webhookUrl, webhookSecret) {
-  const bot = await telegramBotInfo(token);
-  await telegramRequest(token, "setWebhook", {
-    url: webhookUrl,
-    secret_token: webhookSecret,
-    allowed_updates: ["message", "callback_query"],
-    drop_pending_updates: false
-  });
-  await telegramRequest(token, "setMyCommands", {
-    commands: TELEGRAM_COMMANDS
-  });
-  return bot;
-}
-
-export function telegramWebhookAuthorized(request, expectedSecret) {
-  if (!expectedSecret) return false;
-  return request.headers.get("x-telegram-bot-api-secret-token") === expectedSecret;
+export async function sendTelegramTextFile(channelId, token, filename, content, caption = "") {
+  const form = new FormData();
+  form.set("chat_id", rawTelegramChatId(channelId));
+  form.set("document", new Blob([String(content ?? "")], { type: "text/plain;charset=utf-8" }), String(filename || "arena-log.txt"));
+  if (caption) {
+    form.set("caption", discordishToTelegramHtml(decorateDWalletTelegramText(String(caption).slice(0, 900))));
+    form.set("parse_mode", "HTML");
+  }
+  const result = await telegramMultipartRequest(token, "sendDocument", form);
+  return { id: String(result?.message_id || ""), raw: result };
 }
