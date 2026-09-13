@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="96" viewBox="0 0 384 96" fill="none">
+  <title>Veil UI Badge Dead</title>
+  <desc>384x96 transparent responsive status badge frame for the DEAD state. Exact geometry match to the ALIVE badge, with 64px protected end caps and a 256px stretch-safe center. No baked-in text.</desc>
+
+  <metadata>
+    asset: veil_ui_badge_dead.svg
+    geometry-family: veil_ui_badge_alive.svg
+    canvas: 384x96
+    aspect-ratio: 4:1
+    transparent-background: true
+    protected-end-caps: 64px left / 64px right
+    stretch-safe-center: x=64..320
+    intended-css-height: 24-32px
+    text: live HTML/CSS only
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E0E1E4"/>
+      <stop offset="0.22" stop-color="#7B7E86"/>
+      <stop offset="0.52" stop-color="#C9CBD0"/>
+      <stop offset="0.78" stop-color="#555860"/>
+      <stop offset="1" stop-color="#9EA1A8"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1C20"/>
+      <stop offset="0.48" stop-color="#07090B"/>
+      <stop offset="1" stop-color="#121419"/>
+    </linearGradient>
+
+    <linearGradient id="crimsonEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5A171E"/>
+      <stop offset="0.18" stop-color="#9B2834"/>
+      <stop offset="0.50" stop-color="#B33442"/>
+      <stop offset="0.82" stop-color="#9B2834"/>
+      <stop offset="1" stop-color="#5A171E"/>
+    </linearGradient>
+
+    <radialGradient id="crimsonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#C94854" stop-opacity="0.20"/>
+      <stop offset="0.55" stop-color="#A62F3B" stop-opacity="0.075"/>
+      <stop offset="1" stop-color="#A62F3B" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-30%" y="-120%" width="160%" height="340%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-70%" width="140%" height="240%">
+      <feGaussianBlur stdDeviation="0.9" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <pattern id="micro" width="24" height="16" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="4" r="0.35" fill="#FFFFFF" opacity="0.026"/>
+      <circle cx="17" cy="11" r="0.30" fill="#C95763" opacity="0.03"/>
+      <path d="M7 13l5-1" stroke="#FFFFFF" stroke-width="0.28" opacity="0.016"/>
+    </pattern>
+  </defs>
+
+  <!-- True transparent exterior; restrained crimson haze -->
+  <ellipse cx="52" cy="48" rx="38" ry="29" fill="url(#crimsonGlow)" opacity="0.30" filter="url(#softGlow)"/>
+  <ellipse cx="332" cy="48" rx="38" ry="29" fill="url(#crimsonGlow)" opacity="0.30" filter="url(#softGlow)"/>
+
+  <!-- EXACT SAME outer crest geometry as ALIVE -->
+  <path d="M52 19
+           H332
+           C343 19 352 25 357 34
+           L370 48
+           L357 62
+           C352 71 343 77 332 77
+           H52
+           C41 77 32 71 27 62
+           L14 48
+           L27 34
+           C32 25 41 19 52 19Z"
+        fill="url(#gunmetal)"
+        stroke="url(#silver)"
+        stroke-width="3"/>
+
+  <!-- EXACT SAME inner face geometry as ALIVE -->
+  <path d="M58 25
+           H326
+           C336 25 343 30 347 37
+           L356 48
+           L347 59
+           C343 66 336 71 326 71
+           H58
+           C48 71 41 66 37 59
+           L28 48
+           L37 37
+           C41 30 48 25 58 25Z"
+        fill="#08090D"
+        stroke="#22252A"
+        stroke-width="2"/>
+
+  <!-- DEAD state rail -->
+  <path d="M66 29H318"
+        stroke="url(#crimsonEdge)"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        filter="url(#edgeGlow)"/>
+  <path d="M66 67H318"
+        stroke="#7F252F"
+        stroke-opacity="0.20"
+        stroke-width="1"/>
+
+  <!-- Same subtle micro texture footprint -->
+  <path d="M58 28H326C334 28 339 32 343 38L351 48L343 58C339 64 334 68 326 68H58C50 68 45 64 41 58L33 48L41 38C45 32 50 28 58 28Z"
+        fill="url(#micro)"
+        opacity="0.34"/>
+
+  <!-- Left protected end cap: exact geometry match -->
+  <g aria-label="left protected end cap">
+    <circle cx="42" cy="48" r="13" fill="#07090B" stroke="url(#silver)" stroke-width="2.2"/>
+    <circle cx="42" cy="48" r="7.2" fill="#040506" stroke="#74232C" stroke-width="1.1"/>
+    <circle cx="42" cy="48" r="2.4" fill="#B84450" opacity="0.64"/>
+
+    <path d="M27 48H17" stroke="url(#silver)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M17 48L27 42V54L17 48Z" fill="#111318" stroke="url(#silver)" stroke-width="1.5"/>
+
+    <path d="M50 37L59 31L55 41" fill="#0E1013" stroke="url(#silver)" stroke-width="1.25"/>
+    <path d="M50 59L59 65L55 55" fill="#0E1013" stroke="url(#silver)" stroke-width="1.25"/>
+
+    <path d="M50 48H61" stroke="#9B303A" stroke-opacity="0.36" stroke-width="1"/>
+
+    <!-- Tiny fractured / cut-power accent, contained inside end cap -->
+    <path d="M39 40L43 45L40 48L45 54"
+          stroke="#C0434E" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.60"/>
+  </g>
+
+  <!-- Right protected end cap: exact geometry match -->
+  <g aria-label="right protected end cap">
+    <circle cx="342" cy="48" r="13" fill="#07090B" stroke="url(#silver)" stroke-width="2.2"/>
+    <circle cx="342" cy="48" r="7.2" fill="#040506" stroke="#74232C" stroke-width="1.1"/>
+    <circle cx="342" cy="48" r="2.4" fill="#B84450" opacity="0.64"/>
+
+    <path d="M357 48H367" stroke="url(#silver)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M367 48L357 42V54L367 48Z" fill="#111318" stroke="url(#silver)" stroke-width="1.5"/>
+
+    <path d="M334 37L325 31L329 41" fill="#0E1013" stroke="url(#silver)" stroke-width="1.25"/>
+    <path d="M334 59L325 65L329 55" fill="#0E1013" stroke="url(#silver)" stroke-width="1.25"/>
+
+    <path d="M334 48H323" stroke="#9B303A" stroke-opacity="0.36" stroke-width="1"/>
+
+    <!-- Mirrored fractured / cut-power accent -->
+    <path d="M345 40L341 45L344 48L339 54"
+          stroke="#C0434E" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.60"/>
+  </g>
+
+  <!-- Same machining accents -->
+  <g stroke="#ECEDEF" stroke-opacity="0.18" stroke-width="0.7">
+    <path d="M67 24l5 3"/>
+    <path d="M67 72l5-3"/>
+    <path d="M317 24l-5 3"/>
+    <path d="M317 72l-5-3"/>
+  </g>
+
+  <!-- Non-rendering production guides -->
+  <g opacity="0" pointer-events="none">
+    <rect id="left-cap" x="0" y="0" width="64" height="96"/>
+    <rect id="stretch-safe-center" x="64" y="0" width="256" height="96"/>
+    <rect id="right-cap" x="320" y="0" width="64" height="96"/>
+  </g>
+</svg>

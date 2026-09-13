@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="192" viewBox="0 0 960 192" fill="none">
+  <title>Veil UI Secondary Button Frame</title>
+  <desc>960 by 192 transparent SVG. Secondary button frame matching the Veil primary CTA geometry, with protected 144px end caps and a 672px stretch-safe center field.</desc>
+  <metadata>
+    asset: veil_ui_button_secondary.svg
+    canvas: 960x192
+    aspect-ratio: 5:1
+    transparent-background: true
+    protected-end-caps: 144px left / 144px right
+    stretch-safe-center: x=144..816
+    intended-css-height: 48-56px
+    text: live HTML/CSS; do not bake text into artwork
+  </metadata>
+
+  <defs>
+    <!-- Quieter silver than primary: still crisp, less mirror-bright. -->
+    <linearGradient id="silverSecondary" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DCDDDF"/>
+      <stop offset="0.22" stop-color="#777A84"/>
+      <stop offset="0.50" stop-color="#C8C9CF"/>
+      <stop offset="0.76" stop-color="#565962"/>
+      <stop offset="1" stop-color="#A5A7AF"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalSecondary" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#202126"/>
+      <stop offset="0.52" stop-color="#08090C"/>
+      <stop offset="1" stop-color="#17181D"/>
+    </linearGradient>
+
+    <linearGradient id="panelSecondary" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#08090C"/>
+      <stop offset="0.14" stop-color="#0D0E13"/>
+      <stop offset="0.50" stop-color="#08090C"/>
+      <stop offset="0.86" stop-color="#0D0E13"/>
+      <stop offset="1" stop-color="#08090C"/>
+    </linearGradient>
+
+    <!-- Softer / darker violet than primary. -->
+    <linearGradient id="violetSecondary" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4E337A"/>
+      <stop offset="0.18" stop-color="#8667AF"/>
+      <stop offset="0.50" stop-color="#65488B"/>
+      <stop offset="0.82" stop-color="#8667AF"/>
+      <stop offset="1" stop-color="#4E337A"/>
+    </linearGradient>
+
+    <radialGradient id="capGlowSecondary" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#8A68B8" stop-opacity="0.22"/>
+      <stop offset="0.52" stop-color="#694496" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#694496" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="secondaryGlow" x="-25%" y="-70%" width="150%" height="240%">
+      <feGaussianBlur stdDeviation="2.8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="secondarySoftGlow" x="-30%" y="-100%" width="160%" height="300%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+
+    <clipPath id="panelClipSecondary">
+      <rect x="86" y="58" width="788" height="76" rx="30"/>
+    </clipPath>
+
+    <pattern id="microGrainSecondary" width="38" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="5" r="0.55" fill="#FFFFFF" opacity="0.055"/>
+      <circle cx="28" cy="16" r="0.42" fill="#A98BCB" opacity="0.06"/>
+      <path d="M11 19l7-1" stroke="#FFFFFF" stroke-width="0.42" opacity="0.035"/>
+      <path d="M30 5l4 2" stroke="#FFFFFF" stroke-width="0.38" opacity="0.03"/>
+    </pattern>
+  </defs>
+
+  <!-- True transparent exterior; restrained end-cap haze only. -->
+  <ellipse cx="100" cy="96" rx="88" ry="70" fill="url(#capGlowSecondary)" opacity="0.42" filter="url(#secondarySoftGlow)"/>
+  <ellipse cx="860" cy="96" rx="88" ry="70" fill="url(#capGlowSecondary)" opacity="0.42" filter="url(#secondarySoftGlow)"/>
+
+  <!-- Same production geometry as the primary button. -->
+  <rect x="58" y="42" width="844" height="108" rx="50"
+        fill="url(#gunmetalSecondary)" stroke="url(#silverSecondary)" stroke-width="4.5"/>
+
+  <rect x="67" y="50" width="826" height="92" rx="42"
+        fill="#050609" stroke="#14151A" stroke-width="4"/>
+
+  <rect x="78" y="55" width="804" height="82" rx="36"
+        fill="url(#panelSecondary)" stroke="url(#violetSecondary)" stroke-width="1.75"
+        filter="url(#secondaryGlow)"/>
+
+  <rect x="86" y="58" width="788" height="76" rx="30"
+        fill="url(#microGrainSecondary)" opacity="0.46"/>
+
+  <!-- Quiet inner rails. -->
+  <path d="M112 66H848" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="1"/>
+  <path d="M112 126H848" stroke="#9B7CBD" stroke-opacity="0.10" stroke-width="1"/>
+
+  <!-- Left protected end cap: 0..144 -->
+  <g aria-label="left protected end cap">
+    <path d="M58 96H18" stroke="url(#silverSecondary)" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M18 96L48 80V112L18 96Z"
+          fill="url(#gunmetalSecondary)" stroke="url(#silverSecondary)" stroke-width="2.6"/>
+
+    <circle cx="72" cy="96" r="23" fill="#07080B" stroke="url(#silverSecondary)" stroke-width="3.5"/>
+    <circle cx="72" cy="96" r="14" fill="#030406" stroke="#765696" stroke-width="1.5"/>
+    <circle cx="72" cy="96" r="3.2" fill="#A996BF" opacity="0.78"/>
+
+    <path d="M82 76L103 61L95 85" fill="#0E0F13" stroke="url(#silverSecondary)" stroke-width="2.1"/>
+    <path d="M82 116L103 131L95 107" fill="#0E0F13" stroke="url(#silverSecondary)" stroke-width="2.1"/>
+
+    <path d="M92 96H120" stroke="#80609F" stroke-width="1.4" opacity="0.48"/>
+    <circle cx="104" cy="61" r="1.7" fill="#8C6AAA" opacity="0.72"/>
+    <circle cx="104" cy="131" r="1.7" fill="#8C6AAA" opacity="0.72"/>
+  </g>
+
+  <!-- Right protected end cap: 816..960 -->
+  <g aria-label="right protected end cap">
+    <path d="M902 96H942" stroke="url(#silverSecondary)" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M942 96L912 80V112L942 96Z"
+          fill="url(#gunmetalSecondary)" stroke="url(#silverSecondary)" stroke-width="2.6"/>
+
+    <circle cx="888" cy="96" r="23" fill="#07080B" stroke="url(#silverSecondary)" stroke-width="3.5"/>
+    <circle cx="888" cy="96" r="14" fill="#030406" stroke="#765696" stroke-width="1.5"/>
+    <circle cx="888" cy="96" r="3.2" fill="#A996BF" opacity="0.78"/>
+
+    <path d="M878 76L857 61L865 85" fill="#0E0F13" stroke="url(#silverSecondary)" stroke-width="2.1"/>
+    <path d="M878 116L857 131L865 107" fill="#0E0F13" stroke="url(#silverSecondary)" stroke-width="2.1"/>
+
+    <path d="M868 96H840" stroke="#80609F" stroke-width="1.4" opacity="0.48"/>
+    <circle cx="856" cy="61" r="1.7" fill="#8C6AAA" opacity="0.72"/>
+    <circle cx="856" cy="131" r="1.7" fill="#8C6AAA" opacity="0.72"/>
+  </g>
+
+  <!-- Restrained energy accents entirely inside protected caps. -->
+  <g clip-path="url(#panelClipSecondary)" opacity="0.24">
+    <path d="M88 72C111 59 128 63 144 73" stroke="#6D4A92" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M88 120C111 133 128 129 144 119" stroke="#6D4A92" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M872 72C849 59 832 63 816 73" stroke="#6D4A92" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M872 120C849 133 832 129 816 119" stroke="#6D4A92" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Same machining language, quieter finish. -->
+  <g stroke="#E7E7EB" stroke-opacity="0.28" stroke-width="1">
+    <path d="M122 51l10 6"/><path d="M122 141l10-6"/>
+    <path d="M838 51l-10 6"/><path d="M838 141l-10-6"/>
+  </g>
+
+  <!-- Non-rendering production guides. -->
+  <g opacity="0" pointer-events="none">
+    <rect id="stretch-safe-center" x="144" y="0" width="672" height="192"/>
+    <rect id="left-cap" x="0" y="0" width="144" height="192"/>
+    <rect id="right-cap" x="816" y="0" width="144" height="192"/>
+  </g>
+</svg>

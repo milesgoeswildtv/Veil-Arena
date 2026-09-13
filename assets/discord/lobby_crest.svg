@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="640" height="240" viewBox="0 0 640 240"
+  preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#39333f"/>
+      <stop offset="15%" stop-color="#f3edf8"/>
+      <stop offset="33%" stop-color="#817888"/>
+      <stop offset="52%" stop-color="#ffffff"/>
+      <stop offset="72%" stop-color="#655d6c"/>
+      <stop offset="100%" stop-color="#d4ccdc"/>
+    </linearGradient>
+
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1b0d24"/>
+      <stop offset="28%" stop-color="#692898"/>
+      <stop offset="55%" stop-color="#d858f4"/>
+      <stop offset="80%" stop-color="#7122aa"/>
+      <stop offset="100%" stop-color="#20102c"/>
+    </linearGradient>
+
+    <radialGradient id="gem" cx="42%" cy="30%" r="72%">
+      <stop offset="0%" stop-color="#ffe2ff"/>
+      <stop offset="24%" stop-color="#ef79ff"/>
+      <stop offset="60%" stop-color="#a33cdf"/>
+      <stop offset="100%" stop-color="#2f0f3e"/>
+    </radialGradient>
+
+    <filter id="glow" x="-60%" y="-80%" width="220%" height="260%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- transparent background -->
+  <g transform="translate(320 116)">
+    <!-- restrained side blades -->
+    <path d="M-300 18 L-248 -6 L-189 0 L-143 -24 L-100 -10"
+      fill="none" stroke="url(#chrome)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M300 18 L248 -6 L189 0 L143 -24 L100 -10"
+      fill="none" stroke="url(#chrome)" stroke-width="9" stroke-linecap="round"/>
+
+    <path d="M-292 34 L-240 14 L-188 18 L-143 0 L-100 7"
+      fill="none" stroke="#9b3bd8" stroke-width="4" opacity=".68"/>
+    <path d="M292 34 L240 14 L188 18 L143 0 L100 7"
+      fill="none" stroke="#9b3bd8" stroke-width="4" opacity=".68"/>
+
+    <!-- abstract Veil crown -->
+    <g filter="url(#glow)">
+      <path d="M-92 12
+               L-73 -47
+               L-34 -15
+               L0 -76
+               L34 -15
+               L73 -47
+               L92 12
+               L66 37
+               H-66 Z"
+        fill="url(#violet)" stroke="url(#chrome)" stroke-width="8" stroke-linejoin="round"/>
+
+      <path d="M-78 14 H78 L66 40 H-66 Z"
+        fill="#0e0912" stroke="#a845e2" stroke-width="5" stroke-linejoin="round"/>
+
+      <!-- crown jewels -->
+      <circle cx="-73" cy="-47" r="9" fill="url(#gem)" stroke="#f0dcf8" stroke-width="3"/>
+      <circle cx="0" cy="-76" r="11" fill="url(#gem)" stroke="#f0dcf8" stroke-width="3"/>
+      <circle cx="73" cy="-47" r="9" fill="url(#gem)" stroke="#f0dcf8" stroke-width="3"/>
+
+      <!-- center veil shard -->
+      <path d="M-25 -4 L0 -33 L25 -4 L0 37 Z"
+        fill="url(#gem)" stroke="url(#chrome)" stroke-width="5"/>
+      <path d="M-9 -3 L0 -14 L9 -3 L0 16 Z"
+        fill="#fff1ff" opacity=".76"/>
+    </g>
+
+    <!-- lower ornamental blade -->
+    <path d="M-54 46 L0 68 L54 46 L30 88 L0 108 L-30 88 Z"
+      fill="#0e0912" stroke="url(#chrome)" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-15 67 L0 56 L15 67 L0 84 Z"
+      fill="url(#gem)" stroke="#efd9f8" stroke-width="3" filter="url(#glow)"/>
+  </g>
+</svg>

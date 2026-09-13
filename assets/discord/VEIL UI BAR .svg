@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="192" viewBox="0 0 960 192" fill="none">
+  <title>Veil UI Primary CTA Frame</title>
+  <desc>960 by 192 transparent SVG. Three-slice-ready primary button frame with protected 144px end caps and a stretch-safe center field.</desc>
+  <metadata>
+    asset: veil_ui_button_primary.svg
+    canvas: 960x192
+    aspect-ratio: 5:1
+    transparent-background: true
+    protected-end-caps: 144px left / 144px right
+    stretch-safe-center: x=144..816
+    intended-css-height: 48-56px
+    text: live HTML/CSS; do not bake text into artwork
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6F6FA"/>
+      <stop offset="0.20" stop-color="#AEB0BB"/>
+      <stop offset="0.48" stop-color="#FAFAFD"/>
+      <stop offset="0.72" stop-color="#717480"/>
+      <stop offset="1" stop-color="#D9DAE2"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C2D35"/>
+      <stop offset="0.55" stop-color="#08090D"/>
+      <stop offset="1" stop-color="#1D1E25"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#090A0F"/>
+      <stop offset="0.12" stop-color="#101018"/>
+      <stop offset="0.5" stop-color="#0A0A10"/>
+      <stop offset="0.88" stop-color="#101018"/>
+      <stop offset="1" stop-color="#090A0F"/>
+    </linearGradient>
+    <linearGradient id="violetStroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6B35FF"/>
+      <stop offset="0.16" stop-color="#C09BFF"/>
+      <stop offset="0.5" stop-color="#7D49FF"/>
+      <stop offset="0.84" stop-color="#C09BFF"/>
+      <stop offset="1" stop-color="#6B35FF"/>
+    </linearGradient>
+    <radialGradient id="capGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#A879FF" stop-opacity="0.70"/>
+      <stop offset="0.45" stop-color="#742CFF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#742CFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="violetGlow" x="-30%" y="-80%" width="160%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow" x="-40%" y="-120%" width="180%" height="340%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <clipPath id="panelClip">
+      <rect x="86" y="58" width="788" height="76" rx="30"/>
+    </clipPath>
+    <pattern id="microGrain" width="34" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="4" r="0.65" fill="#FFFFFF" opacity="0.11"/>
+      <circle cx="24" cy="15" r="0.45" fill="#B78AFF" opacity="0.12"/>
+      <path d="M10 18l8-1" stroke="#FFFFFF" stroke-width="0.45" opacity="0.07"/>
+      <path d="M27 4l4 2" stroke="#FFFFFF" stroke-width="0.4" opacity="0.05"/>
+    </pattern>
+  </defs>
+
+  <!-- Transparent exterior. Purple haze stays within the 192px canvas. -->
+  <ellipse cx="100" cy="96" rx="92" ry="76" fill="url(#capGlow)" opacity="0.55" filter="url(#softGlow)"/>
+  <ellipse cx="860" cy="96" rx="92" ry="76" fill="url(#capGlow)" opacity="0.55" filter="url(#softGlow)"/>
+
+  <!-- Main chassis: center is intentionally free of fixed ornaments so it can stretch cleanly. -->
+  <rect x="58" y="42" width="844" height="108" rx="50" fill="url(#gunmetal)" stroke="url(#silver)" stroke-width="5"/>
+  <rect x="67" y="50" width="826" height="92" rx="42" fill="#05060A" stroke="#171923" stroke-width="4"/>
+  <rect x="78" y="55" width="804" height="82" rx="36" fill="url(#panel)" stroke="url(#violetStroke)" stroke-width="2.5" filter="url(#violetGlow)"/>
+  <rect x="86" y="58" width="788" height="76" rx="30" fill="url(#microGrain)" opacity="0.62"/>
+
+  <!-- Thin inner rails keep the button crisp at small CSS sizes. -->
+  <path d="M112 66H848" stroke="#FFFFFF" stroke-opacity="0.20" stroke-width="1"/>
+  <path d="M112 126H848" stroke="#B78AFF" stroke-opacity="0.22" stroke-width="1"/>
+
+  <!-- Left protected end cap: 0..144 -->
+  <g aria-label="left protected end cap">
+    <path d="M58 96H18" stroke="url(#silver)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M18 96L48 80V112L18 96Z" fill="url(#gunmetal)" stroke="url(#silver)" stroke-width="3"/>
+    <circle cx="72" cy="96" r="23" fill="#07080D" stroke="url(#silver)" stroke-width="4"/>
+    <circle cx="72" cy="96" r="14" fill="#030407" stroke="#A16AFF" stroke-width="2" filter="url(#violetGlow)"/>
+    <circle cx="72" cy="96" r="4" fill="#DCCBFF"/>
+    <path d="M82 76L103 61L95 85" fill="#11121A" stroke="url(#silver)" stroke-width="2.5"/>
+    <path d="M82 116L103 131L95 107" fill="#11121A" stroke="url(#silver)" stroke-width="2.5"/>
+    <path d="M92 96H120" stroke="#B78AFF" stroke-width="2" opacity="0.85"/>
+    <circle cx="104" cy="61" r="2.2" fill="#B78AFF"/>
+    <circle cx="104" cy="131" r="2.2" fill="#B78AFF"/>
+  </g>
+
+  <!-- Right protected end cap: 816..960 -->
+  <g aria-label="right protected end cap">
+    <path d="M902 96H942" stroke="url(#silver)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M942 96L912 80V112L942 96Z" fill="url(#gunmetal)" stroke="url(#silver)" stroke-width="3"/>
+    <circle cx="888" cy="96" r="23" fill="#07080D" stroke="url(#silver)" stroke-width="4"/>
+    <circle cx="888" cy="96" r="14" fill="#030407" stroke="#A16AFF" stroke-width="2" filter="url(#violetGlow)"/>
+    <circle cx="888" cy="96" r="4" fill="#DCCBFF"/>
+    <path d="M878 76L857 61L865 85" fill="#11121A" stroke="url(#silver)" stroke-width="2.5"/>
+    <path d="M878 116L857 131L865 107" fill="#11121A" stroke="url(#silver)" stroke-width="2.5"/>
+    <path d="M868 96H840" stroke="#B78AFF" stroke-width="2" opacity="0.85"/>
+    <circle cx="856" cy="61" r="2.2" fill="#B78AFF"/>
+    <circle cx="856" cy="131" r="2.2" fill="#B78AFF"/>
+  </g>
+
+  <!-- Corner energy accents. These live inside the protected end caps. -->
+  <g clip-path="url(#panelClip)" opacity="0.55" filter="url(#violetGlow)">
+    <path d="M88 71C111 56 129 61 145 72" stroke="#7F4CFF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M88 121C111 136 129 131 145 120" stroke="#7F4CFF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M872 71C849 56 831 61 815 72" stroke="#7F4CFF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M872 121C849 136 831 131 815 120" stroke="#7F4CFF" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- Small machining notches; all outside the stretch-safe center. -->
+  <g stroke="#F3F3F8" stroke-opacity="0.45" stroke-width="1.2">
+    <path d="M122 51l10 6"/><path d="M122 141l10-6"/>
+    <path d="M838 51l-10 6"/><path d="M838 141l-10-6"/>
+  </g>
+
+  <!-- Invisible guides for authoring tools; do not render. -->
+  <g opacity="0" pointer-events="none">
+    <rect id="stretch-safe-center" x="144" y="0" width="672" height="192"/>
+    <rect id="left-cap" x="0" y="0" width="144" height="192"/>
+    <rect id="right-cap" x="816" y="0" width="144" height="192"/>
+  </g>
+</svg>
