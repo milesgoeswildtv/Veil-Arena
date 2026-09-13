@@ -22,7 +22,7 @@ const RARE_EVENT_CHANCE = 0.035;
 const name = (g, id) => g.players[id]?.displayName || "Unknown";
 const delayFor = brawl => brawl ? 14000 + Math.floor(Math.random() * 2001) : 12000 + Math.floor(Math.random() * 2001);
 const esc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const platformOf = g => g?.platform === "telegram" ? "telegram" : "discord";
+const platformOf = g => g?.platform === "telegram" ? "telegram" : g?.platform === "activity" ? "activity" : "discord";
 const themeIcon = t => t.id === "full_tilt" ? "🎰" : t.id === "dwallet" ? "💜" : "👻";
 
 function rarePrefix(t) {
@@ -139,11 +139,11 @@ function revivalRoundText(g, t, result) {
 
 function crowdOpenText(g, t) {
   let line = "THE FINAL SCARE IS OPEN";
-  let instruction = "Spectators have **30 seconds**. The top two voting positions enter a strict **1v1**. **ONE SURVIVES.**";
+  let instruction = "Spectators have **30 seconds**. The top two vote-getters enter a strict **1v1**. **ONE SURVIVES.**";
   if (t.id === "full_tilt") line = "THE FINAL BET IS OPEN";
   if (t.id === "dwallet") {
     line = "THE CHAT VOTE IS OPEN";
-    instruction = "Spectators have **30 seconds**. Vote inside the live Arena window. The top two voting positions enter a strict **1v1**. **ONE SURVIVES.**";
+    instruction = "Spectators have **30 seconds**. Vote inside the live Arena window. The top two vote-getters enter a strict **1v1**. **ONE SURVIVES.**";
   }
   return `👁️ *ROUND ${g.round} — ${t.labels.crowdVote}*\n\n${line}\n${instruction}`;
 }
@@ -163,6 +163,7 @@ function crowdText(g, t, result, sim = 0) {
 }
 
 async function sendTransport(env, platform, channelId, message, controls = {}) {
+  if (platform === "activity") return { id: null, activity: true };
   if (platform === "telegram") {
     if (!env.TELEGRAM_BOT_TOKEN) throw new Error("Telegram bot token is not configured.");
     return sendTelegramMessage(channelId, env.TELEGRAM_BOT_TOKEN, {
@@ -178,6 +179,7 @@ async function sendTransport(env, platform, channelId, message, controls = {}) {
 }
 
 async function deleteTransport(env, platform, channelId, messageId) {
+  if (platform === "activity") return true;
   if (platform === "telegram") {
     if (!env.TELEGRAM_BOT_TOKEN) return false;
     return deleteTelegramMessage(channelId, messageId, env.TELEGRAM_BOT_TOKEN);
@@ -197,7 +199,7 @@ async function trimToCurrentRound(ctx, env, platform, channelId, groups, current
 }
 
 async function postRound(ctx, env, platform, channelId, round, message, controls = {}) {
-  if (platform === "telegram") return null;
+  if (platform === "telegram" || platform === "activity") return null;
   let groups = await ctx.storage.get("roundMessageGroups") || [];
   groups = await trimToCurrentRound(ctx, env, platform, channelId, groups, round);
   const created = await sendTransport(env, platform, channelId, message, controls);
@@ -207,7 +209,7 @@ async function postRound(ctx, env, platform, channelId, round, message, controls
 }
 
 async function appendRoundMessage(ctx, env, platform, channelId, round, message, controls = {}) {
-  if (platform === "telegram") return null;
+  if (platform === "telegram" || platform === "activity") return null;
   const created = await sendTransport(env, platform, channelId, message, controls);
   const groups = await ctx.storage.get("roundMessageGroups") || [];
   let group = groups.find(x => x.round === round);
@@ -254,9 +256,11 @@ async function finish(env, g) {
   if (payout) rememberDisplayed(g, payout);
   await saveGame(env.DB, g);
   await recordFinishedGame(env.DB, g);
-  await sendTransport(env, platform, g.channelId, msg);
-  if (payout) {
-    for (const chunk of messageChunks(payout)) await sendTransport(env, platform, g.channelId, chunk);
+  if (platform !== "activity") {
+    await sendTransport(env, platform, g.channelId, msg);
+    if (payout) {
+      for (const chunk of messageChunks(payout)) await sendTransport(env, platform, g.channelId, chunk);
+    }
   }
   if (platform === "telegram") {
     await startArenaCooldown(env.DB, g.channelId, TELEGRAM_ARENA_COOLDOWN_MS);
@@ -351,7 +355,7 @@ export class ArenaCoordinator {
         const msg = crowdOpenText(g, t);
         rememberDisplayed(g, msg);
         await saveGame(this.env.DB, g);
-        const controls = platform === "telegram" ? {} : {
+        const controls = platform === "discord" ? {
           discord: [{
             type: 1,
             components: [{
@@ -362,7 +366,7 @@ export class ArenaCoordinator {
               emoji: { name: "👁️" }
             }]
           }]
-        };
+        } : {};
         await postRound(this.ctx, this.env, platform, channelId, g.round, msg, controls);
         await this.ctx.storage.setAlarm(Date.now() + CROWD_VOTE_MS);
         return;
