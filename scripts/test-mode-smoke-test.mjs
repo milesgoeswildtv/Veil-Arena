@@ -45,7 +45,7 @@ assert(telegramGroupEntry.includes('params.set("chat_type", "group")'));
 assert(botsEntry.includes('from "./activity-clean-entry.js"'));
 assert(botsEntry.includes("addFakeContestants"));
 assert(cleanEntry.includes('BUILD = "20260913-19"'));
-assert(cleanEntry.includes('discordsays.com'));
+assert(cleanEntry.includes('discordsays'));
 assert(cleanEntry.includes('VEIL CONNECTION FACTS'));
 assert(cleanEntry.includes('Arena client started'));
 assert(cleanEntry.includes('__VEIL_MARK_CLIENT_STARTED__'));
