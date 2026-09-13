@@ -58,13 +58,17 @@ assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
 assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
 
 const localSdkEntry = readFileSync(new URL("../src/activity-local-sdk-entry.js", import.meta.url), "utf8");
-assert(localSdkEntry.includes('from "./activity-sdk-route-fix-entry.js"'));
 assert(localSdkEntry.includes('MINI_DISCORD_SDK_SOURCE'));
-assert(localSdkEntry.includes('x-veil-sdk-source'));
 assert(localSdkEntry.includes('local-minimal'));
-assert(localSdkEntry.includes('20260913-7'));
+
+const singleScriptEntry = readFileSync(new URL("../src/activity-single-script-entry.js", import.meta.url), "utf8");
+assert(singleScriptEntry.includes('from "./activity-local-sdk-entry.js"'));
+assert(singleScriptEntry.includes('Promise.resolve({ DiscordSDK: InlineDiscordSDK })'));
+assert(singleScriptEntry.includes('replaceAll'));
+assert(singleScriptEntry.includes('20260913-8'));
+assert(singleScriptEntry.includes('x-veil-single-script'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-local-sdk-entry.js"'));
+assert(wrangler.includes('main = "src/activity-single-script-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
