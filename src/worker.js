@@ -1,17 +1,28 @@
 import { handleTelegramRoute } from "./telegram-control.js";
+import { telegramFxMiniAppHtml } from "./telegram-fx-app.js";
 import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
 
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-13-telegram-round-narration-1";
+const TELEGRAM_BUILD = "2026-09-13-telegram-effects-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
+    }
+  });
+}
+
+function html(body, status = 200) {
+  return new Response(body, {
+    status,
+    headers: {
+      "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store"
     }
   });
@@ -37,6 +48,10 @@ async function preserveFinishedRoundNarration(url, response) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (request.method === "GET" && url.pathname === "/telegram/app") {
+      return html(telegramFxMiniAppHtml());
+    }
 
     if (url.pathname.startsWith("/telegram/")) {
       const response = await handleTelegramRoute(request, env);
