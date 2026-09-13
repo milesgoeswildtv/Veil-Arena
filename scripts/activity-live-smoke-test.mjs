@@ -63,23 +63,17 @@ assert(bootstrapEntry.includes('CONNECTING TO DISCORD'));
 assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
 assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
 
-const localSdkEntry = readFileSync(new URL("../src/activity-local-sdk-entry.js", import.meta.url), "utf8");
-assert(localSdkEntry.includes('MINI_DISCORD_SDK_SOURCE'));
-assert(localSdkEntry.includes('local-minimal'));
-
-const singleScriptEntry = readFileSync(new URL("../src/activity-single-script-entry.js", import.meta.url), "utf8");
-assert(singleScriptEntry.includes('from "./activity-local-sdk-entry.js"'));
-assert(singleScriptEntry.includes('Promise.resolve({ DiscordSDK: InlineDiscordSDK })'));
-assert(singleScriptEntry.includes('20260913-10'));
-assert(singleScriptEntry.includes('/activity/veil-arena-20260913-10.js'));
-assert(singleScriptEntry.includes('Expected test guild_id'));
-assert(singleScriptEntry.includes('1504257112094539798'));
-assert(singleScriptEntry.includes('Launch guild_id'));
-assert(singleScriptEntry.includes('Launch channel_id'));
-assert(singleScriptEntry.includes('Worker Application ID'));
-assert(singleScriptEntry.includes('x-veil-single-script'));
+const directEntry = readFileSync(new URL("../src/activity-direct-entry.js", import.meta.url), "utf8");
+assert(directEntry.includes('from "./activity-single-script-entry.js"'));
+assert(directEntry.includes('ACTIVITY_BUILD = "20260913-11"'));
+assert(directEntry.includes('/activity/veil-arena-20260913-11.js'));
+assert(directEntry.includes('const DiscordSDK = InlineDiscordSDK'));
+assert(directEntry.includes('DIRECT / NO DYNAMIC IMPORT'));
+assert(directEntry.includes('Expected test guild_id: ${TEST_GUILD_ID}'));
+assert(directEntry.includes('1504257112094539798'));
+assert(directEntry.includes('x-veil-direct-client'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-single-script-entry.js"'));
+assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
