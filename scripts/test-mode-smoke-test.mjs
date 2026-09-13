@@ -40,7 +40,9 @@ for (const action of [
 }
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/test-entry.js"'));
+const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
+assert(wrangler.includes('main = "src/discord-recovery-entry.js"'));
+assert(recoveryEntry.includes('from "./test-entry.js"'));
 assert(wrangler.includes("[env.test.vars]"));
 assert(wrangler.includes('ARENA_TEST_MODE = "true"'));
 assert(wrangler.includes("[[env.test.durable_objects.bindings]]"));
