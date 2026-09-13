@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { arenaCommands } from "../src/discord.js";
 import { ACTIVITY_PREVIEW_CLIENT } from "../src/activity-preview-client.js";
 import { SPONSOR_PANEL_CLIENT } from "../src/sponsor-panel-client.js";
@@ -31,7 +32,6 @@ const crek = upsertSponsorship(game, { id: "s2", displayName: "Crek" }, { winner
 assert.equal(crek.awards.winner, 1000);
 assert.equal(game.sponsorships.length, 2);
 
-// Re-running sponsorship edits that sponsor's own pledge rather than adding a duplicate.
 upsertSponsorship(game, { id: "s1", displayName: "Sam" }, { winner: 5, most_kills: 4 });
 assert.equal(game.sponsorships.length, 2);
 assert.equal(game.sponsorships.find(x => x.sponsorId === "s1").awards.most_kills, 400);
@@ -74,10 +74,18 @@ for (const field of ["winner","runner_up","most_kills","most_revivals","most_sho
   assert(sponsor.options.some(x => x.name === field), `Missing Discord sponsor field ${field}`);
 }
 
-// Compile the exact browser controller strings so a broken template does not ship to Discord/Telegram.
 new Function(ACTIVITY_PREVIEW_CLIENT);
 new Function(SPONSOR_PANEL_CLIENT);
 assert(ACTIVITY_PREVIEW_CLIENT.includes("data-fx"));
+assert(ACTIVITY_PREVIEW_CLIENT.includes("CONTROLS ONLINE"));
+assert(ACTIVITY_PREVIEW_CLIENT.includes("CONTROLS FAILED"));
 assert(SPONSOR_PANEL_CLIENT.includes("/telegram/miniapp/sponsor"));
 
-console.log("Arena sponsorship + Activity controller smoke tests passed.");
+const activityEntry = fs.readFileSync(new URL("../src/activity-entry.js", import.meta.url), "utf8");
+assert(activityEntry.includes('url.pathname === "/activity-preview/health"'));
+assert(activityEntry.includes('url.pathname === "/setup/discord"'));
+assert(activityEntry.includes('url.pathname === "/admin/discord/register"'));
+assert(activityEntry.includes("registerGuildCommands"));
+assert(activityEntry.includes("/arena sponsor"));
+
+console.log("Arena sponsorship + Discord Activity/setup smoke tests passed.");
