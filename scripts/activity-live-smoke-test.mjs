@@ -21,7 +21,7 @@ assert(ACTIVITY_LIVE_CLIENT.includes('START ARENA'));
 assert(ACTIVITY_LIVE_CLIENT.includes('Community Showdown'));
 
 assert.equal(VEIL_ACTIVITY_TEST_GUILD_ID, "1504257112094539798");
-assert.equal(themeForGuild(VEIL_ACTIVITY_TEST_GUILD_ID), "full_tilt");
+assert.equal(themeForGuild(VEIL_ACTIVITY_TEST_GUILD_ID), "dwallet");
 assert.equal(OFFICIAL_DISCORD_SDK_VERSION, "2.5.0");
 assert(OFFICIAL_DISCORD_SDK_SOURCE.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
 assert(OFFICIAL_DISCORD_SDK_SOURCE.length > 10000);
@@ -65,12 +65,16 @@ assert(directEntry.includes('discord-bot-token'));
 assert(directEntry.includes('Expected test guild_id: ${TEST_GUILD_ID}'));
 assert(directEntry.includes('1504257112094539798'));
 
+const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
+assert(botsEntry.includes('from "./activity-direct-entry.js"'));
+assert(botsEntry.includes('addFakeContestants'));
+
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
 assert(packageJson.includes('"build:discord-sdk"'));
 assert(packageJson.includes('"postinstall"'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
+assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
