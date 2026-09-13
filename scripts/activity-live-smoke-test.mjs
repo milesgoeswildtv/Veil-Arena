@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { ACTIVITY_LIVE_CLIENT } from "../src/activity-live-client.js";
 import { liveActivityHtml } from "../src/activity-live.js";
-import { MINI_DISCORD_SDK_SOURCE } from "../src/activity-mini-sdk.js";
 import { VEIL_ACTIVITY_TEST_GUILD_ID, themeForGuild } from "../src/server-config.js";
+import { OFFICIAL_DISCORD_SDK_SOURCE, OFFICIAL_DISCORD_SDK_VERSION } from "../src/generated/discord-sdk-source.js";
 
 new Function(ACTIVITY_LIVE_CLIENT);
-new Function(MINI_DISCORD_SDK_SOURCE.replace("export class DiscordSDK", "class DiscordSDK"));
+new Function(OFFICIAL_DISCORD_SDK_SOURCE);
 const html = liveActivityHtml("123456789012345678");
 assert(html.includes('data-discord-client-id="123456789012345678"'));
 assert(html.includes('/activity/live.js'));
@@ -22,14 +22,9 @@ assert(ACTIVITY_LIVE_CLIENT.includes('Community Showdown'));
 
 assert.equal(VEIL_ACTIVITY_TEST_GUILD_ID, "1504257112094539798");
 assert.equal(themeForGuild(VEIL_ACTIVITY_TEST_GUILD_ID), "full_tilt");
-
-assert(MINI_DISCORD_SDK_SOURCE.includes('export class DiscordSDK'));
-assert(MINI_DISCORD_SDK_SOURCE.includes('Opcodes.HANDSHAKE'));
-assert(MINI_DISCORD_SDK_SOURCE.includes('"AUTHORIZE"'));
-assert(MINI_DISCORD_SDK_SOURCE.includes('"AUTHENTICATE"'));
-assert(MINI_DISCORD_SDK_SOURCE.includes('"GET_CHANNEL"'));
-assert(!MINI_DISCORD_SDK_SOURCE.includes('cdn.jsdelivr.net'));
-assert(!MINI_DISCORD_SDK_SOURCE.includes('esm.sh'));
+assert.equal(OFFICIAL_DISCORD_SDK_VERSION, "2.5.0");
+assert(OFFICIAL_DISCORD_SDK_SOURCE.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
+assert(OFFICIAL_DISCORD_SDK_SOURCE.length > 10000);
 
 const entry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 assert(entry.includes('DISCORD_CLIENT_SECRET'));
@@ -56,26 +51,24 @@ assert(doctorEntry.includes('botApplicationId'));
 assert(doctorEntry.includes('VERIFY + FORCE REPAIR ACTIVITY'));
 assert(doctorEntry.includes('/admin/activity/doctor-repair'));
 
-const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
-assert(bootstrapEntry.includes('from "./activity-doctor-entry.js"'));
-assert(bootstrapEntry.includes('SDK LOAD FAILED'));
-assert(bootstrapEntry.includes('CONNECTING TO DISCORD'));
-assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
-assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
-
 const directEntry = readFileSync(new URL("../src/activity-direct-entry.js", import.meta.url), "utf8");
-assert(directEntry.includes('from "./activity-single-script-entry.js"'));
-assert(directEntry.includes('ACTIVITY_BUILD = "20260913-12"'));
-assert(directEntry.includes('/activity/veil-arena-20260913-12.js'));
-assert(directEntry.includes('const DiscordSDK = InlineDiscordSDK'));
-assert(directEntry.includes('DIRECT / NO DYNAMIC IMPORT'));
+assert(directEntry.includes('OFFICIAL_DISCORD_SDK_SOURCE'));
+assert(directEntry.includes('OFFICIAL_DISCORD_SDK_VERSION'));
+assert(directEntry.includes('ACTIVITY_BUILD = "20260913-13"'));
+assert(directEntry.includes('/activity/veil-arena-20260913-13.js'));
+assert(directEntry.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
+assert(directEntry.includes('OFFICIAL SDK / BUNDLED LOCAL'));
+assert(directEntry.includes('disableConsoleLogOverride: true'));
+assert(!directEntry.includes('MINI_DISCORD_SDK_SOURCE'));
 assert(directEntry.includes('/applications/@me'));
 assert(directEntry.includes('discord-bot-token'));
-assert(directEntry.includes('ID auto-corrected'));
-assert(directEntry.includes('correctedEnv'));
 assert(directEntry.includes('Expected test guild_id: ${TEST_GUILD_ID}'));
 assert(directEntry.includes('1504257112094539798'));
-assert(directEntry.includes('x-veil-direct-client'));
+
+const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
+assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
+assert(packageJson.includes('"build:discord-sdk"'));
+assert(packageJson.includes('"postinstall"'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
 assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
