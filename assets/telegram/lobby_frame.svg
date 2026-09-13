@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#312c38"/>
+      <stop offset="9%" stop-color="#7d7488"/>
+      <stop offset="17%" stop-color="#f4eff9"/>
+      <stop offset="27%" stop-color="#8f8698"/>
+      <stop offset="50%" stop-color="#fdfaff"/>
+      <stop offset="73%" stop-color="#8d8396"/>
+      <stop offset="83%" stop-color="#eee9f4"/>
+      <stop offset="91%" stop-color="#756c80"/>
+      <stop offset="100%" stop-color="#2c2732"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#312c38"/>
+      <stop offset="9%" stop-color="#7d7488"/>
+      <stop offset="17%" stop-color="#f4eff9"/>
+      <stop offset="27%" stop-color="#8f8698"/>
+      <stop offset="50%" stop-color="#fdfaff"/>
+      <stop offset="73%" stop-color="#8d8396"/>
+      <stop offset="83%" stop-color="#eee9f4"/>
+      <stop offset="91%" stop-color="#756c80"/>
+      <stop offset="100%" stop-color="#2c2732"/>
+    </linearGradient>
+
+    <linearGradient id="violetH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6d24b1" stop-opacity=".15"/>
+      <stop offset="18%" stop-color="#9f3ce5" stop-opacity=".75"/>
+      <stop offset="50%" stop-color="#e05cff"/>
+      <stop offset="82%" stop-color="#9f3ce5" stop-opacity=".75"/>
+      <stop offset="100%" stop-color="#6d24b1" stop-opacity=".15"/>
+    </linearGradient>
+
+    <linearGradient id="violetV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6d24b1" stop-opacity=".15"/>
+      <stop offset="18%" stop-color="#9f3ce5" stop-opacity=".75"/>
+      <stop offset="50%" stop-color="#e05cff"/>
+      <stop offset="82%" stop-color="#9f3ce5" stop-opacity=".75"/>
+      <stop offset="100%" stop-color="#6d24b1" stop-opacity=".15"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#09080b"/>
+      <stop offset="35%" stop-color="#27222c"/>
+      <stop offset="62%" stop-color="#0e0c11"/>
+      <stop offset="100%" stop-color="#3a323f"/>
+    </linearGradient>
+
+    <radialGradient id="gem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffd9ff"/>
+      <stop offset="22%" stop-color="#ef76ff"/>
+      <stop offset="58%" stop-color="#a43ae1"/>
+      <stop offset="100%" stop-color="#32103f"/>
+    </radialGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="smallGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- TOP RAIL: y 0..192 -->
+  <g>
+    <path d="M192 58 H832" stroke="#09080b" stroke-width="38" fill="none"/>
+    <path d="M192 58 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 80 H832" stroke="#5d236f" stroke-width="7" fill="none"/>
+    <path d="M192 93 H832" stroke="url(#violetH)" stroke-width="3.5" fill="none" filter="url(#smallGlow)"/>
+    <path d="M220 126 H804" stroke="#7c2db5" stroke-width="2.5" opacity=".45" fill="none"/>
+  </g>
+
+  <!-- BOTTOM RAIL: y 832..1024 -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M192 58 H832" stroke="#09080b" stroke-width="38" fill="none"/>
+    <path d="M192 58 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 80 H832" stroke="#5d236f" stroke-width="7" fill="none"/>
+    <path d="M192 93 H832" stroke="url(#violetH)" stroke-width="3.5" fill="none" filter="url(#smallGlow)"/>
+    <path d="M220 126 H804" stroke="#7c2db5" stroke-width="2.5" opacity=".45" fill="none"/>
+  </g>
+
+  <!-- LEFT RAIL: x 0..192 -->
+  <g>
+    <path d="M58 192 V832" stroke="#09080b" stroke-width="38" fill="none"/>
+    <path d="M58 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M80 192 V832" stroke="#5d236f" stroke-width="7" fill="none"/>
+    <path d="M93 192 V832" stroke="url(#violetV)" stroke-width="3.5" fill="none" filter="url(#smallGlow)"/>
+    <path d="M126 220 V804" stroke="#7c2db5" stroke-width="2.5" opacity=".45" fill="none"/>
+  </g>
+
+  <!-- RIGHT RAIL: x 832..1024 -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M58 192 V832" stroke="#09080b" stroke-width="38" fill="none"/>
+    <path d="M58 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M80 192 V832" stroke="#5d236f" stroke-width="7" fill="none"/>
+    <path d="M93 192 V832" stroke="url(#violetV)" stroke-width="3.5" fill="none" filter="url(#smallGlow)"/>
+    <path d="M126 220 V804" stroke="#7c2db5" stroke-width="2.5" opacity=".45" fill="none"/>
+  </g>
+
+  <!-- TOP LEFT CORNER -->
+  <g>
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="#09080b" stroke-width="38" fill="none" stroke-linejoin="round"/>
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 80 H124 Q80 80 80 124 V192"
+      stroke="#5d236f" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 93 H132 Q93 93 93 132 V192"
+      stroke="#d65aff" stroke-width="3.5" opacity=".7" fill="none" stroke-linejoin="round" filter="url(#smallGlow)"/>
+
+    <path d="M32 74 L58 34 L88 46 L117 27 L138 54 L113 77 L74 82 L53 113 L27 96 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M50 73 L65 57 L81 72 L66 91 Z"
+      fill="url(#gem)" stroke="#edd9f8" stroke-width="3" filter="url(#smallGlow)"/>
+    <path d="M98 46 L109 34 L122 50 L111 64 Z"
+      fill="#7d2dbc" stroke="#ba72e3" stroke-width="2"/>
+    <path d="M28 124 L49 113 L61 129 L45 151 L24 143 Z"
+      fill="#17121b" stroke="#6e6377" stroke-width="4"/>
+  </g>
+
+  <!-- TOP RIGHT CORNER -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="#09080b" stroke-width="38" fill="none" stroke-linejoin="round"/>
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 80 H124 Q80 80 80 124 V192"
+      stroke="#5d236f" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 93 H132 Q93 93 93 132 V192"
+      stroke="#d65aff" stroke-width="3.5" opacity=".7" fill="none" stroke-linejoin="round" filter="url(#smallGlow)"/>
+
+    <path d="M32 74 L58 34 L88 46 L117 27 L138 54 L113 77 L74 82 L53 113 L27 96 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M50 73 L65 57 L81 72 L66 91 Z"
+      fill="url(#gem)" stroke="#edd9f8" stroke-width="3" filter="url(#smallGlow)"/>
+    <path d="M98 46 L109 34 L122 50 L111 64 Z"
+      fill="#7d2dbc" stroke="#ba72e3" stroke-width="2"/>
+    <path d="M28 124 L49 113 L61 129 L45 151 L24 143 Z"
+      fill="#17121b" stroke="#6e6377" stroke-width="4"/>
+  </g>
+
+  <!-- BOTTOM LEFT CORNER -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="#09080b" stroke-width="38" fill="none" stroke-linejoin="round"/>
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 80 H124 Q80 80 80 124 V192"
+      stroke="#5d236f" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 93 H132 Q93 93 93 132 V192"
+      stroke="#d65aff" stroke-width="3.5" opacity=".7" fill="none" stroke-linejoin="round" filter="url(#smallGlow)"/>
+
+    <path d="M32 74 L58 34 L88 46 L117 27 L138 54 L113 77 L74 82 L53 113 L27 96 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M50 73 L65 57 L81 72 L66 91 Z"
+      fill="url(#gem)" stroke="#edd9f8" stroke-width="3" filter="url(#smallGlow)"/>
+    <path d="M98 46 L109 34 L122 50 L111 64 Z"
+      fill="#7d2dbc" stroke="#ba72e3" stroke-width="2"/>
+    <path d="M28 124 L49 113 L61 129 L45 151 L24 143 Z"
+      fill="#17121b" stroke="#6e6377" stroke-width="4"/>
+  </g>
+
+  <!-- BOTTOM RIGHT CORNER -->
+  <g transform="translate(1024 1024) scale(-1 -1)">
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="#09080b" stroke-width="38" fill="none" stroke-linejoin="round"/>
+    <path d="M192 58 H112 Q58 58 58 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 80 H124 Q80 80 80 124 V192"
+      stroke="#5d236f" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 93 H132 Q93 93 93 132 V192"
+      stroke="#d65aff" stroke-width="3.5" opacity=".7" fill="none" stroke-linejoin="round" filter="url(#smallGlow)"/>
+
+    <path d="M32 74 L58 34 L88 46 L117 27 L138 54 L113 77 L74 82 L53 113 L27 96 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M50 73 L65 57 L81 72 L66 91 Z"
+      fill="url(#gem)" stroke="#edd9f8" stroke-width="3" filter="url(#smallGlow)"/>
+    <path d="M98 46 L109 34 L122 50 L111 64 Z"
+      fill="#7d2dbc" stroke="#ba72e3" stroke-width="2"/>
+    <path d="M28 124 L49 113 L61 129 L45 151 L24 143 Z"
+      fill="#17121b" stroke="#6e6377" stroke-width="4"/>
+  </g>
+
+  <!-- Subtle inner corner sparks, confined to border bands -->
+  <g fill="#d25aff" opacity=".7" filter="url(#smallGlow)">
+    <circle cx="153" cy="153" r="4"/>
+    <circle cx="871" cy="153" r="4"/>
+    <circle cx="153" cy="871" r="4"/>
+    <circle cx="871" cy="871" r="4"/>
+  </g>
+
+  <!-- Center remains intentionally transparent -->
+</svg>
