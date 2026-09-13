@@ -1,5 +1,5 @@
 name = "veil-arena"
-main = "src/activity-local-sdk-entry.js"
+main = "src/activity-single-script-entry.js"
 compatibility_date = "2026-09-01"
 keep_vars = true
 
