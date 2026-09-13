@@ -17,9 +17,9 @@ for (const needle of [
   "new DiscordSDK(clientId",
   "sdk.ready()",
   "sdk.commands.authorize",
-  'applications.commands',
-  'guilds.members.read',
-  'rpc.voice.read',
+  "applications.commands",
+  "guilds.members.read",
+  "rpc.voice.read",
   'jsonFetch("/api/token"',
   "sdk.commands.authenticate",
   'jsonFetch("/activity/state")',
@@ -42,7 +42,7 @@ assert(html.includes("LIVE ROSTER"));
 assert(html.includes("CLEAN CLIENT STARTING"));
 
 const cleanEntry = readFileSync(new URL("../src/activity-clean-entry.js", import.meta.url), "utf8");
-assert(cleanEntry.includes('from "./activity-doctor-entry.js"'));
+assert(cleanEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
 assert(cleanEntry.includes('BUILD = "20260913-16"'));
 assert(cleanEntry.includes('/activity/veil-clean-${BUILD}.js'));
 assert(cleanEntry.includes('url.pathname === "/api/token"'));
@@ -52,12 +52,15 @@ assert(cleanEntry.includes("OFFICIAL_DISCORD_SDK_SOURCE"));
 assert(cleanEntry.includes("activityCleanClientSource"));
 assert(cleanEntry.includes("cleanActivityHtml"));
 
+const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
+assert(bootstrapEntry.includes('url.pathname === "/activity/oauth/token"'));
+assert(bootstrapEntry.includes('discordBearer("/users/@me"'));
+assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
+assert(!bootstrapEntry.includes('discordBot(`/channels/'));
+
 const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
-assert(liveEntry.includes("DISCORD_CLIENT_SECRET"));
-assert(liveEntry.includes('platform: "activity"'));
 assert(liveEntry.includes('url.pathname === "/activity/state"'));
 assert(liveEntry.includes('url.pathname === "/activity/action"'));
-assert(liveEntry.includes('url.pathname === "/activity/oauth/token"'));
 
 const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
 assert(resetEntry.includes('body.action === "abort"'));
