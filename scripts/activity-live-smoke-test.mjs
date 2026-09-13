@@ -86,6 +86,6 @@ assert(packageJson.includes('"build:activity-client"'));
 assert(packageJson.includes('"postinstall": "npm run build:activity-client"'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
+assert(wrangler.includes('main = "src/veil-worker.js"'));
 
 console.log("Discord-official Activity smoke tests passed.");
