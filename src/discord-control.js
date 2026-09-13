@@ -2,6 +2,7 @@ import { handleDiscordRoute as baseHandleDiscordRoute } from "./discord-worker.j
 import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction } from "./discord.js";
 import { ensureSchema, loadActiveGameForChannel, saveGame } from "./storage.js";
 import { isVeilTipAdmin, veilTipAdminEntry, sendDirectDwalletTip } from "./dwallet-direct-tip.js";
+import { discordSetupPage, getDiscordSetupStatus, registerDiscordGuildFromRequest } from "./discord-setup.js";
 
 function canManageGuild(interaction) {
   try {
@@ -105,6 +106,20 @@ async function handleVeilTip(interaction, env) {
 }
 
 export async function handleDiscordRoute(request, env) {
+  const url = new URL(request.url);
+
+  if (request.method === "GET" && url.pathname === "/setup/discord") {
+    return new Response(await discordSetupPage(request, env), {
+      headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }
+    });
+  }
+  if (request.method === "GET" && url.pathname === "/discord/health") {
+    return Response.json(await getDiscordSetupStatus(request, env), { headers: { "cache-control": "no-store" } });
+  }
+  if (request.method === "POST" && url.pathname === "/admin/discord/register") {
+    return registerDiscordGuildFromRequest(request, env);
+  }
+
   if (request.method === "POST" && request.headers.get("x-signature-ed25519")) {
     const raw = await request.clone().text().catch(() => "");
     let interaction = null;
@@ -112,8 +127,9 @@ export async function handleDiscordRoute(request, env) {
     const isCommand = interaction?.type === InteractionType.APPLICATION_COMMAND;
     const commandName = isCommand ? interaction?.data?.name : "";
     const sub = commandName === "arena" ? interaction?.data?.options?.[0]?.name : "";
-    if (sub === "status" || sub === "forceclose" || commandName === "veiltip") {
+    if (sub === "status" || sub === "forceclose" || commandName === "veiltip" || commandName === "ping") {
       if (!await verifyDiscordRequest(request, env.DISCORD_PUBLIC_KEY, raw)) return new Response("Bad signature", { status: 401 });
+      if (commandName === "ping") return interactionMessage("💜 Veil Discord interactions are online.", [], true);
       if (commandName === "veiltip") return handleVeilTip(interaction, env);
       if (!interaction.guild_id) return interactionMessage("Arena controls can only be used inside a Discord server.", [], true);
       if (sub === "status") return handleStatus(interaction, env);
