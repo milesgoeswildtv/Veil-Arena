@@ -1,4 +1,4 @@
-import app, { ArenaCoordinator } from "./activity-entrypoint-entry.js";
+import app, { ArenaCoordinator } from "./activity-doctor-entry.js";
 
 export { ArenaCoordinator };
 
@@ -91,10 +91,6 @@ async function handleActivityOAuth(request, env) {
       throw new Error("Your Discord account is not a member of the server that launched this Activity.");
     }
 
-    // The channel and guild IDs come from the Embedded App SDK launch context.
-    // Do not make Activity authentication depend on the bot having View Channel
-    // permission in the VC. The old strict bot lookup could leave a valid Activity
-    // permanently stuck at CONNECTING on permission-restricted voice channels.
     const displayName = user.global_name || user.username || "Discord User";
     const session = await signSession({
       id: String(user.id),
