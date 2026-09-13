@@ -18,6 +18,13 @@ export function arenaCommands(){return[
     {name:"start",description:"Open Arena registration.",type:1},
     {name:"status",description:"Check the active Arena in this channel.",type:1},
     {name:"forceclose",description:"Host or server admin: force-close a stuck Arena.",type:1},
+    {name:"theme",description:"Server admin: choose the Arena theme for future games.",type:1,options:[
+      {name:"style",description:"Theme used by new Discord and Activity Arena games.",type:3,required:true,choices:[
+        {name:"Full Tilt",value:"full_tilt"},
+        {name:"DWallet",value:"dwallet"},
+        {name:"Veil Default",value:"base"}
+      ]}
+    ]},
     {name:"sponsor",description:"Sponsor optional cash prizes for the active Arena.",type:1,options:[
       sponsorAmount("winner","Dollar amount for the Arena winner."),
       sponsorAmount("runner_up","Dollar amount for the runner-up."),
