@@ -30,6 +30,7 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/activity-single-script-entry.js
           node --check src/activity-local-sdk-entry.js
           node --check src/activity-mini-sdk.js
           node --check src/activity-sdk-route-fix-entry.js
