@@ -1,0 +1,257 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" fill="none">
+  <title>Veil UI Stats Panel</title>
+  <desc>Reusable Veil performance and arena telemetry shell. True SVG vector, 960 by 640, transparent exterior, no baked-in text, images, or raster data. Provides live summary, metric-cell, telemetry, and lower detail regions for HTML/CSS-driven statistics.</desc>
+
+  <metadata>
+    asset: veil_ui_stats_panel.svg
+    family: veil_ui_vote_panel.svg / veil_ui_results_panel.svg / veil_ui_sponsor_panel.svg / veil_ui_rules_panel.svg
+    canvas: 960x640
+    viewBox: 0 0 960 640
+    aspect-ratio: 3:2
+    transparent-background: true
+    text: none
+    image: none
+    foreignObject: none
+    raster: none
+    protected-outer-zones: 96px
+    content-zones: header, primary-metrics, telemetry, detail-strip
+    responsive: mobile + desktop
+  </metadata>
+
+  <defs>
+    <linearGradient id="silverEdge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6F7FA"/>
+      <stop offset="0.16" stop-color="#979DA7"/>
+      <stop offset="0.50" stop-color="#D7DCE4"/>
+      <stop offset="0.82" stop-color="#585E68"/>
+      <stop offset="1" stop-color="#C0C6D0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalOuter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1D24"/>
+      <stop offset="0.44" stop-color="#090B10"/>
+      <stop offset="1" stop-color="#14171D"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0D0F14"/>
+      <stop offset="0.54" stop-color="#07090D"/>
+      <stop offset="1" stop-color="#0A0C10"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#372153"/>
+      <stop offset="0.18" stop-color="#63448D"/>
+      <stop offset="0.50" stop-color="#AD7CDF"/>
+      <stop offset="0.82" stop-color="#63448D"/>
+      <stop offset="1" stop-color="#372153"/>
+    </linearGradient>
+
+    <linearGradient id="silverRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#687180"/>
+      <stop offset="0.16" stop-color="#ADB6C4"/>
+      <stop offset="0.50" stop-color="#F5F7FB"/>
+      <stop offset="0.84" stop-color="#ADB6C4"/>
+      <stop offset="1" stop-color="#687180"/>
+    </linearGradient>
+
+    <linearGradient id="telemetryRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#56606F"/>
+      <stop offset="0.22" stop-color="#A9B3C1"/>
+      <stop offset="0.50" stop-color="#DDE3EC"/>
+      <stop offset="0.78" stop-color="#8361A4"/>
+      <stop offset="1" stop-color="#46335C"/>
+    </linearGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.94"/>
+      <stop offset="0.20" stop-color="#F0E5FB" stop-opacity="0.82"/>
+      <stop offset="0.45" stop-color="#C995EE" stop-opacity="0.56"/>
+      <stop offset="0.76" stop-color="#79519E" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#79519E" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="softSilverCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.90"/>
+      <stop offset="0.46" stop-color="#EDF2F9" stop-opacity="0.38"/>
+      <stop offset="0.86" stop-color="#AAB4C1" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#AAB4C1" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="microNoise" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="6" r="0.4" fill="#FFFFFF" opacity="0.018"/>
+      <circle cx="16" cy="14" r="0.35" fill="#C997F0" opacity="0.010"/>
+      <path d="M8 18l4-1" stroke="#FFFFFF" stroke-width="0.28" opacity="0.009"/>
+    </pattern>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.7"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.55" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- transparent exterior -->
+
+  <!-- quiet ambient system glows -->
+  <ellipse cx="110" cy="104" rx="38" ry="38" fill="url(#violetCore)" opacity="0.10" filter="url(#softGlow)"/>
+  <ellipse cx="850" cy="104" rx="38" ry="38" fill="url(#violetCore)" opacity="0.10" filter="url(#softGlow)"/>
+  <ellipse cx="110" cy="536" rx="38" ry="38" fill="url(#violetCore)" opacity="0.07" filter="url(#softGlow)"/>
+  <ellipse cx="850" cy="536" rx="38" ry="38" fill="url(#violetCore)" opacity="0.07" filter="url(#softGlow)"/>
+
+  <!-- exact shared outer shell geometry -->
+  <path id="outer-shell" d="M98 38H392L414 18H546L568 38H862L904 78V188L926 210V430L904 452V562L862 602H568L546 622H414L392 602H98L56 562V452L34 430V210L56 188V78Z"
+        fill="url(#gunmetalOuter)" stroke="url(#silverEdge)" stroke-width="3.2" stroke-linejoin="round"/>
+
+  <path id="middle-shell" d="M112 52H396L416 34H544L564 52H848L888 89V194L908 214V426L888 446V551L848 588H564L544 606H416L396 588H112L72 551V446L52 426V214L72 194V89Z"
+        fill="#0A0C11" stroke="#6D737E" stroke-opacity="0.75" stroke-width="1.8" stroke-linejoin="round"/>
+
+  <path id="inner-shell" d="M126 66H401L419 50H541L559 66H834L872 100V198L890 216V424L872 442V540L834 574H559L541 590H419L401 574H126L88 540V442L70 424V216L88 198V100Z"
+        fill="url(#gunmetalInner)" stroke="#20242C" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M126 66H401L419 50H541L559 66H834L872 100V198L890 216V424L872 442V540L834 574H559L541 590H419L401 574H126L88 540V442L70 424V216L88 198V100Z"
+        fill="url(#microNoise)" opacity="0.30"/>
+
+  <!-- summary / status header -->
+  <path d="M164 104H796L824 128V182L796 206H164L144 188V122Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 118H782L806 138V172L782 192H178L162 178V132Z" fill="#05070B"/>
+  <path d="M178 118H782L806 138V172L782 192H178L162 178V132Z" fill="url(#microNoise)" opacity="0.14"/>
+
+  <!-- header live slots -->
+  <path d="M190 132H346L360 145V167L346 180H190L178 170V142Z" fill="#04060A" stroke="#20242B" stroke-width="1.15" stroke-linejoin="round"/>
+  <path d="M392 128H568L584 144V168L568 184H392L376 168V144Z" fill="#04060A" stroke="#20242B" stroke-width="1.15" stroke-linejoin="round"/>
+  <path d="M614 132H770L782 144V168L770 180H614L602 170V142Z" fill="#04060A" stroke="#20242B" stroke-width="1.15" stroke-linejoin="round"/>
+
+  <!-- primary metrics stage -->
+  <path d="M164 224H796L824 248V350L796 374H164L144 358V240Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 238H782L806 258V340L782 360H178L162 346V254Z" fill="#05070B"/>
+  <path d="M178 238H782L806 258V340L782 360H178L162 346V254Z" fill="url(#microNoise)" opacity="0.13"/>
+
+  <!-- six metric cells; empty live-data framing -->
+  <g>
+    <path d="M194 258H356L370 271V317L356 330H194L182 320V268Z" fill="#05070B" stroke="#252A33" stroke-width="1.15" stroke-linejoin="round"/>
+    <path d="M399 258H561L575 271V317L561 330H399L387 320V268Z" fill="#05070B" stroke="#252A33" stroke-width="1.15" stroke-linejoin="round"/>
+    <path d="M604 258H766L780 271V317L766 330H604L592 320V268Z" fill="#05070B" stroke="#252A33" stroke-width="1.15" stroke-linejoin="round"/>
+    <path d="M194 336H356L370 349V355L356 368H194L182 358V346Z" fill="#04060A" stroke="#20242B" stroke-width="1.0" stroke-linejoin="round" opacity="0.76"/>
+    <path d="M399 336H561L575 349V355L561 368H399L387 358V346Z" fill="#04060A" stroke="#20242B" stroke-width="1.0" stroke-linejoin="round" opacity="0.76"/>
+    <path d="M604 336H766L780 349V355L766 368H604L592 358V346Z" fill="#04060A" stroke="#20242B" stroke-width="1.0" stroke-linejoin="round" opacity="0.76"/>
+  </g>
+
+  <!-- metric signal nodes, no numbers or fake values -->
+  <g>
+    <circle cx="208" cy="273" r="4.2" fill="url(#violetCore)" opacity="0.64"/>
+    <circle cx="413" cy="273" r="4.2" fill="url(#violetCore)" opacity="0.64"/>
+    <circle cx="618" cy="273" r="4.2" fill="url(#violetCore)" opacity="0.64"/>
+    <path d="M220 273H252" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.30"/>
+    <path d="M425 273H457" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.30"/>
+    <path d="M630 273H662" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.30"/>
+  </g>
+
+  <!-- telemetry stage -->
+  <path d="M164 394H796L824 418V478L796 502H164L144 486V410Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 408H782L806 428V468L782 488H178L162 474V424Z" fill="#05070B"/>
+  <path d="M178 408H782L806 428V468L782 488H178L162 474V424Z" fill="url(#microNoise)" opacity="0.12"/>
+
+  <!-- left telemetry framing for live chart/bars -->
+  <path d="M196 424H514L528 437V459L514 472H196L184 462V434Z" fill="#04060A" stroke="#222730" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M206 438H500" stroke="#EDF2F8" stroke-opacity="0.045" stroke-width="1" stroke-linecap="round"/>
+  <path d="M206 452H500" stroke="#EDF2F8" stroke-opacity="0.045" stroke-width="1" stroke-linecap="round"/>
+  <path d="M206 466H500" stroke="#EDF2F8" stroke-opacity="0.045" stroke-width="1" stroke-linecap="round"/>
+  <path d="M224 430V466" stroke="#EDF2F8" stroke-opacity="0.04" stroke-width="1"/>
+  <path d="M294 430V466" stroke="#EDF2F8" stroke-opacity="0.04" stroke-width="1"/>
+  <path d="M364 430V466" stroke="#EDF2F8" stroke-opacity="0.04" stroke-width="1"/>
+  <path d="M434 430V466" stroke="#EDF2F8" stroke-opacity="0.04" stroke-width="1"/>
+
+  <!-- right telemetry lanes for progress/activity live DOM -->
+  <path d="M548 424H764L778 437V459L764 472H548L536 462V434Z" fill="#04060A" stroke="#222730" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M560 438H750" stroke="url(#silverRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.12"/>
+  <path d="M560 452H750" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.12"/>
+  <path d="M560 466H750" stroke="url(#silverRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.10"/>
+  <circle cx="552" cy="438" r="3.5" fill="url(#violetCore)" opacity="0.46"/>
+  <circle cx="552" cy="452" r="3.5" fill="url(#softSilverCore)" opacity="0.46"/>
+  <circle cx="552" cy="466" r="3.5" fill="url(#violetCore)" opacity="0.34"/>
+
+  <!-- lower detail strip -->
+  <path d="M164 522H796L824 546V570L796 594H164L144 578V536Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 536H782L806 556V566L782 580H178L162 568V546Z" fill="#05070B"/>
+  <path d="M178 536H782L806 556V566L782 580H178L162 568V546Z" fill="url(#microNoise)" opacity="0.14"/>
+  <path d="M204 550H372" stroke="#F2F5FA" stroke-opacity="0.05" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M396 550H564" stroke="url(#violetRail)" stroke-opacity="0.10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M588 550H756" stroke="#F2F5FA" stroke-opacity="0.05" stroke-width="1.1" stroke-linecap="round"/>
+
+  <!-- analytical top-center monitoring core -->
+  <path d="M480 34V114" stroke="url(#violetRail)" stroke-width="2.0" stroke-linecap="round" opacity="0.82" filter="url(#edgeGlow)"/>
+  <path d="M454 54H506" stroke="url(#silverRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.74"/>
+  <circle cx="480" cy="88" r="12.5" fill="url(#violetCore)" opacity="0.88" filter="url(#softGlow)"/>
+  <circle cx="480" cy="88" r="8.2" fill="url(#softSilverCore)" opacity="0.72" filter="url(#softGlow)"/>
+  <circle cx="480" cy="88" r="4.4" fill="#FFFFFF" fill-opacity="0.88"/>
+  <path d="M464 70H472M488 70H496" stroke="url(#telemetryRail)" stroke-width="1.1" stroke-linecap="round" opacity="0.44"/>
+  <path d="M468 76H492" stroke="url(#violetRail)" stroke-width="0.9" stroke-linecap="round" opacity="0.26"/>
+
+  <!-- family rails, more analytical than dramatic -->
+  <path d="M152 90H808" stroke="url(#silverRail)" stroke-width="1.9" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M170 104H790" stroke="url(#violetRail)" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M152 566H808" stroke="url(#silverRail)" stroke-width="1.9" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M170 552H790" stroke="url(#violetRail)" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M114 142V516" stroke="url(#violetRail)" stroke-width="1.55" stroke-linecap="round" opacity="0.64" filter="url(#edgeGlow)"/>
+  <path d="M846 142V516" stroke="url(#violetRail)" stroke-width="1.55" stroke-linecap="round" opacity="0.50" filter="url(#edgeGlow)"/>
+
+  <!-- data bus rails linking regions -->
+  <path d="M184 214H372" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.18"/>
+  <path d="M588 214H776" stroke="url(#telemetryRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.18"/>
+  <path d="M182 384H778" stroke="#F5F8FC" stroke-opacity="0.045" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M182 510H778" stroke="#F5F8FC" stroke-opacity="0.042" stroke-width="1.0" stroke-linecap="round"/>
+
+  <!-- lower monitoring node -->
+  <path d="M480 492V614" stroke="url(#violetRail)" stroke-width="1.8" stroke-linecap="round" opacity="0.46" filter="url(#edgeGlow)"/>
+  <circle cx="480" cy="552" r="9.5" fill="url(#violetCore)" opacity="0.68" filter="url(#softGlow)"/>
+  <circle cx="480" cy="552" r="3.8" fill="#FFFFFF" fill-opacity="0.78"/>
+
+  <!-- exact family corner machinery -->
+  <g>
+    <circle cx="110" cy="104" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="110" cy="104" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="110" cy="104" r="4.8" fill="url(#violetCore)"/>
+    <path d="M89 84L66 70L76 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M131 84L154 70L144 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="850" cy="104" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="850" cy="104" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="850" cy="104" r="4.8" fill="url(#violetCore)"/>
+    <path d="M871 84L894 70L884 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M829 84L806 70L816 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="110" cy="536" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="110" cy="536" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="110" cy="536" r="4.8" fill="url(#violetCore)"/>
+    <path d="M89 556L66 570L76 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M131 556L154 570L144 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="850" cy="536" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="850" cy="536" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="850" cy="536" r="4.8" fill="url(#violetCore)"/>
+    <path d="M871 556L894 570L884 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M829 556L806 570L816 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- hidden production guides -->
+  <g opacity="0" pointer-events="none">
+    <rect id="protected-zone" x="96" y="96" width="768" height="448"/>
+    <rect id="header-zone" x="164" y="104" width="660" height="102"/>
+    <rect id="primary-metrics-zone" x="164" y="224" width="660" height="150"/>
+    <rect id="telemetry-zone" x="164" y="394" width="660" height="108"/>
+    <rect id="detail-zone" x="164" y="522" width="660" height="72"/>
+  </g>
+</svg>

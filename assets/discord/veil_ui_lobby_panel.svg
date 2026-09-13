@@ -1,0 +1,261 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" fill="none">
+  <title>Veil UI Lobby Panel</title>
+  <desc>Reusable Veil pre-match lobby and staging shell for Arena. True SVG vector, 960 by 640, transparent exterior, no baked-in text. Contains room/status header lanes, roster/player-slot staging regions, readiness/join control framing, and a lower pre-match control strip. Designed for responsive mobile and desktop scaling.</desc>
+
+  <metadata>
+    asset: veil_ui_lobby_panel.svg
+    family: veil_ui_vote_panel.svg / veil_ui_results_panel.svg / veil_ui_sponsor_panel.svg / veil_ui_rules_panel.svg / veil_ui_stats_panel.svg / veil_ui_leaderboard_panel.svg
+    canvas: 960x640
+    aspect-ratio: 3:2
+    transparent-background: true
+    text: none
+    raster: none
+    protected-outer-zones: 96px
+    content-zones: header, roster, player-slots, readiness, footer
+    responsive: mobile + desktop
+  </metadata>
+
+  <defs>
+    <linearGradient id="silverEdge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6F7FA"/>
+      <stop offset="0.16" stop-color="#979DA7"/>
+      <stop offset="0.50" stop-color="#D7DCE4"/>
+      <stop offset="0.82" stop-color="#585E68"/>
+      <stop offset="1" stop-color="#C0C6D0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalOuter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1D24"/>
+      <stop offset="0.44" stop-color="#090B10"/>
+      <stop offset="1" stop-color="#14171D"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetalInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0D0F14"/>
+      <stop offset="0.54" stop-color="#07090D"/>
+      <stop offset="1" stop-color="#0A0C10"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3B2359"/>
+      <stop offset="0.18" stop-color="#6F4B9D"/>
+      <stop offset="0.50" stop-color="#B984EF"/>
+      <stop offset="0.82" stop-color="#6F4B9D"/>
+      <stop offset="1" stop-color="#3B2359"/>
+    </linearGradient>
+
+    <linearGradient id="silverRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#687180"/>
+      <stop offset="0.16" stop-color="#ADB6C4"/>
+      <stop offset="0.50" stop-color="#F5F7FB"/>
+      <stop offset="0.84" stop-color="#ADB6C4"/>
+      <stop offset="1" stop-color="#687180"/>
+    </linearGradient>
+
+    <linearGradient id="readyRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#314E47"/>
+      <stop offset="0.25" stop-color="#5F8A7E"/>
+      <stop offset="0.50" stop-color="#B9D9D1"/>
+      <stop offset="0.75" stop-color="#5F8A7E"/>
+      <stop offset="1" stop-color="#314E47"/>
+    </linearGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.20" stop-color="#F3E7FF" stop-opacity="0.94"/>
+      <stop offset="0.44" stop-color="#D7A8FF" stop-opacity="0.74"/>
+      <stop offset="0.76" stop-color="#8459B0" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#8459B0" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="softSilverCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="0.46" stop-color="#EDF2F9" stop-opacity="0.40"/>
+      <stop offset="0.86" stop-color="#AAB4C1" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#AAB4C1" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="microNoise" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="6" r="0.4" fill="#FFFFFF" opacity="0.018"/>
+      <circle cx="16" cy="14" r="0.35" fill="#C997F0" opacity="0.012"/>
+      <path d="M8 18l4-1" stroke="#FFFFFF" stroke-width="0.28" opacity="0.010"/>
+    </pattern>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.7" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- quiet ambient glows: lobby state stays calm -->
+  <ellipse cx="110" cy="104" rx="38" ry="38" fill="url(#violetCore)" opacity="0.10" filter="url(#softGlow)"/>
+  <ellipse cx="850" cy="104" rx="38" ry="38" fill="url(#violetCore)" opacity="0.10" filter="url(#softGlow)"/>
+  <ellipse cx="110" cy="536" rx="38" ry="38" fill="url(#violetCore)" opacity="0.07" filter="url(#softGlow)"/>
+  <ellipse cx="850" cy="536" rx="38" ry="38" fill="url(#violetCore)" opacity="0.07" filter="url(#softGlow)"/>
+
+  <!-- exact shared outer shell -->
+  <path d="M98 38H392L414 18H546L568 38H862L904 78V188L926 210V430L904 452V562L862 602H568L546 622H414L392 602H98L56 562V452L34 430V210L56 188V78Z"
+        fill="url(#gunmetalOuter)" stroke="url(#silverEdge)" stroke-width="3.2" stroke-linejoin="round"/>
+
+  <path d="M112 52H396L416 34H544L564 52H848L888 89V194L908 214V426L888 446V551L848 588H564L544 606H416L396 588H112L72 551V446L52 426V214L72 194V89Z"
+        fill="#0A0C11" stroke="#6D737E" stroke-opacity="0.75" stroke-width="1.8" stroke-linejoin="round"/>
+
+  <path d="M126 66H401L419 50H541L559 66H834L872 100V198L890 216V424L872 442V540L834 574H559L541 590H419L401 574H126L88 540V442L70 424V216L88 198V100Z"
+        fill="url(#gunmetalInner)" stroke="#20242C" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M126 66H401L419 50H541L559 66H834L872 100V198L890 216V424L872 442V540L834 574H559L541 590H419L401 574H126L88 540V442L70 424V216L88 198V100Z"
+        fill="url(#microNoise)" opacity="0.30"/>
+
+  <!-- room/status header -->
+  <path d="M164 104H796L824 128V184L796 208H164L144 190V122Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 118H782L806 139V173L782 194H178L162 180V132Z" fill="#05070B"/>
+  <path d="M178 118H782L806 139V173L782 194H178L162 180V132Z" fill="url(#microNoise)" opacity="0.14"/>
+
+  <!-- header live zones: room, population, timer/status -->
+  <path d="M190 132H354L366 144V168L354 180H190L178 170V142Z"
+        fill="#04060A" stroke="#20242B" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M392 128H568L584 144V168L568 184H392L376 168V144Z"
+        fill="#04060A" stroke="#20242B" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M608 132H770L782 144V168L770 180H608L596 170V142Z"
+        fill="#04060A" stroke="#20242B" stroke-width="1.2" stroke-linejoin="round"/>
+
+  <!-- main staging chamber -->
+  <path d="M164 228H796L824 252V470L796 494H164L144 478V244Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 242H782L806 262V458L782 480H178L162 466V258Z"
+        fill="#05070B"/>
+  <path d="M178 242H782L806 262V458L782 480H178L162 466V258Z"
+        fill="url(#microNoise)" opacity="0.13"/>
+
+  <!-- roster column -->
+  <path d="M202 268H414L430 282V438L414 452H202L188 440V280Z"
+        fill="#06080C" stroke="#252A33" stroke-width="1.2" stroke-linejoin="round"/>
+
+  <!-- player-slot regions -->
+  <path d="M216 286H398L410 297V325L398 336H216L206 328V294Z"
+        fill="#04060A" stroke="#1F242C" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M216 346H398L410 357V385L398 396H216L206 388V354Z"
+        fill="#04060A" stroke="#1F242C" stroke-width="1.0" stroke-linejoin="round"/>
+  <path d="M216 406H398L410 417V435L398 446H216L206 438V414Z"
+        fill="#04060A" stroke="#1F242C" stroke-width="1.0" stroke-linejoin="round"/>
+
+  <!-- staging/control column -->
+  <path d="M458 268H758L774 282V438L758 452H458L444 440V280Z"
+        fill="#06080C" stroke="#252A33" stroke-width="1.2" stroke-linejoin="round"/>
+
+  <!-- room/status block -->
+  <path d="M474 286H742L756 299V331L742 344H474L462 334V296Z"
+        fill="#04060A" stroke="#1F242C" stroke-width="1.0" stroke-linejoin="round"/>
+
+  <!-- readiness/join control frame -->
+  <path d="M474 364H742L756 377V419L742 432H474L462 422V374Z"
+        fill="#04060A" stroke="#1F242C" stroke-width="1.0" stroke-linejoin="round"/>
+
+  <!-- holding-chamber rails -->
+  <path d="M488 304H724" stroke="#F4F7FF" stroke-opacity="0.055" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M488 320H650" stroke="url(#violetRail)" stroke-opacity="0.10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M492 384H654" stroke="url(#readyRail)" stroke-opacity="0.18" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M492 412H724" stroke="#F4F7FF" stroke-opacity="0.05" stroke-width="1.0" stroke-linecap="round"/>
+
+  <!-- player slot nodes, no state baked in -->
+  <g opacity="0.78">
+    <circle cx="232" cy="311" r="7.5" fill="url(#softSilverCore)"/>
+    <circle cx="232" cy="371" r="7.5" fill="url(#softSilverCore)"/>
+    <circle cx="232" cy="426" r="6.5" fill="url(#softSilverCore)"/>
+  </g>
+  <g opacity="0.26">
+    <circle cx="384" cy="311" r="5.0" fill="url(#violetCore)"/>
+    <circle cx="384" cy="371" r="5.0" fill="url(#violetCore)"/>
+    <circle cx="384" cy="426" r="4.5" fill="url(#violetCore)"/>
+  </g>
+
+  <!-- readiness connector cues -->
+  <path d="M514 398H548L558 388L568 398H604"
+        fill="none" stroke="url(#readyRail)" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" opacity="0.44"/>
+  <path d="M626 398H706"
+        stroke="url(#violetRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.12"/>
+
+  <!-- top-center lobby core, calmer than gameplay states -->
+  <path d="M480 34V120" stroke="url(#violetRail)" stroke-width="2.05" stroke-linecap="round" opacity="0.82" filter="url(#edgeGlow)"/>
+  <path d="M450 54H510" stroke="url(#silverRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.78"/>
+  <circle cx="480" cy="90" r="12.5" fill="url(#violetCore)" opacity="0.86" filter="url(#softGlow)"/>
+  <circle cx="480" cy="90" r="8.2" fill="url(#softSilverCore)" opacity="0.78" filter="url(#softGlow)"/>
+  <circle cx="480" cy="90" r="4.5" fill="#FFFFFF" fill-opacity="0.90"/>
+
+  <!-- holding chamber cue -->
+  <path d="M462 64H498" stroke="url(#silverEdge)" stroke-width="1.15" stroke-linecap="round" opacity="0.70"/>
+  <path d="M468 70H492" stroke="url(#violetRail)" stroke-width="0.9" stroke-linecap="round" opacity="0.28"/>
+
+  <!-- footer / pre-match controls -->
+  <path d="M164 518H796L824 542V576L796 600H164L144 584V532Z"
+        fill="#07090D" stroke="#2B3039" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M178 532H782L806 552V572L782 586H178L162 574V542Z"
+        fill="#05070B"/>
+  <path d="M178 532H782L806 552V572L782 586H178L162 574V542Z"
+        fill="url(#microNoise)" opacity="0.14"/>
+
+  <!-- footer guide lanes -->
+  <path d="M206 550H398" stroke="#F3F5FA" stroke-opacity="0.05" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M562 550H754" stroke="#F3F5FA" stroke-opacity="0.05" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M222 568H382" stroke="url(#violetRail)" stroke-opacity="0.10" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M578 568H738" stroke="url(#readyRail)" stroke-opacity="0.13" stroke-width="1.0" stroke-linecap="round"/>
+
+  <!-- shared family rails -->
+  <path d="M152 90H808" stroke="url(#silverRail)" stroke-width="1.9" stroke-linecap="round" opacity="0.88" filter="url(#edgeGlow)"/>
+  <path d="M170 104H790" stroke="url(#violetRail)" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M152 568H808" stroke="url(#silverRail)" stroke-width="1.9" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M170 554H790" stroke="url(#violetRail)" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M114 142V524" stroke="url(#violetRail)" stroke-width="1.62" stroke-linecap="round" opacity="0.66" filter="url(#edgeGlow)"/>
+  <path d="M846 142V524" stroke="url(#violetRail)" stroke-width="1.62" stroke-linecap="round" opacity="0.52" filter="url(#edgeGlow)"/>
+
+  <!-- lower center waiting core -->
+  <path d="M480 476V612" stroke="url(#violetRail)" stroke-width="1.85" stroke-linecap="round" opacity="0.48" filter="url(#edgeGlow)"/>
+  <circle cx="480" cy="550" r="10" fill="url(#violetCore)" opacity="0.72" filter="url(#softGlow)"/>
+  <circle cx="480" cy="550" r="3.9" fill="#FFFFFF" fill-opacity="0.82"/>
+
+  <!-- corner machinery -->
+  <g>
+    <circle cx="110" cy="104" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="110" cy="104" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="110" cy="104" r="4.8" fill="url(#violetCore)"/>
+    <path d="M89 84L66 70L76 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M131 84L154 70L144 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="850" cy="104" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="850" cy="104" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="850" cy="104" r="4.8" fill="url(#violetCore)"/>
+    <path d="M871 84L894 70L884 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M829 84L806 70L816 94Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="110" cy="536" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="110" cy="536" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="110" cy="536" r="4.8" fill="url(#violetCore)"/>
+    <path d="M89 556L66 570L76 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M131 556L154 570L144 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle cx="850" cy="536" r="22" fill="#07090D" stroke="url(#silverEdge)" stroke-width="2.0"/>
+    <circle cx="850" cy="536" r="12" fill="#05070B" stroke="#72509B" stroke-width="1.1"/>
+    <circle cx="850" cy="536" r="4.8" fill="url(#violetCore)"/>
+    <path d="M871 556L894 570L884 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M829 556L806 570L816 546Z" fill="#0E1117" stroke="url(#silverEdge)" stroke-width="1.3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- hidden production guides -->
+  <g opacity="0" pointer-events="none">
+    <rect id="protected-zone" x="96" y="96" width="768" height="448"/>
+    <rect id="header-zone" x="164" y="104" width="660" height="104"/>
+    <rect id="roster-zone" x="202" y="268" width="228" height="184"/>
+    <rect id="staging-zone" x="458" y="268" width="316" height="184"/>
+    <rect id="footer-zone" x="164" y="518" width="660" height="82"/>
+  </g>
+</svg>
