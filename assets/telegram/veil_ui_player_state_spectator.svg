@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <title>Veil UI Player State Spectator</title>
+  <desc>720x360 transparent overlay for the Veil UI player card. Adds SPECTATOR state treatment only: muted silver-gray rails, very low violet observer energy, dimmed portrait-edge response, and subtle watching activity around corner/core nodes. No base card body, portrait, or text is duplicated.</desc>
+
+  <metadata>
+    asset: veil_ui_player_state_spectator.svg
+    family: veil_ui_player_card.svg
+    canvas: 720x360
+    aspect-ratio: 2:1
+    transparent-background: true
+    overlay-only: true
+    alignment: exact match to veil_ui_player_card.svg
+    text: none
+    intended-use: spectator state overlay
+  </metadata>
+
+  <defs>
+    <linearGradient id="silverRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#49505B"/>
+      <stop offset="0.18" stop-color="#78808B"/>
+      <stop offset="0.50" stop-color="#C7CED9"/>
+      <stop offset="0.82" stop-color="#78808B"/>
+      <stop offset="1" stop-color="#49505B"/>
+    </linearGradient>
+
+    <linearGradient id="graySoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EEF2F7" stop-opacity="0.55"/>
+      <stop offset="0.30" stop-color="#B1BAC7" stop-opacity="0.28"/>
+      <stop offset="0.72" stop-color="#59616D" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#2A2E35" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#35204F"/>
+      <stop offset="0.22" stop-color="#60427F"/>
+      <stop offset="0.50" stop-color="#9B6BC7"/>
+      <stop offset="0.78" stop-color="#60427F"/>
+      <stop offset="1" stop-color="#35204F"/>
+    </linearGradient>
+
+    <radialGradient id="silverCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.76"/>
+      <stop offset="0.38" stop-color="#E8EDF5" stop-opacity="0.42"/>
+      <stop offset="0.78" stop-color="#768090" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#768090" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#EEDFFF" stop-opacity="0.52"/>
+      <stop offset="0.34" stop-color="#C696F0" stop-opacity="0.22"/>
+      <stop offset="0.72" stop-color="#724A98" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#724A98" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.0"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="portraitGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Muted top/bottom rails -->
+  <path d="M108 68H612" stroke="url(#silverRail)" stroke-width="2.05" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M124 80H596" stroke="#E1E7F1" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M154 74H566" stroke="url(#violetRail)" stroke-width="0.95" stroke-linecap="round" opacity="0.10"/>
+
+  <path d="M108 292H612" stroke="url(#silverRail)" stroke-width="2.05" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M124 280H596" stroke="#E1E7F1" stroke-opacity="0.09" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M154 286H566" stroke="url(#violetRail)" stroke-width="0.95" stroke-linecap="round" opacity="0.09"/>
+
+  <!-- very quiet side response -->
+  <path d="M76 114V246" stroke="url(#silverRail)" stroke-width="1.7" stroke-linecap="round" opacity="0.70" filter="url(#edgeGlow)"/>
+  <path d="M644 114V246" stroke="url(#silverRail)" stroke-width="1.45" stroke-linecap="round" opacity="0.52" filter="url(#edgeGlow)"/>
+
+  <!-- portrait edge response, dimmed but intact -->
+  <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"
+        fill="none"
+        stroke="url(#graySoft)"
+        stroke-width="2.0"
+        stroke-linejoin="round"
+        filter="url(#portraitGlow)"/>
+  <path d="M60 82H184L210 108V252L184 278H60L42 262V98Z"
+        fill="none"
+        stroke="#E0E6EF"
+        stroke-opacity="0.12"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <!-- subtle observer arcs around portrait module -->
+  <path d="M73 102C96 88 123 84 149 89" fill="none" stroke="url(#silverRail)" stroke-width="1.06" stroke-linecap="round" opacity="0.34"/>
+  <path d="M82 258C102 267 129 268 153 261" fill="none" stroke="url(#silverRail)" stroke-width="0.98" stroke-linecap="round" opacity="0.26"/>
+  <path d="M88 116C110 109 136 111 158 120" fill="none" stroke="url(#violetRail)" stroke-width="0.85" stroke-linecap="round" opacity="0.10"/>
+
+  <!-- top/bottom observer core activity -->
+  <path d="M360 22V90" stroke="url(#silverRail)" stroke-width="2.15" stroke-linecap="round" opacity="0.68" filter="url(#edgeGlow)"/>
+  <path d="M360 33V79" stroke="url(#violetRail)" stroke-width="0.85" stroke-linecap="round" opacity="0.12"/>
+  <circle cx="360" cy="70" r="10.2" fill="url(#silverCore)" opacity="0.82" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="6.8" fill="url(#violetCore)" opacity="0.46" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="3.7" fill="#F7FAFF" fill-opacity="0.72"/>
+
+  <path d="M360 270V338" stroke="url(#silverRail)" stroke-width="1.95" stroke-linecap="round" opacity="0.56" filter="url(#edgeGlow)"/>
+  <path d="M360 281V327" stroke="url(#violetRail)" stroke-width="0.82" stroke-linecap="round" opacity="0.10"/>
+  <circle cx="360" cy="290" r="9.3" fill="url(#silverCore)" opacity="0.70" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="6.2" fill="url(#violetCore)" opacity="0.38" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="3.3" fill="#F7FAFF" fill-opacity="0.62"/>
+
+  <!-- corner nodes: still present, lightly observing -->
+  <g>
+    <circle cx="78" cy="78" r="23" fill="url(#silverCore)" opacity="0.24" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="16" fill="url(#violetCore)" opacity="0.16" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="5.8" fill="#F7FAFF" fill-opacity="0.66"/>
+    <path d="M61 78A17 17 0 0 1 78 61" fill="none" stroke="url(#silverRail)" stroke-width="1.38" stroke-linecap="round" opacity="0.44"/>
+  </g>
+  <g>
+    <circle cx="642" cy="78" r="23" fill="url(#silverCore)" opacity="0.22" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="16" fill="url(#violetCore)" opacity="0.14" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="5.5" fill="#F7FAFF" fill-opacity="0.60"/>
+    <path d="M659 78A17 17 0 0 0 642 61" fill="none" stroke="url(#silverRail)" stroke-width="1.32" stroke-linecap="round" opacity="0.38"/>
+  </g>
+  <g>
+    <circle cx="78" cy="282" r="22" fill="url(#silverCore)" opacity="0.17" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="14" fill="url(#violetCore)" opacity="0.10" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="5.1" fill="#F7FAFF" fill-opacity="0.52"/>
+    <path d="M61 282A17 17 0 0 0 78 299" fill="none" stroke="url(#silverRail)" stroke-width="1.24" stroke-linecap="round" opacity="0.30"/>
+  </g>
+  <g>
+    <circle cx="642" cy="282" r="22" fill="url(#silverCore)" opacity="0.15" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="14" fill="url(#violetCore)" opacity="0.09" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="4.9" fill="#F7FAFF" fill-opacity="0.48"/>
+    <path d="M659 282A17 17 0 0 1 642 299" fill="none" stroke="url(#silverRail)" stroke-width="1.24" stroke-linecap="round" opacity="0.28"/>
+  </g>
+
+  <!-- low observer activity in the lower strip -->
+  <path d="M259 257H642" stroke="url(#silverRail)" stroke-width="1.05" stroke-linecap="round" opacity="0.14"/>
+  <path d="M282 272H620" stroke="url(#violetRail)" stroke-width="0.82" stroke-linecap="round" opacity="0.06"/>
+  <path d="M272 278H632" stroke="#F1F5FB" stroke-opacity="0.05" stroke-width="1.0" stroke-linecap="round"/>
+</svg>

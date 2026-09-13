@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <title>Veil UI Player State Winner</title>
+  <desc>720x360 transparent overlay for the Veil UI player card. Adds WINNER state treatment only: controlled violet and silver champion rails, brighter central and corner cores, subtle crown-like crest emphasis at the top center, and a clean premium winner rail around the card. No base card body or text is duplicated.</desc>
+
+  <metadata>
+    asset: veil_ui_player_state_winner.svg
+    family: veil_ui_player_card.svg
+    canvas: 720x360
+    aspect-ratio: 2:1
+    transparent-background: true
+    overlay-only: true
+    alignment: exact match to veil_ui_player_card.svg
+    text: none
+    intended-use: winner state overlay
+  </metadata>
+
+  <defs>
+    <linearGradient id="championRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#47306A"/>
+      <stop offset="0.16" stop-color="#7352A0"/>
+      <stop offset="0.34" stop-color="#D7DCE7"/>
+      <stop offset="0.50" stop-color="#F2F4F7"/>
+      <stop offset="0.66" stop-color="#D7DCE7"/>
+      <stop offset="0.84" stop-color="#7352A0"/>
+      <stop offset="1" stop-color="#47306A"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3E265C"/>
+      <stop offset="0.18" stop-color="#6D4A99"/>
+      <stop offset="0.50" stop-color="#C28AF3"/>
+      <stop offset="0.82" stop-color="#6D4A99"/>
+      <stop offset="1" stop-color="#3E265C"/>
+    </linearGradient>
+
+    <linearGradient id="silverLine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="0.38" stop-color="#DCE1E9" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#AAB1BF" stop-opacity="0.62"/>
+    </linearGradient>
+
+    <linearGradient id="championSoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3E6FF" stop-opacity="0.88"/>
+      <stop offset="0.22" stop-color="#DDB8FF" stop-opacity="0.66"/>
+      <stop offset="0.62" stop-color="#8860B5" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#4A315F" stop-opacity="0.05"/>
+    </linearGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.18" stop-color="#F1E4FF" stop-opacity="0.96"/>
+      <stop offset="0.44" stop-color="#D7A7FF" stop-opacity="0.78"/>
+      <stop offset="0.72" stop-color="#8358AE" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#8358AE" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="silverCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
+      <stop offset="0.42" stop-color="#EEF2F8" stop-opacity="0.70"/>
+      <stop offset="0.82" stop-color="#B1BAC8" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#B1BAC8" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.8"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.8" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="portraitGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2.9" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Clean outer winner rail, aligned to base card silhouette -->
+  <path d="M94 52
+           H307
+           L320 40
+           H400
+           L413 52
+           H626
+           L660 83
+           V143
+           L673 156
+           V204
+           L660 217
+           V277
+           L626 308
+           H413
+           L400 320
+           H320
+           L307 308
+           H94
+           L60 277
+           V217
+           L47 204
+           V156
+           L60 143
+           V83
+           Z"
+        fill="none"
+        stroke="url(#championRail)"
+        stroke-width="2.2"
+        stroke-linejoin="round"
+        opacity="0.88"
+        filter="url(#edgeGlow)"/>
+
+  <!-- top/bottom champion rails -->
+  <path d="M108 68H612" stroke="url(#championRail)" stroke-width="2.4" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 80H596" stroke="url(#silverLine)" stroke-opacity="0.16" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M152 74H568" stroke="url(#violetRail)" stroke-width="1.05" stroke-linecap="round" opacity="0.20"/>
+
+  <path d="M108 292H612" stroke="url(#championRail)" stroke-width="2.4" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 280H596" stroke="url(#silverLine)" stroke-opacity="0.16" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M152 286H568" stroke="url(#violetRail)" stroke-width="1.05" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- side response -->
+  <path d="M76 114V246" stroke="url(#championRail)" stroke-width="1.95" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M644 114V246" stroke="url(#championRail)" stroke-width="1.75" stroke-linecap="round" opacity="0.72" filter="url(#edgeGlow)"/>
+
+  <!-- portrait edge response, premium and controlled -->
+  <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"
+        fill="none"
+        stroke="url(#championSoft)"
+        stroke-width="2.35"
+        stroke-linejoin="round"
+        filter="url(#portraitGlow)"/>
+  <path d="M60 82H184L210 108V252L184 278H60L42 262V98Z"
+        fill="none"
+        stroke="#F0F3F8"
+        stroke-opacity="0.18"
+        stroke-width="1.08"
+        stroke-linejoin="round"/>
+  <path d="M73 101C98 84 128 82 156 90" fill="none" stroke="url(#violetRail)" stroke-width="1.16" stroke-linecap="round" opacity="0.42"/>
+  <path d="M80 258C104 271 135 271 159 261" fill="none" stroke="url(#silverLine)" stroke-width="1.05" stroke-linecap="round" opacity="0.32"/>
+
+  <!-- top center champion crest emphasis -->
+  <path d="M360 18V92" stroke="url(#championRail)" stroke-width="2.6" stroke-linecap="round" opacity="0.95" filter="url(#edgeGlow)"/>
+  <path d="M360 28V82" stroke="url(#violetRail)" stroke-width="1.0" stroke-linecap="round" opacity="0.26"/>
+  <circle cx="360" cy="70" r="12.5" fill="url(#violetCore)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="8.2" fill="url(#silverCore)" opacity="0.86" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="4.8" fill="#FFFFFF" fill-opacity="0.96"/>
+
+  <!-- subtle crown-like crest, not cheesy -->
+  <path d="M344 42L352 34L360 42L368 34L376 42"
+        fill="none"
+        stroke="url(#silverLine)"
+        stroke-width="1.55"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.90"/>
+  <path d="M348 46H372" stroke="url(#violetRail)" stroke-width="1.05" stroke-linecap="round" opacity="0.44"/>
+
+  <!-- bottom center echo -->
+  <path d="M360 268V342" stroke="url(#championRail)" stroke-width="2.35" stroke-linecap="round" opacity="0.82" filter="url(#edgeGlow)"/>
+  <path d="M360 278V332" stroke="url(#violetRail)" stroke-width="0.95" stroke-linecap="round" opacity="0.20"/>
+  <circle cx="360" cy="290" r="10.8" fill="url(#violetCore)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="7.0" fill="url(#silverCore)" opacity="0.78" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="4.1" fill="#FFFFFF" fill-opacity="0.92"/>
+
+  <!-- corner champion activity -->
+  <g>
+    <circle cx="78" cy="78" r="27" fill="url(#violetCore)" opacity="0.34" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="19" fill="url(#silverCore)" opacity="0.24" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="7.3" fill="#FFFFFF" fill-opacity="0.95"/>
+    <path d="M61 78A17 17 0 0 1 78 61" fill="none" stroke="url(#championRail)" stroke-width="1.7" stroke-linecap="round" opacity="0.82"/>
+  </g>
+  <g>
+    <circle cx="642" cy="78" r="27" fill="url(#violetCore)" opacity="0.32" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="19" fill="url(#silverCore)" opacity="0.22" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="7.0" fill="#FFFFFF" fill-opacity="0.92"/>
+    <path d="M659 78A17 17 0 0 0 642 61" fill="none" stroke="url(#championRail)" stroke-width="1.6" stroke-linecap="round" opacity="0.74"/>
+  </g>
+  <g>
+    <circle cx="78" cy="282" r="26" fill="url(#violetCore)" opacity="0.26" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="17" fill="url(#silverCore)" opacity="0.18" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="6.3" fill="#FFFFFF" fill-opacity="0.84"/>
+    <path d="M61 282A17 17 0 0 0 78 299" fill="none" stroke="url(#championRail)" stroke-width="1.45" stroke-linecap="round" opacity="0.64"/>
+  </g>
+  <g>
+    <circle cx="642" cy="282" r="26" fill="url(#violetCore)" opacity="0.24" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="17" fill="url(#silverCore)" opacity="0.16" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="6.0" fill="#FFFFFF" fill-opacity="0.80"/>
+    <path d="M659 282A17 17 0 0 1 642 299" fill="none" stroke="url(#championRail)" stroke-width="1.45" stroke-linecap="round" opacity="0.60"/>
+  </g>
+
+  <!-- lower strip premium response -->
+  <path d="M259 257H642" stroke="url(#championRail)" stroke-width="1.2" stroke-linecap="round" opacity="0.28"/>
+  <path d="M282 272H620" stroke="url(#silverLine)" stroke-width="0.95" stroke-linecap="round" opacity="0.14"/>
+  <path d="M272 278H632" stroke="url(#violetRail)" stroke-opacity="0.10" stroke-width="0.95" stroke-linecap="round"/>
+</svg>

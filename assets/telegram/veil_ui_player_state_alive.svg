@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <title>Veil UI Player State Alive</title>
+  <desc>720x360 transparent overlay for the Veil UI player card. Adds restrained ALIVE state treatment only: emerald rails, subtle corner/core activity, and faint portrait edge response. No base card body or text is duplicated.</desc>
+
+  <metadata>
+    asset: veil_ui_player_state_alive.svg
+    family: veil_ui_player_card.svg
+    canvas: 720x360
+    aspect-ratio: 2:1
+    transparent-background: true
+    overlay-only: true
+    alignment: exact match to veil_ui_player_card.svg
+    text: none
+    intended-use: alive state overlay
+  </metadata>
+
+  <defs>
+    <linearGradient id="emeraldRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1B5A44"/>
+      <stop offset="0.18" stop-color="#2A8F69"/>
+      <stop offset="0.50" stop-color="#6EE0AE"/>
+      <stop offset="0.82" stop-color="#2A8F69"/>
+      <stop offset="1" stop-color="#1B5A44"/>
+    </linearGradient>
+
+    <linearGradient id="emeraldSoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#CFFFEA" stop-opacity="0.95"/>
+      <stop offset="0.25" stop-color="#6EE0AE" stop-opacity="0.78"/>
+      <stop offset="0.70" stop-color="#2E8F69" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#1C4D3D" stop-opacity="0.06"/>
+    </linearGradient>
+
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ECFFF7" stop-opacity="0.95"/>
+      <stop offset="0.30" stop-color="#7CE5B9" stop-opacity="0.78"/>
+      <stop offset="0.70" stop-color="#2C8A66" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#2C8A66" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="portraitGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- top/bottom ALIVE state rails -->
+  <path d="M108 68H612" stroke="url(#emeraldRail)" stroke-width="2.2" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 80H596" stroke="#8BE2B9" stroke-opacity="0.14" stroke-width="1.0" stroke-linecap="round"/>
+
+  <path d="M108 292H612" stroke="url(#emeraldRail)" stroke-width="2.2" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 280H596" stroke="#8BE2B9" stroke-opacity="0.14" stroke-width="1.0" stroke-linecap="round"/>
+
+  <!-- subtle side response -->
+  <path d="M76 114V246" stroke="url(#emeraldRail)" stroke-width="1.8" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M644 114V246" stroke="url(#emeraldRail)" stroke-width="1.4" stroke-linecap="round" opacity="0.55" filter="url(#edgeGlow)"/>
+
+  <!-- portrait edge response -->
+  <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"
+        fill="none"
+        stroke="url(#emeraldSoft)"
+        stroke-width="2.2"
+        stroke-linejoin="round"
+        filter="url(#portraitGlow)"/>
+  <path d="M60 82H184L210 108V252L184 278H60L42 262V98Z"
+        fill="none"
+        stroke="#86E0B6"
+        stroke-opacity="0.18"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <!-- faint portrait energy arcs -->
+  <path d="M74 102C96 88 122 83 147 88" fill="none" stroke="url(#emeraldRail)" stroke-width="1.2" stroke-linecap="round" opacity="0.58"/>
+  <path d="M80 258C101 269 129 271 154 263" fill="none" stroke="url(#emeraldRail)" stroke-width="1.1" stroke-linecap="round" opacity="0.42"/>
+
+  <!-- center crest activity -->
+  <path d="M360 22V90" stroke="url(#emeraldRail)" stroke-width="2.4" stroke-linecap="round" opacity="0.85" filter="url(#edgeGlow)"/>
+  <circle cx="360" cy="70" r="10.5" fill="url(#coreGlow)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="4.1" fill="#DFFFF2" fill-opacity="0.92"/>
+
+  <path d="M360 270V338" stroke="url(#emeraldRail)" stroke-width="2.1" stroke-linecap="round" opacity="0.72" filter="url(#edgeGlow)"/>
+  <circle cx="360" cy="290" r="9.5" fill="url(#coreGlow)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="3.8" fill="#DFFFF2" fill-opacity="0.84"/>
+
+  <!-- corner/core activity, aligned to locked player card -->
+  <g>
+    <circle cx="78" cy="78" r="24" fill="url(#coreGlow)" opacity="0.34" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="6.5" fill="#E8FFF5" fill-opacity="0.88"/>
+    <path d="M61 78A17 17 0 0 1 78 61" fill="none" stroke="url(#emeraldRail)" stroke-width="1.6" stroke-linecap="round" opacity="0.72"/>
+  </g>
+  <g>
+    <circle cx="642" cy="78" r="24" fill="url(#coreGlow)" opacity="0.28" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="6.2" fill="#E8FFF5" fill-opacity="0.82"/>
+    <path d="M659 78A17 17 0 0 0 642 61" fill="none" stroke="url(#emeraldRail)" stroke-width="1.5" stroke-linecap="round" opacity="0.62"/>
+  </g>
+  <g>
+    <circle cx="78" cy="282" r="24" fill="url(#coreGlow)" opacity="0.22" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="5.8" fill="#E8FFF5" fill-opacity="0.76"/>
+    <path d="M61 282A17 17 0 0 0 78 299" fill="none" stroke="url(#emeraldRail)" stroke-width="1.4" stroke-linecap="round" opacity="0.56"/>
+  </g>
+  <g>
+    <circle cx="642" cy="282" r="24" fill="url(#coreGlow)" opacity="0.20" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="5.6" fill="#E8FFF5" fill-opacity="0.72"/>
+    <path d="M659 282A17 17 0 0 1 642 299" fill="none" stroke="url(#emeraldRail)" stroke-width="1.4" stroke-linecap="round" opacity="0.52"/>
+  </g>
+
+  <!-- lower strip readiness pulse, subtle and calm -->
+  <path d="M259 257H642" stroke="url(#emeraldRail)" stroke-width="1.15" stroke-linecap="round" opacity="0.20"/>
+  <path d="M272 278H632" stroke="#A3FFCF" stroke-opacity="0.08" stroke-width="1.0" stroke-linecap="round"/>
+</svg>

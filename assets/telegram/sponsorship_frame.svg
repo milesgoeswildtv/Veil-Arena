@@ -1,0 +1,218 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none"
+  role="img"
+  aria-label="Veil Arena sponsorship responsive nine-slice frame">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#26222a"/>
+      <stop offset="10%" stop-color="#6f6877"/>
+      <stop offset="20%" stop-color="#f5f0fa"/>
+      <stop offset="33%" stop-color="#8b8391"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="67%" stop-color="#8c8392"/>
+      <stop offset="80%" stop-color="#f0ebf5"/>
+      <stop offset="91%" stop-color="#6a6371"/>
+      <stop offset="100%" stop-color="#242028"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#26222a"/>
+      <stop offset="10%" stop-color="#6f6877"/>
+      <stop offset="20%" stop-color="#f5f0fa"/>
+      <stop offset="33%" stop-color="#8b8391"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="67%" stop-color="#8c8392"/>
+      <stop offset="80%" stop-color="#f0ebf5"/>
+      <stop offset="91%" stop-color="#6a6371"/>
+      <stop offset="100%" stop-color="#242028"/>
+    </linearGradient>
+
+    <linearGradient id="violetH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#572184" stop-opacity=".10"/>
+      <stop offset="16%" stop-color="#8040c8" stop-opacity=".70"/>
+      <stop offset="38%" stop-color="#b35af4"/>
+      <stop offset="50%" stop-color="#dd88ff"/>
+      <stop offset="62%" stop-color="#b35af4"/>
+      <stop offset="84%" stop-color="#8040c8" stop-opacity=".70"/>
+      <stop offset="100%" stop-color="#572184" stop-opacity=".10"/>
+    </linearGradient>
+
+    <linearGradient id="violetV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#572184" stop-opacity=".10"/>
+      <stop offset="16%" stop-color="#8040c8" stop-opacity=".70"/>
+      <stop offset="38%" stop-color="#b35af4"/>
+      <stop offset="50%" stop-color="#dd88ff"/>
+      <stop offset="62%" stop-color="#b35af4"/>
+      <stop offset="84%" stop-color="#8040c8" stop-opacity=".70"/>
+      <stop offset="100%" stop-color="#572184" stop-opacity=".10"/>
+    </linearGradient>
+
+    <linearGradient id="goldH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#82631f" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#b78d35" stop-opacity=".40"/>
+      <stop offset="50%" stop-color="#f1d686" stop-opacity=".82"/>
+      <stop offset="78%" stop-color="#b78d35" stop-opacity=".40"/>
+      <stop offset="100%" stop-color="#82631f" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="goldV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#82631f" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#b78d35" stop-opacity=".40"/>
+      <stop offset="50%" stop-color="#f1d686" stop-opacity=".82"/>
+      <stop offset="78%" stop-color="#b78d35" stop-opacity=".40"/>
+      <stop offset="100%" stop-color="#82631f" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="platinumH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c4c9d5" stop-opacity="0"/>
+      <stop offset="24%" stop-color="#edf1f8" stop-opacity=".26"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity=".60"/>
+      <stop offset="76%" stop-color="#edf1f8" stop-opacity=".26"/>
+      <stop offset="100%" stop-color="#c4c9d5" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="platinumV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c4c9d5" stop-opacity="0"/>
+      <stop offset="24%" stop-color="#edf1f8" stop-opacity=".26"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity=".60"/>
+      <stop offset="76%" stop-color="#edf1f8" stop-opacity=".26"/>
+      <stop offset="100%" stop-color="#c4c9d5" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#09080b"/>
+      <stop offset="34%" stop-color="#2b2630"/>
+      <stop offset="64%" stop-color="#100d13"/>
+      <stop offset="100%" stop-color="#403844"/>
+    </linearGradient>
+
+    <radialGradient id="violetGem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#f8e7ff"/>
+      <stop offset="22%" stop-color="#db96ff"/>
+      <stop offset="58%" stop-color="#9e4ae0"/>
+      <stop offset="100%" stop-color="#331145"/>
+    </radialGradient>
+
+    <radialGradient id="goldGem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#fff7d7"/>
+      <stop offset="24%" stop-color="#f2d785"/>
+      <stop offset="58%" stop-color="#bc913c"/>
+      <stop offset="100%" stop-color="#4f3912"/>
+    </radialGradient>
+
+    <radialGradient id="platinumGem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="26%" stop-color="#eef2f8"/>
+      <stop offset="60%" stop-color="#b9c0ce"/>
+      <stop offset="100%" stop-color="#48515c"/>
+    </radialGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- IMPORTANT: corner lives in defs so it does not render twice -->
+    <g id="corner">
+      <path d="M192 54 H114 Q54 54 54 114 V192"
+        stroke="#08070a" stroke-width="40" fill="none" stroke-linejoin="round"/>
+      <path d="M192 54 H114 Q54 54 54 114 V192"
+        stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+      <path d="M192 78 H128 Q78 78 78 128 V192"
+        stroke="#59286d" stroke-width="7" fill="none" stroke-linejoin="round"/>
+      <path d="M192 92 H138 Q92 92 92 138 V192"
+        stroke="#c066ff" stroke-width="4" opacity=".68" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+
+      <path d="M27 81 L52 35 L84 46 L112 24 L143 50 L122 76 L89 83 L61 119 L29 106 Z"
+        fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+
+      <path d="M48 72 L65 51 L84 70 L65 93 Z"
+        fill="url(#violetGem)" stroke="#f1e2f8" stroke-width="3" filter="url(#glow)"/>
+      <path d="M99 44 L113 31 L128 47 L115 61 Z"
+        fill="url(#goldGem)" stroke="#f7e3a7" stroke-width="2.5"/>
+      <path d="M131 58 L141 48 L152 59 L142 70 Z"
+        fill="url(#platinumGem)" stroke="#ffffff" stroke-width="2.2"/>
+
+      <path d="M100 101 L150 88 L128 112 Z"
+        fill="#2f183a" stroke="#9c4fd0" stroke-width="3"/>
+      <path d="M116 118 L164 118 L137 138 Z"
+        fill="#221b24" stroke="#ad8740" stroke-width="2.4"/>
+      <path d="M22 129 L52 114 L70 136 L50 162 L20 151 Z"
+        fill="#161118" stroke="#756d7d" stroke-width="4"/>
+      <path d="M144 85 L154 79 L164 85 L154 91 Z"
+        fill="#e8d199" opacity=".70"/>
+    </g>
+  </defs>
+
+  <!-- Top rail -->
+  <g>
+    <path d="M192 54 H832" stroke="#08070a" stroke-width="40" fill="none"/>
+    <path d="M192 54 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 78 H832" stroke="#59286d" stroke-width="7" fill="none"/>
+    <path d="M192 92 H832" stroke="url(#violetH)" stroke-width="4" fill="none" filter="url(#glow)"/>
+    <path d="M242 121 H782" stroke="url(#goldH)" stroke-width="3" fill="none"/>
+    <path d="M314 110 H710" stroke="url(#platinumH)" stroke-width="2.2" fill="none" opacity=".65"/>
+    <path d="M458 132 H566" stroke="#d8b764" stroke-width="1.8" fill="none" opacity=".34"/>
+  </g>
+
+  <!-- Bottom rail -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M192 54 H832" stroke="#08070a" stroke-width="40" fill="none"/>
+    <path d="M192 54 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 78 H832" stroke="#59286d" stroke-width="7" fill="none"/>
+    <path d="M192 92 H832" stroke="url(#violetH)" stroke-width="4" fill="none" filter="url(#glow)"/>
+    <path d="M242 121 H782" stroke="url(#goldH)" stroke-width="3" fill="none"/>
+    <path d="M314 110 H710" stroke="url(#platinumH)" stroke-width="2.2" fill="none" opacity=".65"/>
+    <path d="M458 132 H566" stroke="#d8b764" stroke-width="1.8" fill="none" opacity=".34"/>
+  </g>
+
+  <!-- Left rail -->
+  <g>
+    <path d="M54 192 V832" stroke="#08070a" stroke-width="40" fill="none"/>
+    <path d="M54 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M78 192 V832" stroke="#59286d" stroke-width="7" fill="none"/>
+    <path d="M92 192 V832" stroke="url(#violetV)" stroke-width="4" fill="none" filter="url(#glow)"/>
+    <path d="M121 242 V782" stroke="url(#goldV)" stroke-width="3" fill="none"/>
+    <path d="M110 314 V710" stroke="url(#platinumV)" stroke-width="2.2" fill="none" opacity=".65"/>
+    <path d="M132 458 V566" stroke="#d8b764" stroke-width="1.8" fill="none" opacity=".34"/>
+  </g>
+
+  <!-- Right rail -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M54 192 V832" stroke="#08070a" stroke-width="40" fill="none"/>
+    <path d="M54 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M78 192 V832" stroke="#59286d" stroke-width="7" fill="none"/>
+    <path d="M92 192 V832" stroke="url(#violetV)" stroke-width="4" fill="none" filter="url(#glow)"/>
+    <path d="M121 242 V782" stroke="url(#goldV)" stroke-width="3" fill="none"/>
+    <path d="M110 314 V710" stroke="url(#platinumV)" stroke-width="2.2" fill="none" opacity=".65"/>
+    <path d="M132 458 V566" stroke="#d8b764" stroke-width="1.8" fill="none" opacity=".34"/>
+  </g>
+
+  <!-- Four corners -->
+  <use href="#corner"/>
+  <use href="#corner" transform="translate(1024 0) scale(-1 1)"/>
+  <use href="#corner" transform="translate(0 1024) scale(1 -1)"/>
+  <use href="#corner" transform="translate(1024 1024) scale(-1 -1)"/>
+
+  <!-- restrained premium accents inside border bands only -->
+  <g opacity=".78" filter="url(#glow)">
+    <circle cx="153" cy="153" r="4.2" fill="#cf78ff"/>
+    <circle cx="871" cy="153" r="4.2" fill="#cf78ff"/>
+    <circle cx="153" cy="871" r="4.2" fill="#cf78ff"/>
+    <circle cx="871" cy="871" r="4.2" fill="#cf78ff"/>
+  </g>
+
+  <g opacity=".58">
+    <circle cx="176" cy="140" r="3.1" fill="#e5c56b"/>
+    <circle cx="848" cy="140" r="3.1" fill="#e5c56b"/>
+    <circle cx="176" cy="884" r="3.1" fill="#e5c56b"/>
+    <circle cx="848" cy="884" r="3.1" fill="#e5c56b"/>
+    <circle cx="162" cy="160" r="2.4" fill="#f7f9ff"/>
+    <circle cx="862" cy="160" r="2.4" fill="#f7f9ff"/>
+    <circle cx="162" cy="864" r="2.4" fill="#f7f9ff"/>
+    <circle cx="862" cy="864" r="2.4" fill="#f7f9ff"/>
+  </g>
+
+  <!-- Center intentionally transparent -->
+</svg>

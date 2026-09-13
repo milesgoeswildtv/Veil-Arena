@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none"
+  role="img"
+  aria-label="Veil Arena reusable panel frame">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#201d24"/>
+      <stop offset="12%" stop-color="#5e5865"/>
+      <stop offset="24%" stop-color="#ece8f2"/>
+      <stop offset="38%" stop-color="#7c7482"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="62%" stop-color="#7c7482"/>
+      <stop offset="76%" stop-color="#ece8f2"/>
+      <stop offset="88%" stop-color="#5e5865"/>
+      <stop offset="100%" stop-color="#201d24"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#201d24"/>
+      <stop offset="12%" stop-color="#5e5865"/>
+      <stop offset="24%" stop-color="#ece8f2"/>
+      <stop offset="38%" stop-color="#7c7482"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="62%" stop-color="#7c7482"/>
+      <stop offset="76%" stop-color="#ece8f2"/>
+      <stop offset="88%" stop-color="#5e5865"/>
+      <stop offset="100%" stop-color="#201d24"/>
+    </linearGradient>
+
+    <linearGradient id="violetH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6b2fa8" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#8144cc" stop-opacity=".38"/>
+      <stop offset="50%" stop-color="#d28aff" stop-opacity=".82"/>
+      <stop offset="82%" stop-color="#8144cc" stop-opacity=".38"/>
+      <stop offset="100%" stop-color="#6b2fa8" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="violetV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b2fa8" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#8144cc" stop-opacity=".38"/>
+      <stop offset="50%" stop-color="#d28aff" stop-opacity=".82"/>
+      <stop offset="82%" stop-color="#8144cc" stop-opacity=".38"/>
+      <stop offset="100%" stop-color="#6b2fa8" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c0a0f"/>
+      <stop offset="45%" stop-color="#251f2a"/>
+      <stop offset="100%" stop-color="#16131a"/>
+    </linearGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Corner primitive stored in defs so it only renders when used -->
+    <g id="corner">
+      <path d="M128 42 H82 Q42 42 42 82 V128"
+        stroke="#0c0a0f" stroke-width="26" fill="none" stroke-linejoin="round"/>
+      <path d="M128 42 H82 Q42 42 42 82 V128"
+        stroke="url(#chromeH)" stroke-width="8" fill="none" stroke-linejoin="round"/>
+      <path d="M128 58 H92 Q58 58 58 92 V128"
+        stroke="#51306f" stroke-width="4.5" fill="none" stroke-linejoin="round"/>
+      <path d="M128 70 H100 Q70 70 70 100 V128"
+        stroke="#c986ff" stroke-width="2.25" opacity=".62" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+
+      <!-- restrained plate ornament -->
+      <path d="M26 62 L44 31 L66 39 L86 24 L107 42 L93 59 L71 64 L52 88 L29 78 Z"
+        fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="4.5"/>
+      <path d="M44 109 L57 102 L65 112 L55 126 L42 121 Z"
+        fill="#17131b" stroke="#736c79" stroke-width="2.4"/>
+    </g>
+  </defs>
+
+  <!-- TOP RAIL -->
+  <g>
+    <path d="M128 42 H896" stroke="#0c0a0f" stroke-width="26" fill="none"/>
+    <path d="M128 42 H896" stroke="url(#chromeH)" stroke-width="8" fill="none"/>
+    <path d="M128 58 H896" stroke="#51306f" stroke-width="4.5" fill="none"/>
+    <path d="M128 70 H896" stroke="url(#violetH)" stroke-width="2.25" fill="none" filter="url(#glow)"/>
+  </g>
+
+  <!-- BOTTOM RAIL -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M128 42 H896" stroke="#0c0a0f" stroke-width="26" fill="none"/>
+    <path d="M128 42 H896" stroke="url(#chromeH)" stroke-width="8" fill="none"/>
+    <path d="M128 58 H896" stroke="#51306f" stroke-width="4.5" fill="none"/>
+    <path d="M128 70 H896" stroke="url(#violetH)" stroke-width="2.25" fill="none" filter="url(#glow)"/>
+  </g>
+
+  <!-- LEFT RAIL -->
+  <g>
+    <path d="M42 128 V896" stroke="#0c0a0f" stroke-width="26" fill="none"/>
+    <path d="M42 128 V896" stroke="url(#chromeV)" stroke-width="8" fill="none"/>
+    <path d="M58 128 V896" stroke="#51306f" stroke-width="4.5" fill="none"/>
+    <path d="M70 128 V896" stroke="url(#violetV)" stroke-width="2.25" fill="none" filter="url(#glow)"/>
+  </g>
+
+  <!-- RIGHT RAIL -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M42 128 V896" stroke="#0c0a0f" stroke-width="26" fill="none"/>
+    <path d="M42 128 V896" stroke="url(#chromeV)" stroke-width="8" fill="none"/>
+    <path d="M58 128 V896" stroke="#51306f" stroke-width="4.5" fill="none"/>
+    <path d="M70 128 V896" stroke="url(#violetV)" stroke-width="2.25" fill="none" filter="url(#glow)"/>
+  </g>
+
+  <!-- FOUR CORNERS -->
+  <use href="#corner"/>
+  <use href="#corner" transform="translate(1024 0) scale(-1 1)"/>
+  <use href="#corner" transform="translate(0 1024) scale(1 -1)"/>
+  <use href="#corner" transform="translate(1024 1024) scale(-1 -1)"/>
+
+  <!-- Tiny anchor accents inside border band only -->
+  <g fill="#cf8dff" opacity=".58" filter="url(#glow)">
+    <circle cx="102" cy="102" r="2.8"/>
+    <circle cx="922" cy="102" r="2.8"/>
+    <circle cx="102" cy="922" r="2.8"/>
+    <circle cx="922" cy="922" r="2.8"/>
+  </g>
+
+  <!-- Center intentionally transparent -->
+</svg>
