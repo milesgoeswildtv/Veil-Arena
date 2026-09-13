@@ -35,6 +35,12 @@ export function arenaCommands(){return[
     ]},
     {name:"rules",description:"Show the Arena rules for 30 seconds.",type:1}
   ]},
+  {name:"veiltip",description:"Authorized Veil wallet tip to a Discord member.",type:1,options:[
+    {name:"amount",description:"Dollar value like $5, or raw crypto amount like 0.01.",type:3,required:true,min_length:1,max_length:32},
+    {name:"currency",description:"DWallet asset ticker, e.g. SOL, USDT, XRP.",type:3,required:true,min_length:2,max_length:16},
+    {name:"user",description:"Member receiving Veil's tip.",type:6,required:true},
+    {name:"note",description:"Optional note stored with the DWallet tip.",type:3,required:false,min_length:1,max_length:200}
+  ]},
   {name:"arenastats",description:"View your lifetime Arena stats in this server.",type:1},
   {name:"arenaleaderboard",description:"View the Arena leaderboard for this server.",type:1},
   {name:"arenalog",description:"Download narration from a completed Arena match.",type:1,options:[
