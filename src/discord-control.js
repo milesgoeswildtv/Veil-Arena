@@ -28,12 +28,27 @@ async function activeDiscordGame(interaction, env) {
     return activityGame;
   }
 
+  // Emergency fallback: let /arena forceclose be run from any channel in the same
+  // Discord server when the embedded Activity itself (often a voice channel) is stuck.
+  const row = await env.DB.prepare(`
+    SELECT state_json FROM games
+    WHERE guild_id = ?
+      AND channel_id LIKE 'activity:%'
+      AND status IN ('registration', 'starting', 'running')
+    ORDER BY updated_at DESC, created_at DESC
+    LIMIT 1
+  `).bind(String(interaction.guild_id)).first();
+  if (row?.state_json) {
+    const game = JSON.parse(row.state_json);
+    if (game?.platform === "activity") return game;
+  }
+
   return null;
 }
 
 async function handleStatus(interaction, env) {
   const game = await activeDiscordGame(interaction, env);
-  if (!game) return interactionMessage("No Arena is active in this channel.", [], true);
+  if (!game) return interactionMessage("No Arena is active in this channel or stuck Discord Activity in this server.", [], true);
   return interactionMessage(
     `⚔️ Arena is **${game.status}**. Round **${Number(game.round) || 0}**. **${game.aliveIds?.length || 0}/${Object.keys(game.players || {}).length}** players alive. Host: <@${game.hostId}>.`,
     [],
@@ -43,7 +58,7 @@ async function handleStatus(interaction, env) {
 
 async function handleForceClose(interaction, env) {
   const game = await activeDiscordGame(interaction, env);
-  if (!game) return interactionMessage("No active Arena exists in this channel. You can start a new one now.", [], true);
+  if (!game) return interactionMessage("No active Arena or stuck Discord Activity exists in this server. You can start a new one now.", [], true);
   const user = userFromInteraction(interaction);
   if (!user || (user.id !== game.hostId && !canManageGuild(interaction))) {
     return interactionMessage("Only the Arena host or a server admin can force-close it.", [], true);
@@ -59,7 +74,7 @@ async function handleForceClose(interaction, env) {
   const prizeWarning = game.dwalletWinnerPayout?.status === "funded"
     ? "\n\n⚠️ This Arena had a funded DWallet prize. The Arena is closed, but that funded prize still needs to be reconciled/refunded before reuse."
     : "";
-  return interactionMessage(`🛑 **Arena force-closed.** The stuck active state is cleared. A new Arena can be started in this channel immediately.${prizeWarning}`);
+  return interactionMessage(`🛑 **Arena force-closed.** The stuck active state is cleared. A new Arena can be started in this server immediately.${prizeWarning}`);
 }
 
 function optionValue(interaction, name) {
