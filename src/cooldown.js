@@ -1,4 +1,5 @@
 export const DEFAULT_ARENA_COOLDOWN_MS = 30 * 60 * 1000;
+export const TELEGRAM_ARENA_COOLDOWN_MS = DEFAULT_ARENA_COOLDOWN_MS;
 
 async function ensureCooldownSchema(db) {
   if (!db) throw new Error("D1 binding DB is not configured.");
