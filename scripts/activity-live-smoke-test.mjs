@@ -33,10 +33,14 @@ assert(resetEntry.includes('status === "cancelled"'));
 const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
 assert(entryPointEntry.includes('type: 4'));
 assert(entryPointEntry.includes('handler: 2'));
-assert(entryPointEntry.includes('/setup/activity'));
-assert(entryPointEntry.includes('/admin/activity/register'));
+
+const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
+assert(doctorEntry.includes('EMBEDDED_FLAG'));
+assert(doctorEntry.includes('/applications/@me'));
+assert(doctorEntry.includes('VERIFY + FORCE REPAIR ACTIVITY'));
+assert(doctorEntry.includes('/admin/activity/doctor-repair'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-entrypoint-entry.js"'));
+assert(wrangler.includes('main = "src/activity-doctor-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
