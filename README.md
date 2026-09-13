@@ -8,7 +8,9 @@ Arena is the shared game engine behind Veil's Discord and Telegram elimination g
 - `full_tilt` — Full Tilt Arena
 - `dwallet` — DWallet Telegram Arena
 
-The DWallet theme contains exactly **26,000** narration templates across kills, self-eliminations, Community Showdowns, multi-pins, revivals, normal events, rare DWallet glitches, and the DWallet HQ expansion.
+The DWallet theme contains exactly **26,000** narration templates across eliminations, self-eliminations, Community Showdowns, multi-person showdowns, revivals, normal events, rare DWallet glitches, and the DWallet HQ expansion.
+
+Full Tilt now contains exactly **26,680** theme-specific narration templates. Its latest 13,000-line pass is built specifically around Full Tilt's poker/casino identity: felt, rails, chips, dealers, all-ins, bad beats, the cage, the sportsbook, high-limit rooms, tilt, river pain, Final Bets, and Double or Nothing. The new pass is distributed across eliminations, self-eliminations, Final Bet duels, multi-person Final Bets, revivals, normal events, and rare events instead of being concentrated in one category.
 
 ## DWallet Telegram architecture
 
@@ -115,7 +117,7 @@ Sponsorships are sponsor-defined fixed-dollar pledges, not percentages or preset
 - Sam: Most Eliminations — $2
 - Crek: Winner — $10
 
-Sponsors choose only the categories they want. Multiple sponsors may stack on one Arena. Sponsorships are editable during registration and lock when START is pressed. Statistical ties split that sponsor's entered award. At the end, Veil posts a payout report showing who is owed what.
+Sponsors choose only the categories they want. Multiple sponsors may stack on one Arena. Sponsorships are editable during registration and lock when START is pressed. Statistical ties split that sponsor's entered award. At the end, Veil posts a payout report showing who is owed what. Veil tracks the payout accounting but does **not** move money automatically.
 
 Supported award categories currently include Winner, Runner-Up, Most Eliminations, Most Revivals, Most Community Showdowns Survived, and Most Mass Brawls Survived.
 
@@ -171,6 +173,12 @@ The Activity shell starts with **CONTROLS LOADING**. Once the external controlle
 
 For Discord Activity URL mappings, map `/` to the Worker target ending in `/activity-preview` (without the `https://` prefix in Discord's target field). The Worker also serves the controller from both `/activity-preview/app.js` and `/app.js` so Discord's proxy path shape cannot strand the controls.
 
+## Copy and narration QA
+
+The automated suite checks the new Full Tilt 13,000-line pass for exact category counts, duplicate generated lines, malformed placeholders, unreplaced template tokens, `undefined`/`null` leaks, repeated spacing, broken connective punctuation, and excessive line length. It also verifies the live Full Tilt pool total and key sponsorship/Discord labels.
+
+User-facing sponsorship copy uses **Save Sponsorship** while registration is open because pledges remain editable until START. Rules across Full Tilt, DWallet and Vibe Queen use consistent vote terminology and explain sponsorship locking, tied-award splitting, and payout accounting.
+
 ## Development
 
 ```bash
@@ -180,4 +188,4 @@ npm run dev
 npm run dev:test
 ```
 
-`npm test` runs the core Arena suite, Telegram/DWallet Mini App suite, sponsorship suite, and QA Test Mode suite. CI also syntax-checks production and QA modules before running the tests, and validates both production and QA Wrangler bundles.
+`npm test` runs the core Arena suite, Telegram/DWallet Mini App suite, sponsorship suite, QA Test Mode suite, and Full Tilt copy/narration audit. CI also syntax-checks production and QA modules before running the tests, and validates both production and QA Wrangler bundles.
