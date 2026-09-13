@@ -4,7 +4,7 @@ import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-dwallet-live";
-const TELEGRAM_BUILD = "2026-09-13-telegram-forceclose-2";
+const TELEGRAM_BUILD = "2026-09-13-telegram-veiltip-3";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -36,6 +36,8 @@ export default {
         gameCore: "preserved",
         discord: env.DISCORD_BOT_TOKEN && env.DISCORD_PUBLIC_KEY && env.DISCORD_APPLICATION_ID ? "configured" : "waiting-for-keys",
         dwalletPayouts: env.DWALLET_API_KEY ? "configured" : "waiting-for-api-key",
+        veilTipAdminsConfigured: Boolean(String(env.VEIL_TIP_ADMIN_IDS || "").trim()),
+        veilTipPlatformAdminsEnabled: env.VEIL_TIP_ALLOW_PLATFORM_ADMINS === "true",
         telegram: env.TELEGRAM_BOT_TOKEN ? "configured" : "waiting-for-keys",
         telegramBuild: TELEGRAM_BUILD,
         telegramTestMode: env.TELEGRAM_TEST_MODE === "true",
