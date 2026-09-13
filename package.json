@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:activity-client": "vite build --config activity/vite.config.js",
+    "build:activity-client": "vite build --config activity/vite.config.js && node scripts/sync-telegram-assets.mjs",
     "build": "npm run build:activity-client",
     "test": "node scripts/smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/dwallet-payout-smoke-test.mjs",
     "deploy": "npm run build:activity-client && wrangler deploy"
