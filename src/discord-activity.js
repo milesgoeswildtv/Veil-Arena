@@ -1,7 +1,7 @@
 import { createGame, addPlayer, startGame, castCrowdVote } from "./core/engine.js";
 import { addFakeContestants, setSimulatedCrowd } from "./core/simulation.js";
 import { advanceArenaGame } from "./core/orchestrator.js";
-import { ensureSchema, loadGame, loadActiveGameForChannel, saveGame, recordFinishedGame } from "./storage.js";
+import { ensureSchema, loadGame, loadActiveGameForChannel, saveGame, recordFinishedGame, getGuildConfig, setGuildTheme } from "./storage.js";
 import { themeForGuild } from "./server-config.js";
 
 const DISCORD_API = "https://discord.com/api/v10";
@@ -247,7 +247,9 @@ function publicState(game, session, env) {
 async function actionOpen(env, session) {
   let active = await loadActiveGameForChannel(env.DB, session.scope);
   if (active) return hydrateRegistrations(env.DB, active);
-  const themeId = themeForGuild(session.guildId, "vibe_queen_slots");
+  const config = await getGuildConfig(env.DB, session.guildId);
+  const themeId = themeForGuild(session.guildId, config.theme_id);
+  if (themeId !== config.theme_id) await setGuildTheme(env.DB, session.guildId, themeId);
   const game = createGame({ guildId: session.guildId, channelId: session.scope, hostId: session.user.id, themeId, platform: "activity" });
   game.discordChannelId = session.channelId;
   game.discordInstanceId = session.instanceId;
