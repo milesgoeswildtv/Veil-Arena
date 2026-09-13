@@ -184,6 +184,17 @@ function controls(state) {
   return out.join("");
 }
 
+function sponsorshipCard() {
+  return `
+    <div class="sponsorship-card" aria-label="Arena sponsor">
+      ${artwork("veil_ui_icon_sponsor", "sponsor-icon")}
+      <div class="sponsorship-copy">
+        <small>Discord Arena</small>
+        <strong>DWALLET × VEIL</strong>
+      </div>
+    </div>`;
+}
+
 function render(state) {
   const previousState = currentState;
   currentState = state;
@@ -198,19 +209,26 @@ function render(state) {
         <h2>No Arena is open.</h2>
         <p>Open registration for this Activity instance.</p>
         <div class="controls">${controls(state)}</div>
-      </div>`;
+      </div>
+      ${sponsorshipCard()}`;
     bindControls();
     lastFxSignature = "none";
     return;
   }
 
-  const roster = game.players.map(player => `
-    <div class="player ${player.alive ? "" : "dead"}" data-player-id="${esc(player.id)}">
-      ${artwork(String(game.winnerId || "") === String(player.id) ? "veil_ui_player_state_winner" : player.alive ? "veil_ui_player_state_alive" : "veil_ui_player_state_dead", "player-state")}
-      <span class="player-portrait">${artwork(String(game.winnerId || "") === String(player.id) ? "veil_ui_icon_crown" : player.alive ? "veil_ui_icon_arena" : "veil_ui_icon_skull")}</span>
+  const selectedVoteId = game.crowdVote?.selectedId != null ? String(game.crowdVote.selectedId) : "";
+  const roster = game.players.map(player => {
+    const isWinner = String(game.winnerId || "") === String(player.id);
+    const isSelected = Boolean(selectedVoteId) && selectedVoteId === String(player.id);
+    return `
+    <div class="player ${player.alive ? "" : "dead"} ${isSelected ? "selected" : ""}" data-player-id="${esc(player.id)}">
+      ${artwork(isWinner ? "veil_ui_player_state_winner" : player.alive ? "veil_ui_player_state_alive" : "veil_ui_player_state_dead", "player-state")}
+      ${isSelected ? artwork("veil_ui_player_state_selected", "player-state player-state-selected") : ""}
+      <span class="player-portrait">${artwork(isWinner ? "veil_ui_icon_crown" : player.alive ? "veil_ui_icon_arena" : "veil_ui_icon_skull")}</span>
       <span class="player-name">${esc(player.displayName)} ${player.simulated ? '<span class="tag">BOT</span>' : ""}</span>
       <span class="small">${player.alive ? `${player.eliminations} KO` : "ELIMINATED"}</span>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 
   const latest = [...(game.displayLog || [])].reverse()[0]?.text || game.lastEvent?.text || "Registration is open.";
   const previousLatest = previousState?.game ? ([...(previousState.game.displayLog || [])].reverse()[0]?.text || previousState.game.lastEvent?.text || "") : "";
@@ -246,7 +264,8 @@ function render(state) {
     <div class="panel roster-panel">
       <div class="small section-label">${artwork("veil_ui_icon_stats")} ROSTER</div>
       <div class="roster">${roster || "Nobody has entered yet."}</div>
-    </div>`;
+    </div>
+    ${sponsorshipCard()}`;
   bindControls();
   bindSpoilers();
   triggerFx(previousState, state);
