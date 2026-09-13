@@ -8,22 +8,28 @@ import {
   telegramRequest
 } from "./telegram.js";
 import { ensureSchema, loadActiveGameForChannel, saveGame } from "./storage.js";
+import { isVeilTipAdmin, veilTipAdminEntry, sendDirectDwalletTip } from "./dwallet-direct-tip.js";
 
 function commandParts(text = "") {
   const parts = String(text).trim().split(/\s+/).filter(Boolean);
   return { command: (parts.shift() || "").toLowerCase().split("@")[0], args: parts };
 }
 
-async function isTelegramAdmin(message, env) {
+async function telegramAdminStatus(message, env) {
   try {
     const member = await telegramRequest(env.TELEGRAM_BOT_TOKEN, "getChatMember", {
       chat_id: message.chat.id,
       user_id: message.from.id
     });
-    return member?.status === "creator" || member?.status === "administrator";
+    return member?.status || "";
   } catch {
-    return false;
+    return "";
   }
+}
+
+async function isTelegramAdmin(message, env) {
+  const status = await telegramAdminStatus(message, env);
+  return status === "creator" || status === "administrator";
 }
 
 async function forceCloseTelegramArena(message, env) {
@@ -63,6 +69,67 @@ async function forceCloseTelegramArena(message, env) {
   );
 }
 
+async function handleVeilTip(message, args, env) {
+  const scope = telegramScope(message?.chat?.id);
+  if (!isTelegramGroup(message?.chat)) {
+    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Use /veiltip in a Telegram group by replying to the person you want to tip.");
+  }
+
+  const user = userFromTelegram(message.from);
+  if (!user) return;
+  const platformAdmin = env.VEIL_TIP_ALLOW_PLATFORM_ADMINS === "true" && await isTelegramAdmin(message, env);
+  if (!isVeilTipAdmin(env, "telegram", user.id) && !platformAdmin) {
+    const entry = veilTipAdminEntry("telegram", user.id);
+    return sendTelegramMessage(
+      scope,
+      env.TELEGRAM_BOT_TOKEN,
+      `You are not authorized to spend Veil's DWallet balance.\n\nYour allowlist entry is ${entry}. Add it to the Cloudflare secret/variable VEIL_TIP_ADMIN_IDS (comma-separated if there are multiple approved spenders).`
+    );
+  }
+
+  if (!env.DWALLET_API_KEY) {
+    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Veil's DWallet API key is not configured on this Worker.");
+  }
+
+  const target = message?.reply_to_message?.from;
+  if (!target?.id) {
+    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Reply to the recipient's message with `/veiltip $5 SOL` (or a raw amount like `/veiltip 0.01 SOL`).");
+  }
+  if (target.is_bot) {
+    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Veil direct tips are for Telegram users, not bot accounts.");
+  }
+
+  const amount = args[0];
+  const currency = args[1];
+  if (!amount || !currency) {
+    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Usage: reply to a user's message with `/veiltip $5 SOL`. You can add a note after the asset ticker.");
+  }
+
+  const targetName = [target.first_name, target.last_name].filter(Boolean).join(" ").trim() || target.username || `Telegram ${target.id}`;
+  const suppliedNote = args.slice(2).join(" ").trim();
+  const note = suppliedNote || `Veil direct tip authorized by ${user.displayName}`;
+
+  try {
+    const sent = await sendDirectDwalletTip(env, {
+      toUserId: target.id,
+      amount,
+      currency,
+      note
+    });
+    return sendTelegramMessage(
+      scope,
+      env.TELEGRAM_BOT_TOKEN,
+      `💜 Veil tipped ${targetName} ${sent.amount} ${sent.currency}.${sent.tipId ? `\nDWallet tip #${sent.tipId}` : ""}\nAuthorized by ${user.displayName}.`
+    );
+  } catch (error) {
+    return sendTelegramMessage(
+      scope,
+      env.TELEGRAM_BOT_TOKEN,
+      `⚠️ Veil tip failed: ${String(error?.message || error)}\n\nNo automatic retry was attempted. Check Veil's DWallet history before trying again so an ambiguous timeout cannot cause a duplicate payment.`
+    );
+  }
+}
+
 export async function handleTelegramRoute(request, env) {
   const url = new URL(request.url);
 
@@ -72,6 +139,7 @@ export async function handleTelegramRoute(request, env) {
     if (message?.text) {
       const { command, args } = commandParts(message.text);
       const sub = String(args[0] || "").toLowerCase();
+      if (command === "/veiltip") return handleVeilTip(message, args, env);
       if (command === "/arenaforceclose" || (command === "/arena" && (sub === "forceclose" || sub === "close" || sub === "reset"))) {
         return forceCloseTelegramArena(message, env);
       }
