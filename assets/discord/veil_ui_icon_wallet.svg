@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+  <title>Veil UI Icon Wallet</title>
+  <desc>96x96 transparent Veil wallet icon. Compact angular wallet vault in silver and gunmetal with a recessed latch core and restrained violet transaction glow. Designed for 18–32 CSS px rendering.</desc>
+
+  <metadata>
+    asset: veil_ui_icon_wallet.svg
+    family: veil_ui_icon_arena.svg
+    canvas: 96x96
+    aspect-ratio: 1:1
+    transparent-background: true
+    intended-css-size: 18-32px
+    safe-padding: 10px
+    text: none
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0F1F3"/>
+      <stop offset="0.22" stop-color="#83868E"/>
+      <stop offset="0.50" stop-color="#D6D8DD"/>
+      <stop offset="0.78" stop-color="#565962"/>
+      <stop offset="1" stop-color="#A5A8B0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#202228"/>
+      <stop offset="0.50" stop-color="#090A0D"/>
+      <stop offset="1" stop-color="#15171C"/>
+    </linearGradient>
+
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#744B9E"/>
+      <stop offset="0.55" stop-color="#A86FD0"/>
+      <stop offset="1" stop-color="#593576"/>
+    </linearGradient>
+
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#F0DEFF" stop-opacity="1"/>
+      <stop offset="0.35" stop-color="#C88DEB" stop-opacity="0.95"/>
+      <stop offset="0.72" stop-color="#7B4A9E" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#593576" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="coreBloom" x="-130%" y="-130%" width="360%" height="360%">
+      <feGaussianBlur stdDeviation="1.15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Veil crest -->
+  <path d="M48 10
+           L60 17
+           L73 18
+           L78 30
+           L86 39
+           L81 51
+           L79 66
+           L65 70
+           L48 86
+           L31 70
+           L17 66
+           L15 51
+           L10 39
+           L18 30
+           L23 18
+           L36 17
+           Z"
+        fill="url(#gunmetal)"
+        stroke="url(#silver)"
+        stroke-width="2.2"
+        stroke-linejoin="round"/>
+
+  <!-- Rear wallet body -->
+  <path d="M24 34
+           H60
+           C64.4 34 68 37.6 68 42
+           V60
+           C68 64.4 64.4 68 60 68
+           H28
+           C23.6 68 20 64.4 20 60
+           V38
+           C20 35.8 21.8 34 24 34Z"
+        fill="#0A0B0F"
+        stroke="url(#silver)"
+        stroke-width="1.9"
+        stroke-linejoin="round"/>
+
+  <!-- Front wallet flap / vault face -->
+  <path d="M28 28
+           H61
+           C65.4 28 69 31.6 69 36
+           V57
+           C69 61.4 65.4 65 61 65
+           H31
+           C26.6 65 23 61.4 23 57
+           V33
+           C23 30.2 25.2 28 28 28Z"
+        fill="url(#gunmetal)"
+        stroke="url(#silver)"
+        stroke-width="2.0"
+        stroke-linejoin="round"/>
+
+  <!-- Interior inset plate -->
+  <path d="M30.5 33
+           H58.5
+           C61.5 33 64 35.5 64 38.5
+           V54.5
+           C64 57.5 61.5 60 58.5 60
+           H33.5
+           C30.5 60 28 57.5 28 54.5
+           V35.5
+           C28 34.1 29.1 33 30.5 33Z"
+        fill="#0A0B0F"
+        stroke="#34373D"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <!-- Balance rails -->
+  <path d="M33 39H53" stroke="url(#violet)" stroke-width="1.35" stroke-linecap="round" opacity="0.74"/>
+  <path d="M33 45H48" stroke="url(#silver)" stroke-width="1.05" stroke-linecap="round" opacity="0.76"/>
+  <path d="M33 51H44" stroke="url(#silver)" stroke-width="1.05" stroke-linecap="round" opacity="0.68"/>
+
+  <!-- Latch / transaction core -->
+  <path d="M57 41
+           H69
+           C71.8 41 74 43.2 74 46
+           V52
+           C74 54.8 71.8 57 69 57
+           H57
+           C54.2 57 52 54.8 52 52
+           V46
+           C52 43.2 54.2 41 57 41Z"
+        fill="#090A0D"
+        stroke="url(#silver)"
+        stroke-width="1.6"
+        stroke-linejoin="round"/>
+
+  <circle cx="61.7" cy="49" r="4.2"
+          fill="#090A0D"
+          stroke="url(#silver)"
+          stroke-width="1.1"/>
+  <circle cx="61.7" cy="49" r="2.4"
+          fill="url(#coreGlow)"
+          filter="url(#coreBloom)"/>
+  <circle cx="61.7" cy="49" r="0.95" fill="#F3E7FF"/>
+
+  <!-- Subtle payout / transaction cue -->
+  <path d="M63.8 31
+           C68.5 31.6 72.6 34.2 74.8 38.5"
+        fill="none"
+        stroke="url(#violet)"
+        stroke-width="1.3"
+        stroke-linecap="round"
+        opacity="0.78"/>
+  <path d="M72.8 36.7L75.6 39.8L71.3 40.4"
+        fill="none"
+        stroke="url(#silver)"
+        stroke-width="1.15"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Bottom wallet seam -->
+  <path d="M32 65H57"
+        stroke="url(#silver)"
+        stroke-width="1.15"
+        stroke-linecap="round"
+        opacity="0.82"/>
+
+  <!-- Side cue tabs -->
+  <path d="M25 42H19" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M25 54H19" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M71 42H77" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M71 54H77" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Small side fins / family details -->
+  <path d="M21 39L15 44L22 46"
+        fill="#0E1014"
+        stroke="url(#silver)"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <path d="M75 39L81 44L74 46"
+        fill="#0E1014"
+        stroke="url(#silver)"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <!-- Tiny family gate ticks -->
+  <g stroke="#B181D3" stroke-width="1.1" stroke-linecap="round" opacity="0.44">
+    <path d="M48 15V18"/>
+    <path d="M48 75V78"/>
+    <path d="M18 48H21"/>
+    <path d="M75 48H78"/>
+  </g>
+</svg>
