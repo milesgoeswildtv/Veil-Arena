@@ -1,6 +1,16 @@
 (() => {
   const CHUNKS = Array.from({ length: 15 }, (_, i) => `/sfx/chunks/veil-sfx-${String(i).padStart(2, "0")}.b64`);
   const VOLUME = 0.78;
+  const MUSIC = {
+    lobby: {
+      src: "/sfx/music/veil-lobby-music.mp3",
+      volume: 0.22
+    },
+    battle: {
+      src: "/sfx/music/veil-arena-battle-music.mp3",
+      volume: 0.26
+    }
+  };
   const CUES = {
     click: [0.000000, 0.110023],
     confirm: [0.190023, 0.250023],
@@ -26,6 +36,17 @@
   let previous = null;
   let deadline = null;
   let deadlineCueKey = "";
+  let desiredMusic = "";
+  let activeMusic = "";
+  let musicTransition = 0;
+
+  const musicPlayers = Object.fromEntries(Object.entries(MUSIC).map(([name, config]) => {
+    const audio = new Audio(config.src);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = 0;
+    return [name, audio];
+  }));
 
   function audioContext() {
     if (!ctx) {
@@ -80,6 +101,65 @@
     } catch {}
   }
 
+  function fadeMusic(audio, from, to, duration, transitionId, onDone) {
+    const startedAt = performance.now();
+    audio.volume = Math.max(0, Math.min(1, from));
+
+    function step(now) {
+      if (transitionId !== musicTransition) return;
+      const progress = Math.min(1, (now - startedAt) / duration);
+      audio.volume = Math.max(0, Math.min(1, from + ((to - from) * progress)));
+      if (progress < 1) requestAnimationFrame(step);
+      else if (onDone) onDone();
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  async function applyMusic() {
+    const target = desiredMusic;
+    if (target === activeMusic) {
+      const current = musicPlayers[target];
+      if (current?.paused) await current.play().catch(() => {});
+      return;
+    }
+
+    const transitionId = ++musicTransition;
+    const outgoingName = activeMusic;
+    const outgoing = musicPlayers[outgoingName];
+    const incoming = musicPlayers[target];
+
+    activeMusic = target;
+
+    if (outgoing) {
+      const from = outgoing.volume;
+      fadeMusic(outgoing, from, 0, 500, transitionId, () => {
+        outgoing.pause();
+        outgoing.currentTime = 0;
+      });
+    }
+
+    if (!incoming || !MUSIC[target]) return;
+
+    incoming.volume = 0;
+    const started = await incoming.play().then(() => true).catch(() => false);
+    if (!started || transitionId !== musicTransition) return;
+    fadeMusic(incoming, 0, MUSIC[target].volume, 900, transitionId);
+  }
+
+  function musicForStatus(status) {
+    if (status === "registration") return "lobby";
+    if (status === "running" || status === "starting") return "battle";
+    return "";
+  }
+
+  function updateMusic(status) {
+    const next = musicForStatus(status);
+    if (next === desiredMusic) return;
+    desiredMusic = next;
+    applyMusic();
+  }
+
   function normalize(payload) {
     if (!payload || typeof payload !== "object") return null;
     const game = payload.game;
@@ -117,9 +197,18 @@
   }
 
   function handleState(payload) {
+    if (payload && Object.prototype.hasOwnProperty.call(payload, "game") && !payload.game) {
+      updateMusic("");
+      previous = null;
+      deadline = null;
+      deadlineCueKey = "";
+      return;
+    }
+
     const current = normalize(payload);
     if (!current) return;
     updateDeadline(current);
+    updateMusic(current.status);
 
     const prior = previous;
     previous = current;
@@ -196,9 +285,17 @@
 
   document.addEventListener("pointerdown", event => {
     const target = event.target?.closest?.("button,[data-action],[data-vote]");
-    if (!target) return;
-    play("click");
+    if (target) play("click");
+    if (desiredMusic) applyMusic();
   }, true);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      Object.values(musicPlayers).forEach(audio => audio.pause());
+      return;
+    }
+    if (desiredMusic) applyMusic();
+  });
 
   setInterval(() => {
     if (!deadline) return;
