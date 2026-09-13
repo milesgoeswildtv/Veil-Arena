@@ -4,9 +4,14 @@ function apiBase(env) {
   return String(env.DWALLET_API_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, "");
 }
 
-function authHeaders(env) {
+function apiKey(env) {
   const key = String(env.DWALLET_API_KEY || "").trim();
   if (!key) throw new Error("DWALLET_API_KEY is not configured.");
+  return key;
+}
+
+function configuredAuth(env) {
+  const key = apiKey(env);
   const header = String(env.DWALLET_API_KEY_HEADER || "x-api-key").trim();
   const prefix = String(env.DWALLET_API_KEY_PREFIX || "");
   return { [header]: `${prefix}${key}` };
@@ -25,17 +30,30 @@ export function normalizeDwalletCurrency(value) {
   return currency;
 }
 
-async function dwalletRequest(env, path, init = {}) {
+async function requestOnce(env, path, init, auth) {
   const response = await fetch(`${apiBase(env)}${path}`, {
     ...init,
     headers: {
       accept: "application/json",
       "content-type": "application/json",
-      ...authHeaders(env),
+      ...auth,
       ...(init.headers || {})
     }
   });
   const body = await response.json().catch(() => null);
+  return { response, body };
+}
+
+async function dwalletRequest(env, path, init = {}) {
+  let { response, body } = await requestOnce(env, path, init, configuredAuth(env));
+
+  // Swagger screenshot confirms API-key auth but not the header name. If the Worker
+  // has not explicitly configured a header and x-api-key is rejected, safely try
+  // Bearer auth once. A 401 means the first attempt was not executed as a payout.
+  if (response.status === 401 && !env.DWALLET_API_KEY_HEADER) {
+    ({ response, body } = await requestOnce(env, path, init, { authorization: `Bearer ${apiKey(env)}` }));
+  }
+
   if (!response.ok || body?.success === false) {
     const error = new Error(body?.message || `DWallet HTTP ${response.status}`);
     error.status = response.status;
