@@ -40,10 +40,14 @@ for (const action of [
 }
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
 const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
 const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-reset-entry.js"'));
+assert(wrangler.includes('main = "src/activity-entrypoint-entry.js"'));
+assert(entryPointEntry.includes('from "./activity-reset-entry.js"'));
+assert(entryPointEntry.includes('type: 4'));
+assert(entryPointEntry.includes('handler: 2'));
 assert(resetEntry.includes('from "./activity-live-entry.js"'));
 assert(resetEntry.includes('ABORT / RESET ARENA'));
 assert(resetEntry.includes('body.action === "abort"'));
