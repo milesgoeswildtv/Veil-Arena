@@ -160,11 +160,19 @@ export async function validateTelegramInitData(initData, botToken, maxAgeSeconds
   const user = userFromTelegram(rawUser);
   if (!user) throw new Error("Telegram user identity is missing.");
 
+  const startParam = params.get("start_param") || "";
+  const arenaLaunch = startParam.startsWith("arena_");
+
   return {
     user,
-    startParam: params.get("start_param") || "",
-    chatType: params.get("chat_type") || "",
-    chatInstance: params.get("chat_instance") || "",
+    startParam,
+    // Main Mini App deep links reliably include start_param but some Telegram
+    // clients omit chat_type/chat_instance even when the link was tapped in a
+    // group. Arena already verifies the authenticated user is a member of the
+    // exact originating group via getChatMember, so use the signed Arena ID as
+    // a stable internal context key instead of rejecting a valid launch.
+    chatType: arenaLaunch ? "group" : (params.get("chat_type") || ""),
+    chatInstance: arenaLaunch ? `arena:${startParam.slice(6)}` : (params.get("chat_instance") || ""),
     authDate
   };
 }
