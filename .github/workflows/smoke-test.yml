@@ -35,6 +35,9 @@ jobs:
           node --check src/discord-setup.js
           node --check src/discord-control.js
           node --check src/discord-worker.js
+          node --check src/discord-activity.js
+          node --check activity/main.js
+          node --check activity/vite.config.js
           node --check src/telegram.js
           node --check src/telegram-control.js
           node --check src/telegram-app.js
@@ -54,6 +57,9 @@ jobs:
 
       - name: Run Arena core tests
         run: npm test
+
+      - name: Build Discord Activity
+        run: npm run build:activity-client
 
       - name: Validate Cloudflare Worker bundle
         run: npx wrangler deploy --dry-run
