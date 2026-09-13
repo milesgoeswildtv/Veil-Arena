@@ -15,6 +15,13 @@ function commandParts(text = "") {
   return { command: (parts.shift() || "").toLowerCase().split("@")[0], args: parts };
 }
 
+function webhookAck() {
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { "content-type": "application/json; charset=utf-8" }
+  });
+}
+
 async function telegramAdminStatus(message, env) {
   try {
     const member = await telegramRequest(env.TELEGRAM_BOT_TOKEN, "getChatMember", {
@@ -139,9 +146,13 @@ export async function handleTelegramRoute(request, env) {
     if (message?.text) {
       const { command, args } = commandParts(message.text);
       const sub = String(args[0] || "").toLowerCase();
-      if (command === "/veiltip") return handleVeilTip(message, args, env);
+      if (command === "/veiltip") {
+        await handleVeilTip(message, args, env);
+        return webhookAck();
+      }
       if (command === "/arenaforceclose" || (command === "/arena" && (sub === "forceclose" || sub === "close" || sub === "reset"))) {
-        return forceCloseTelegramArena(message, env);
+        await forceCloseTelegramArena(message, env);
+        return webhookAck();
       }
     }
   }
