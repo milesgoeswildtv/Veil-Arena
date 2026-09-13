@@ -74,7 +74,26 @@ async function handleForceClose(interaction, env) {
   game.history.push({ type: "force_closed", byUserId: user.id, round: game.round || 0, at: game.abortedAt });
   await saveGame(env.DB, game);
 
-  if (game.id) {
+  if (game.platform === "activity" && game.channelId) {
+    // Hard-clear this exact Discord Activity scope. Without this, the Activity
+    // state loader can fall back to an older finished game and appear stuck.
+    await env.DB.prepare(`
+      UPDATE games
+      SET status = 'aborted', updated_at = CURRENT_TIMESTAMP
+      WHERE channel_id = ?
+        AND status IN ('registration', 'starting', 'running', 'finished', 'cancelled')
+    `).bind(String(game.channelId)).run();
+
+    await env.DB.prepare(`
+      DELETE FROM arena_registrations
+      WHERE game_id IN (SELECT id FROM games WHERE channel_id = ?)
+    `).bind(String(game.channelId)).run().catch(() => null);
+
+    await env.DB.prepare(`
+      DELETE FROM activity_tick_leases
+      WHERE game_id IN (SELECT id FROM games WHERE channel_id = ?)
+    `).bind(String(game.channelId)).run().catch(() => null);
+  } else if (game.id) {
     await env.DB.prepare("DELETE FROM arena_registrations WHERE game_id = ?").bind(game.id).run().catch(() => null);
     await env.DB.prepare("DELETE FROM activity_tick_leases WHERE game_id = ?").bind(game.id).run().catch(() => null);
   }
@@ -82,7 +101,7 @@ async function handleForceClose(interaction, env) {
   const prizeWarning = game.dwalletWinnerPayout?.status === "funded"
     ? "\n\n⚠️ This Arena had a funded DWallet prize. The Arena is closed, but that funded prize still needs to be reconciled/refunded before reuse."
     : "";
-  return interactionMessage(`🛑 **Arena force-closed hard.** The latest Discord Activity state was marked aborted and its registration/tick state was cleared. You can start a new Arena now.${prizeWarning}`);
+  return interactionMessage(`🛑 **Arena force-closed hard.** The stuck Discord Activity scope and its registration/tick state were cleared. You can start a new Arena now.${prizeWarning}`);
 }
 
 function optionValue(interaction, name) {
