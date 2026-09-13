@@ -27,21 +27,26 @@ async function requestOnce(env, path, init, auth) {
       ...(init.headers || {})
     }
   });
-  const body = await response.json().catch(() => null);
-  return { response, body };
+  const text = await response.text().catch(() => "");
+  let body = null;
+  try { body = text ? JSON.parse(text) : null; } catch {}
+  return { response, body, text };
+}
+
+function apiError(response, body, text, path) {
+  const detail = body?.detail || body?.error || body?.message || text || `HTTP ${response.status}`;
+  const error = new Error(`DWallet ${path} HTTP ${response.status}: ${String(detail).slice(0, 300)}`);
+  error.status = response.status;
+  error.body = body;
+  return error;
 }
 
 async function dwalletRequest(env, path, init = {}) {
-  let { response, body } = await requestOnce(env, path, init, configuredAuth(env));
+  let { response, body, text } = await requestOnce(env, path, init, configuredAuth(env));
   if (response.status === 401 && !env.DWALLET_API_KEY_HEADER) {
-    ({ response, body } = await requestOnce(env, path, init, { authorization: `Bearer ${apiKey(env)}` }));
+    ({ response, body, text } = await requestOnce(env, path, init, { authorization: `Bearer ${apiKey(env)}` }));
   }
-  if (!response.ok || body?.success === false) {
-    const error = new Error(body?.message || `DWallet HTTP ${response.status}`);
-    error.status = response.status;
-    error.body = body;
-    throw error;
-  }
+  if (!response.ok || body?.success === false) throw apiError(response, body, text, path);
   return body;
 }
 
@@ -87,23 +92,23 @@ export function veilTipAdminEntry(platform, userId) {
   return `${String(platform || "").toLowerCase()}:${String(userId || "")}`;
 }
 
-export async function sendDirectDwalletTip(env, { toUserId, amount, currency, note, guildId, channelId }) {
+export async function sendDirectDwalletTip(env, { toUserId, amount, currency }) {
   const normalizedAmount = normalizeDirectTipAmount(amount);
   const normalizedCurrency = normalizeDirectTipCurrency(currency);
   const recipient = String(toUserId || "").trim();
   if (!/^\d+$/.test(recipient)) throw new Error("Recipient user ID is invalid.");
 
+  // Keep the money-moving request deliberately minimal. Discord/Telegram context and
+  // notes are useful to Veil, but they are not required to execute a DWallet tip and
+  // can make an otherwise valid transfer fail if the upstream schema changes.
   const body = {
     to_user_id: recipient,
     amount: normalizedAmount,
-    currency: normalizedCurrency,
-    note: String(note || "Veil direct tip").slice(0, 240)
+    currency: normalizedCurrency
   };
-  if (guildId) body.guild_id = String(guildId);
-  if (channelId) body.channel_id = String(channelId);
 
-  // Intentionally one attempt only. A network timeout can be ambiguous; automatically
-  // retrying a money transfer risks sending twice.
+  // Intentionally one attempt only. A network timeout or upstream 5xx can be
+  // ambiguous; automatically retrying a money transfer risks sending twice.
   const result = await dwalletRequest(env, "/tips", {
     method: "POST",
     body: JSON.stringify(body)
