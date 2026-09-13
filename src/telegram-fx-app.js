@@ -1,14 +1,684 @@
 export function telegramFxMiniAppHtml() {
   return `<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DWallet Arena</title><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08060d">
+<title>DWallet Arena</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}*{box-sizing:border-box}body{margin:0;background:#08060d;color:#f8f4ff;min-height:100vh;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,#32185055 0,transparent 42%),radial-gradient(circle at 50% 100%,#1b0b2e44 0,transparent 48%);z-index:-1}.wrap{max-width:760px;margin:auto;padding:18px 14px 80px;position:relative}.hero{padding:20px;border:1px solid #5c3f78;border-radius:24px;background:linear-gradient(145deg,#171020,#0d0912);box-shadow:0 18px 50px #0008;transition:box-shadow .3s,border-color .3s}.eyebrow{font:800 12px ui-monospace,monospace;letter-spacing:.22em;color:#c6a4ff}.title{font-size:40px;line-height:.95;margin:8px 0 4px;font-weight:950}.status{color:#cbbfd6;margin:0 0 16px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat,.card{border:1px solid #49355e;background:#0d0a11;border-radius:16px;padding:13px}.stat b{display:block;font-size:23px}.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}button{appearance:none;border:1px solid #7655a3;border-radius:13px;background:#231432;color:white;padding:12px 14px;font-weight:900;font-size:14px}button.primary{background:#8d57e8;border-color:#aa7aff}button.danger{background:#3a1018;border-color:#8f2c3e}.section{margin-top:14px}.section h3{font:900 12px ui-monospace,monospace;letter-spacing:.18em;color:#c7a8ef;margin:0 0 8px}.event{white-space:pre-wrap;line-height:1.45;font-size:15px}.event strong{font-weight:900}.event em{font-style:italic}.event s{opacity:.55;text-decoration-thickness:2px}.event-head{display:block;font-weight:950;font-size:1.08em;letter-spacing:.02em}.roster{display:grid;gap:6px}.player{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #352642;border-radius:12px;background:#0d0911;transition:transform .25s,box-shadow .25s,border-color .25s,opacity .25s}.dead{opacity:.45;text-decoration:line-through}.new-dead{animation:playerOut 1.1s ease both;border-color:#b73755!important;box-shadow:0 0 24px #b7375555}.revived-now{animation:playerBack 1.4s ease both;border-color:#39d8a0!important;box-shadow:0 0 28px #39d8a055}.sim{font-size:10px;border:1px solid #59456c;padding:2px 5px;border-radius:6px;margin-left:6px}.voteGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.vote-live{animation:voteGlow 1.2s ease-in-out infinite alternate;border-color:#9b66e8!important}.error{display:none;background:#3a1018;border:1px solid #8f2c3e;border-radius:14px;padding:12px;margin:12px 0;color:#ffdbe2}.small{font-size:12px;color:#9d91a5}.pulse{animation:pulse 1.4s infinite}.fx-layer{position:fixed;inset:0;z-index:999;pointer-events:none;overflow:hidden}.fx-flash{position:absolute;inset:0;opacity:0}.fx-banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.72);width:min(88vw,560px);padding:20px 18px;text-align:center;border-radius:22px;border:1px solid #9c69e0;background:#0b0710e8;box-shadow:0 0 50px #8d57e877;opacity:0}.fx-icon{font-size:42px;line-height:1}.fx-title{font-weight:1000;font-size:28px;letter-spacing:.08em;margin-top:8px}.fx-sub{font:800 12px ui-monospace,monospace;letter-spacing:.18em;margin-top:7px;opacity:.78}.fx-particle{position:absolute;left:50%;top:48%;font-size:20px;opacity:0;will-change:transform,opacity}.fx-layer.active .fx-banner{animation:bannerIn 1.65s cubic-bezier(.2,.8,.2,1) both}.fx-layer.active .fx-flash{animation:flash 1s ease-out both}.fx-layer.mass .fx-banner{border-color:#df3c58;box-shadow:0 0 65px #d72e4f88}.fx-layer.mass .fx-flash,.fx-layer.elimination .fx-flash,.fx-layer.showdown .fx-flash{background:radial-gradient(circle,#c52d4c77 0,#6b153f44 35%,transparent 70%)}.fx-layer.revival .fx-banner{border-color:#45e2b0;box-shadow:0 0 65px #35d99d88}.fx-layer.revival .fx-flash{background:radial-gradient(circle,#31e0a755 0,#1b7d6844 35%,transparent 72%)}.fx-layer.vote .fx-banner,.fx-layer.glitch .fx-banner{border-color:#ad72ff;box-shadow:0 0 70px #9a54ff99}.fx-layer.vote .fx-flash,.fx-layer.glitch .fx-flash{background:radial-gradient(circle,#9c5eff55 0,#5d21a144 40%,transparent 72%)}.fx-layer.finalfive .fx-banner,.fx-layer.winner .fx-banner{border-color:#f5c45c;box-shadow:0 0 75px #e7b64b99}.fx-layer.finalfive .fx-flash,.fx-layer.winner .fx-flash{background:radial-gradient(circle,#f5c45c66 0,#9f6d2444 42%,transparent 74%)}.screen-shake{animation:shake .58s cubic-bezier(.36,.07,.19,.97) both}.hero-event{animation:heroPulse .9s ease}.glitching{animation:glitch .65s steps(2,end)}.fx-particle.burst{animation:burst 1.35s ease-out var(--delay,0ms) both}.fx-particle.rise{animation:rise 1.6s ease-out var(--delay,0ms) both}.fx-particle.confetti{top:-8%;animation:confetti 2.4s linear var(--delay,0ms) both}.ambient-pulse{animation:ambientPulse .75s ease}.winner-glow{animation:winnerGlow 1.7s ease-in-out 2}.final-five-glow{animation:finalFiveGlow 1.5s ease-in-out 2}@keyframes pulse{50%{opacity:.45}}@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.72);filter:blur(8px)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.05);filter:blur(0)}28%,72%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-54%) scale(.94)}}@keyframes flash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}@keyframes shake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-7px,0,0)}40%,60%{transform:translate3d(7px,0,0)}}@keyframes heroPulse{0%{box-shadow:0 18px 50px #0008}35%{box-shadow:0 0 45px #9e63e899;border-color:#a46deb}100%{box-shadow:0 18px 50px #0008}}@keyframes glitch{0%,100%{transform:none;filter:none}20%{transform:translateX(-4px);filter:hue-rotate(35deg)}40%{transform:translateX(5px) skewX(1deg);filter:hue-rotate(-35deg)}60%{transform:translateX(-2px);filter:contrast(1.25)}80%{transform:translateX(3px)}}@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1.25)}}@keyframes rise{0%{opacity:0;transform:translate(-50%,20px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),-65vh) scale(1.35)}}@keyframes confetti{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(112vh) rotate(var(--r))}}@keyframes playerOut{0%{transform:scale(1);opacity:1}22%{transform:scale(1.025)}55%{transform:translateX(-5px)}100%{transform:scale(.98);opacity:.45}}@keyframes playerBack{0%{opacity:.2;transform:scale(.94)}35%{opacity:1;transform:scale(1.035)}100%{transform:scale(1)}}@keyframes voteGlow{from{box-shadow:0 0 8px #7f49d733}to{box-shadow:0 0 30px #9a62ee77}}@keyframes ambientPulse{35%{background-color:#160a20}100%{background-color:#08060d}}@keyframes winnerGlow{50%{box-shadow:0 0 55px #efc15c88;border-color:#f0c35f}}@keyframes finalFiveGlow{50%{box-shadow:0 0 42px #eab64d66;border-color:#e9b957}}@media(prefers-reduced-motion:reduce){.fx-layer *,.screen-shake,.hero-event,.glitching,.ambient-pulse,.winner-glow,.final-five-glow,.new-dead,.revived-now,.vote-live{animation:none!important}.fx-layer{display:none}}
-</style></head><body><div class="fx-layer" id="fxLayer"><div class="fx-flash"></div><div class="fx-banner"><div class="fx-icon" id="fxIcon">💜</div><div class="fx-title" id="fxTitle">ARENA</div><div class="fx-sub" id="fxSub"></div></div><div id="fxParticles"></div></div><div class="wrap" id="wrap"><div class="hero" id="hero"><div class="eyebrow">DWALLET // VEIL</div><div class="title">ARENA</div><p class="status" id="status">Connecting to Telegram…</p><div class="stats"><div class="stat"><b id="round">0</b><span>ROUND</span></div><div class="stat"><b id="players">0</b><span>PLAYERS</span></div><div class="stat"><b id="alive">0</b><span>ALIVE</span></div></div><div class="error" id="error"></div><div class="controls" id="controls"></div></div><div class="section card" id="eventCard"><h3>LIVE EVENT</h3><div class="event" id="event">Waiting for Arena…</div><div class="small" id="timer"></div></div><div class="section card" id="voteCard" style="display:none"><h3>COMMUNITY SHOWDOWN</h3><div class="voteGrid" id="voteGrid"></div></div><div class="section card"><h3>LIVE ROSTER</h3><div class="roster" id="roster"></div></div></div>
+:root{
+  color-scheme:dark;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --bg:#07050a;
+  --panel:#0e0a12ee;
+  --panel-2:#141019e8;
+  --text:#fbf8ff;
+  --muted:#b9acc4;
+  --violet:#c45cff;
+  --violet-soft:#9a54ff;
+  --red:#ef526f;
+  --green:#55e2ae;
+  --gold:#f2c968;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% -10%,#3b175b55 0,transparent 36rem),
+    radial-gradient(circle at 15% 85%,#38104b2f 0,transparent 30rem),
+    #07050a;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.22;
+  background-image:
+    linear-gradient(#ffffff05 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff04 1px,transparent 1px);
+  background-size:28px 28px;
+  mask-image:linear-gradient(to bottom,#000,transparent 78%);
+}
+button{font:inherit}
+img{display:block;max-width:100%}
+.app{
+  width:min(1180px,100%);
+  margin:0 auto;
+  padding:max(14px,env(safe-area-inset-top)) 12px max(74px,env(safe-area-inset-bottom));
+}
+.state-shell{
+  position:relative;
+  isolation:isolate;
+  min-height:calc(100vh - 28px);
+  border-radius:32px;
+  background:linear-gradient(165deg,#100b16f2,#07050af7 48%,#0b0710f2);
+  box-shadow:0 26px 80px #000b,inset 0 0 0 1px #ffffff08;
+  overflow:hidden;
+}
+.state-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:0;
+  pointer-events:none;
+  object-fit:fill;
+  opacity:.96;
+}
+.state-content{
+  position:relative;
+  z-index:1;
+  min-height:inherit;
+  padding:clamp(30px,5vw,64px);
+}
+.topline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  min-width:0;
+  margin-bottom:clamp(14px,2vw,24px);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+}
+.crest{width:clamp(152px,24vw,255px);height:auto;filter:drop-shadow(0 8px 18px #0008)}
+.brand-copy{min-width:0}
+.kicker{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#d7cce0;
+  font:900 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.kicker img{width:18px;height:18px}
+.brand-copy strong{
+  display:block;
+  margin-top:4px;
+  font-size:clamp(15px,2vw,20px);
+  letter-spacing:.04em;
+}
+.status-badge,.player-badge{
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  flex:none;
+  min-width:112px;
+  height:30px;
+  padding:0 18px;
+  background-position:center;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  font:950 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  text-shadow:0 2px 5px #000;
+}
+.status-badge.pending{background-image:url("/telegram/veil_ui_badge_pending.svg")}
+.status-badge.live{background-image:url("/telegram/veil_ui_badge_live.svg")}
+.status-badge.ready{background-image:url("/telegram/veil_ui_badge_ready.svg")}
+.main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);
+  align-items:start;
+  gap:14px;
+}
+.panel{
+  position:relative;
+  min-width:0;
+  padding:clamp(20px,2.6vw,30px);
+  background:linear-gradient(155deg,#130e19e8,#09070deb);
+  border:18px solid transparent;
+  border-image:url("/telegram/veil_ui_panel_frame.svg") 96 fill stretch;
+  filter:drop-shadow(0 16px 25px #0008);
+}
+.hero-panel{min-height:100%}
+.arena-title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:4px;
+}
+.arena-title img{
+  width:clamp(38px,5vw,52px);
+  height:clamp(38px,5vw,52px);
+  filter:drop-shadow(0 0 14px #bd64ff66);
+}
+.arena-title h1{
+  margin:0;
+  font-size:clamp(34px,7vw,68px);
+  line-height:.86;
+  letter-spacing:-.055em;
+  font-weight:1000;
+}
+.status-line{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:26px;
+  color:var(--muted);
+  margin:9px 0 18px;
+  font-weight:750;
+}
+.status-line img{width:20px;height:20px;opacity:.9}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.stat{
+  position:relative;
+  min-width:0;
+  padding:13px 12px;
+  border:1px solid #56366d88;
+  background:linear-gradient(160deg,#160d1dd9,#0a080ed9);
+  border-radius:13px;
+  overflow:hidden;
+}
+.stat:after{
+  content:"";
+  position:absolute;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  right:-20px;
+  top:-20px;
+  background:#ba5cff19;
+}
+.stat-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#b9a9c6;
+  font:850 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.13em;
+}
+.stat-head img{width:16px;height:16px;opacity:.86}
+.stat b{
+  display:block;
+  margin-top:8px;
+  font-size:clamp(22px,4vw,34px);
+  line-height:1;
+}
+.readout{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-height:48px;
+  margin-top:12px;
+  padding:9px 18px;
+  background:url("/telegram/veil_ui_input_field.svg") center/100% 100% no-repeat;
+  color:#cbbbd8;
+  font:800 11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.06em;
+}
+.readout img{width:22px;height:22px}
+.controls{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+.veil-button{
+  position:relative;
+  isolation:isolate;
+  min-width:0;
+  min-height:52px;
+  padding:11px 17px;
+  border:0;
+  background:transparent;
+  color:#fff;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.025em;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,filter .15s ease,opacity .15s ease;
+}
+.veil-button:before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  background:url("/telegram/veil_ui_button_secondary.svg") center/100% 100% no-repeat;
+}
+.veil-button.primary:before{background-image:url("/telegram/VEIL%20UI%20BAR%20.svg")}
+.veil-button.danger{color:#ffd5dd}
+.veil-button.danger:before{filter:hue-rotate(315deg) saturate(1.35)}
+.veil-button.selected{filter:drop-shadow(0 0 12px #c368ff99)}
+.veil-button:active{transform:scale(.98)}
+.veil-button:focus-visible{outline:2px solid #f0c8ff;outline-offset:2px}
+.busy .veil-button{pointer-events:none;opacity:.56}
+.error{
+  display:none;
+  gap:9px;
+  align-items:flex-start;
+  margin-top:12px;
+  padding:12px 14px;
+  border:1px solid #ae4057;
+  border-radius:12px;
+  background:#351018e8;
+  color:#ffe1e7;
+  font-size:13px;
+}
+.error img{width:22px;height:22px;flex:none}
+.stack{display:grid;gap:14px}
+.section-head{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:12px;
+}
+.section-head img{width:25px;height:25px}
+.section-head h2{
+  margin:0;
+  color:#decbea;
+  font:950 11px/1.15 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.event{
+  min-height:110px;
+  white-space:pre-wrap;
+  line-height:1.52;
+  font-size:15px;
+  overflow-wrap:anywhere;
+}
+.event strong{font-weight:950}
+.event em{font-style:italic}
+.event s{opacity:.52;text-decoration-thickness:2px}
+.event-head{
+  display:block;
+  margin-bottom:4px;
+  font-weight:1000;
+  font-size:1.08em;
+  letter-spacing:.02em;
+}
+.timer{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:30px;
+  margin-top:10px;
+  color:#a99ab5;
+  font-size:12px;
+  font-weight:800;
+}
+.timer img{width:20px;height:20px}
+.vote-panel{display:none}
+.vote-panel.live{animation:voteGlow 1.25s ease-in-out infinite alternate}
+.vote-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.vote-note{
+  grid-column:1/-1;
+  color:#b8a9c3;
+  font-size:13px;
+  line-height:1.45;
+}
+.roster-panel{margin-top:14px}
+.roster{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.player{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+  padding:10px 11px 10px 13px;
+  border:1px solid #3f2b4c;
+  border-radius:12px;
+  background:linear-gradient(145deg,#100b15,#0b080f);
+  transition:transform .25s,box-shadow .25s,border-color .25s,opacity .25s;
+}
+.player-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:13px;
+  font-weight:850;
+}
+.bot-tag{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 5px;
+  border:1px solid #654676;
+  border-radius:5px;
+  color:#bdaaca;
+  font:800 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  vertical-align:2px;
+}
+.player-meta{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex:none;
+}
+.player-kos{
+  color:#9c8ba8;
+  font-size:10px;
+  font-weight:850;
+  white-space:nowrap;
+}
+.player-badge{
+  min-width:76px;
+  height:25px;
+  padding:0 12px;
+  font-size:8px;
+}
+.player-badge.alive{background-image:url("/telegram/veil_ui_badge_alive.svg")}
+.player-badge.dead{background-image:url("/telegram/veil_ui_badge_dead.svg")}
+.player.dead-row{opacity:.56}
+.new-dead{animation:playerOut 1.1s ease both;border-color:#b73755!important;box-shadow:0 0 24px #b7375555}
+.revived-now{animation:playerBack 1.4s ease both;border-color:#39d8a0!important;box-shadow:0 0 28px #39d8a055}
+.footer-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:14px;
+  color:#9f91aa;
+  font-size:11px;
+}
+.footer-mark{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+  font:850 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.1em;
+}
+.footer-mark img{width:18px;height:18px}
+.rules{max-width:620px}
+.rules summary{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  cursor:pointer;
+  list-style:none;
+  color:#bcaac9;
+  font-weight:850;
+}
+.rules summary::-webkit-details-marker{display:none}
+.rules summary img{width:18px;height:18px}
+.rules-copy{
+  margin-top:8px;
+  padding:10px 12px;
+  border:1px solid #392744;
+  border-radius:10px;
+  background:#09070dcf;
+  line-height:1.5;
+}
+.empty{color:#9789a2;font-size:12px}
+.fx-layer{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  pointer-events:none;
+  overflow:hidden;
+}
+.fx-flash{position:absolute;inset:0;opacity:0}
+.fx-banner{
+  position:absolute;
+  left:50%;
+  top:42%;
+  transform:translate(-50%,-50%) scale(.72);
+  width:min(88vw,560px);
+  padding:25px 22px 22px;
+  text-align:center;
+  border:18px solid transparent;
+  border-image:url("/telegram/veil_ui_panel_frame.svg") 96 fill stretch;
+  background:#08050ce8;
+  filter:drop-shadow(0 0 28px #8d57e877);
+  opacity:0;
+}
+.fx-icon{
+  width:52px;
+  height:52px;
+  margin:0 auto;
+  filter:drop-shadow(0 0 14px #c261ff77);
+}
+.fx-title{font-weight:1000;font-size:clamp(24px,7vw,32px);letter-spacing:.07em;margin-top:8px}
+.fx-sub{font:850 11px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em;margin-top:7px;color:#c7b7d3}
+.fx-particle{position:absolute;left:50%;top:48%;font-size:20px;opacity:0;will-change:transform,opacity}
+.fx-layer.active .fx-banner{animation:bannerIn 1.65s cubic-bezier(.2,.8,.2,1) both}
+.fx-layer.active .fx-flash{animation:flash 1s ease-out both}
+.fx-layer.mass .fx-flash,.fx-layer.elimination .fx-flash,.fx-layer.showdown .fx-flash{background:radial-gradient(circle,#c52d4c77 0,#6b153f44 35%,transparent 70%)}
+.fx-layer.revival .fx-flash{background:radial-gradient(circle,#31e0a755 0,#1b7d6844 35%,transparent 72%)}
+.fx-layer.vote .fx-flash,.fx-layer.glitch .fx-flash{background:radial-gradient(circle,#9c5eff55 0,#5d21a144 40%,transparent 72%)}
+.fx-layer.finalfive .fx-flash,.fx-layer.winner .fx-flash{background:radial-gradient(circle,#f5c45c66 0,#9f6d2444 42%,transparent 74%)}
+.screen-shake{animation:shake .58s cubic-bezier(.36,.07,.19,.97) both}
+.hero-event{animation:heroPulse .9s ease}
+.glitching{animation:glitch .65s steps(2,end)}
+.fx-particle.burst{animation:burst 1.35s ease-out var(--delay,0ms) both}
+.fx-particle.rise{animation:rise 1.6s ease-out var(--delay,0ms) both}
+.fx-particle.confetti{top:-8%;animation:confetti 2.4s linear var(--delay,0ms) both}
+.ambient-pulse{animation:ambientPulse .75s ease}
+.winner-glow{animation:winnerGlow 1.7s ease-in-out 2}
+.final-five-glow{animation:finalFiveGlow 1.5s ease-in-out 2}
+@keyframes voteGlow{from{filter:drop-shadow(0 16px 25px #0008)}to{filter:drop-shadow(0 16px 34px #9a62ee66)}}
+@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.72);filter:blur(8px)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.05);filter:blur(0) drop-shadow(0 0 28px #8d57e877)}28%,72%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:drop-shadow(0 0 28px #8d57e877)}100%{opacity:0;transform:translate(-50%,-54%) scale(.94)}}
+@keyframes flash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+@keyframes shake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-7px,0,0)}40%,60%{transform:translate3d(7px,0,0)}}
+@keyframes heroPulse{0%{filter:drop-shadow(0 16px 25px #0008)}35%{filter:drop-shadow(0 0 30px #9e63e877)}100%{filter:drop-shadow(0 16px 25px #0008)}}
+@keyframes glitch{0%,100%{transform:none;filter:none}20%{transform:translateX(-4px);filter:hue-rotate(35deg)}40%{transform:translateX(5px) skewX(1deg);filter:hue-rotate(-35deg)}60%{transform:translateX(-2px);filter:contrast(1.25)}80%{transform:translateX(3px)}}
+@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1.25)}}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,20px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),-65vh) scale(1.35)}}
+@keyframes confetti{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(112vh) rotate(var(--r))}}
+@keyframes playerOut{0%{transform:scale(1);opacity:1}22%{transform:scale(1.025)}55%{transform:translateX(-5px)}100%{transform:scale(.98);opacity:.56}}
+@keyframes playerBack{0%{opacity:.2;transform:scale(.94)}35%{opacity:1;transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes ambientPulse{35%{background-color:#160a20}100%{background-color:#08060d}}
+@keyframes winnerGlow{50%{filter:drop-shadow(0 0 36px #efc15c77)}}
+@keyframes finalFiveGlow{50%{filter:drop-shadow(0 0 30px #eab64d66)}}
+@media(max-width:760px){
+  .app{padding-left:6px;padding-right:6px}
+  .state-shell{border-radius:22px}
+  .state-content{padding:30px 22px 44px}
+  .topline{align-items:flex-start;gap:8px}
+  .brand-copy{display:none}
+  .status-badge{min-width:98px;height:27px;padding:0 12px;font-size:8px}
+  .main-grid{grid-template-columns:1fr}
+  .stack{gap:10px}
+  .panel{border-width:13px;padding:18px}
+  .roster{grid-template-columns:1fr}
+  .footer-row{flex-direction:column;align-items:stretch}
+  .rules summary{justify-content:flex-start}
+}
+@media(max-width:440px){
+  .state-content{padding:26px 16px 38px}
+  .crest{width:145px}
+  .stats{gap:6px}
+  .stat{padding:11px 9px}
+  .stat-head{font-size:8px;letter-spacing:.08em}
+  .controls{grid-template-columns:1fr}
+  .vote-grid{grid-template-columns:1fr}
+  .event{min-height:90px}
+  .player{align-items:flex-start}
+  .player-meta{flex-direction:column;align-items:flex-end;gap:4px}
+}
+@media(min-width:1000px){
+  .roster{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(hover:hover) and (pointer:fine){
+  .veil-button:hover{transform:translateY(-1px);filter:brightness(1.12)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important}
+  .fx-layer *,.screen-shake,.hero-event,.glitching,.ambient-pulse,.winner-glow,.final-five-glow,.new-dead,.revived-now,.vote-panel.live{animation:none!important}
+  .fx-layer{display:none}
+}
+</style>
+</head>
+<body>
+<div class="fx-layer" id="fxLayer" aria-hidden="true">
+  <div class="fx-flash"></div>
+  <div class="fx-banner">
+    <img class="fx-icon" id="fxIcon" src="/telegram/veil_ui_icon_arena.svg" alt="">
+    <div class="fx-title" id="fxTitle">ARENA</div>
+    <div class="fx-sub" id="fxSub"></div>
+  </div>
+  <div id="fxParticles"></div>
+</div>
+
+<main class="app" id="app">
+  <section class="state-shell" id="stateShell">
+    <img class="state-frame" id="stateFrame" src="/telegram/lobby_frame.svg" alt="" aria-hidden="true">
+    <div class="state-content">
+      <div class="topline">
+        <div class="brand">
+          <img class="crest" src="/telegram/lobby_crest.svg" alt="Veil Arena">
+          <div class="brand-copy">
+            <div class="kicker"><img src="/telegram/veil_ui_icon_sponsor.svg" alt="">DWALLET // VEIL</div>
+            <strong>Telegram Arena</strong>
+          </div>
+        </div>
+        <div class="status-badge pending" id="stateBadge">CONNECTING</div>
+      </div>
+
+      <div class="main-grid">
+        <section class="panel hero-panel" id="hero">
+          <div class="arena-title">
+            <img src="/telegram/veil_ui_icon_arena.svg" alt="">
+            <h1>ARENA</h1>
+          </div>
+          <div class="status-line" id="statusLine">
+            <img id="statusIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
+            <span id="status">Connecting to Telegram…</span>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-head"><img src="/telegram/veil_ui_icon_timer.svg" alt="">ROUND</div>
+              <b id="round">0</b>
+            </div>
+            <div class="stat">
+              <div class="stat-head"><img src="/telegram/veil_ui_icon_stats.svg" alt="">PLAYERS</div>
+              <b id="players">0</b>
+            </div>
+            <div class="stat">
+              <div class="stat-head"><img src="/telegram/veil_ui_icon_skull.svg" alt="">ALIVE</div>
+              <b id="alive">0</b>
+            </div>
+          </div>
+
+          <div class="readout" id="viewerReadout">
+            <img id="viewerIcon" src="/telegram/veil_ui_icon_spectate.svg" alt="">
+            <span id="viewerText">Connecting viewer…</span>
+          </div>
+
+          <div class="error" id="error">
+            <img src="/telegram/veil_ui_icon_warning.svg" alt="">
+            <span id="errorText"></span>
+          </div>
+          <div class="controls" id="controls"></div>
+        </section>
+
+        <div class="stack">
+          <section class="panel" id="eventCard">
+            <div class="section-head">
+              <img id="eventIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
+              <h2>Live Event</h2>
+            </div>
+            <div class="event" id="event">Waiting for Arena…</div>
+            <div class="timer" id="timerRow">
+              <img src="/telegram/veil_ui_icon_timer.svg" alt="">
+              <span id="timer"></span>
+            </div>
+          </section>
+
+          <section class="panel vote-panel" id="voteCard">
+            <div class="section-head">
+              <img src="/telegram/veil_ui_icon_vote.svg" alt="">
+              <h2>Community Showdown</h2>
+            </div>
+            <div class="vote-grid" id="voteGrid"></div>
+          </section>
+        </div>
+      </div>
+
+      <section class="panel roster-panel">
+        <div class="section-head">
+          <img src="/telegram/veil_ui_icon_leaderboard.svg" alt="">
+          <h2>Live Roster</h2>
+        </div>
+        <div class="roster" id="roster"></div>
+      </section>
+
+      <div class="footer-row">
+        <div class="footer-mark">
+          <img src="/telegram/veil_ui_icon_wallet.svg" alt="">
+          DWALLET ARENA // POWERED BY VEIL
+        </div>
+        <details class="rules">
+          <summary><img src="/telegram/veil_ui_icon_rules.svg" alt="">QUICK RULES</summary>
+          <div class="rules-copy">
+            Join while registration is open. Once Arena starts, the game resolves live. Eliminated players keep watching and may vote when a Community Showdown opens. Last player alive wins.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
 <script>
-const tg=window.Telegram&&window.Telegram.WebApp;const initData=tg?.initData||'';let state=null,busy=false,lastFxKey='',finalFiveSeen=false;const changeUntil=new Map();
-if(tg){try{tg.ready();tg.expand();tg.setHeaderColor('#100b17');tg.setBackgroundColor('#08060d');}catch{}}
-const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tg=window.Telegram&&window.Telegram.WebApp;
+const initData=tg?.initData||'';
+const A='/telegram/';
+const icons={
+  arena:A+'veil_ui_icon_arena.svg',
+  crown:A+'veil_ui_icon_crown.svg',
+  leaderboard:A+'veil_ui_icon_leaderboard.svg',
+  revive:A+'veil_ui_icon_revive.svg',
+  rules:A+'veil_ui_icon_rules.svg',
+  skull:A+'veil_ui_icon_skull.svg',
+  spectate:A+'veil_ui_icon_spectate.svg',
+  sponsor:A+'veil_ui_icon_sponsor.svg',
+  stats:A+'veil_ui_icon_stats.svg',
+  success:A+'veil_ui_icon_success.svg',
+  timer:A+'veil_ui_icon_timer.svg',
+  vote:A+'veil_ui_icon_vote.svg',
+  wallet:A+'veil_ui_icon_wallet.svg',
+  warning:A+'veil_ui_icon_warning.svg'
+};
+const frames={
+  registration:A+'lobby_frame.svg',
+  running:A+'active_match_frame.svg',
+  vote:A+'vote_frame.svg',
+  finished:A+'results_frame.svg'
+};
+let state=null,busy=false,lastFxKey='',finalFiveSeen=false;
+const changeUntil=new Map();
+
+if(tg){
+  try{
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#08060d');
+    tg.setBackgroundColor('#08060d');
+  }catch{}
+}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 function richText(value=''){
   let out=esc(value);
   out=out.replaceAll(String.fromCharCode(92)+'.','.');
@@ -20,20 +690,356 @@ function richText(value=''){
   out=out.replace(/(^|[^*])\\*([^*\\n]+?)\\*(?!\\*)/g,'$1<em>$2</em>');
   return out;
 }
-function err(message=''){const e=$('error');e.textContent=message;e.style.display=message?'block':'none'}
-async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',headers:{'content-type':'application/json','x-telegram-init-data':initData},body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({error:'Bad server response'}));if(!r.ok||d.error)throw new Error(d.error||'Request failed');return d}
-function haptic(kind='light',notice=null){try{const h=tg&&tg.HapticFeedback;if(!h)return;if(notice)h.notificationOccurred(notice);else h.impactOccurred(kind)}catch{}}
-function clearFx(){const layer=$('fxLayer');layer.className='fx-layer';$('fxParticles').innerHTML='';$('wrap').classList.remove('screen-shake','glitching');$('hero').classList.remove('hero-event','winner-glow','final-five-glow');document.body.classList.remove('ambient-pulse')}
-function particles(mode,count,chars){const box=$('fxParticles');box.innerHTML='';for(let i=0;i<count;i++){const p=document.createElement('span');p.className='fx-particle '+mode;p.textContent=chars[i%chars.length];const angle=(Math.PI*2*i/count)+(Math.random()*.4);const dist=90+Math.random()*220;p.style.setProperty('--x',Math.round(Math.cos(angle)*dist)+'px');p.style.setProperty('--y',Math.round(Math.sin(angle)*dist)+'px');p.style.setProperty('--r',(Math.round(Math.random()*620)-310)+'deg');p.style.setProperty('--delay',Math.round(Math.random()*180)+'ms');if(mode==='confetti'){p.style.left=Math.round(Math.random()*100)+'%';p.style.top=(-5-Math.random()*15)+'%'}box.appendChild(p)}}
-function showFx(type,title,sub,icon,particleMode='burst',particleChars=['✦'],particleCount=18){clearFx();const layer=$('fxLayer');$('fxIcon').textContent=icon;$('fxTitle').textContent=title;$('fxSub').textContent=sub||'';layer.className='fx-layer active '+type;if(particleCount)particles(particleMode,particleCount,particleChars);$('hero').classList.add('hero-event');setTimeout(clearFx,2500)}
-function markRosterChanges(next,prev){if(!prev)return;const old=new Map((prev.players||[]).map(p=>[String(p.id),p]));for(const p of next.players||[]){const before=old.get(String(p.id));if(!before)continue;if(before.alive&&!p.alive)changeUntil.set(String(p.id),{kind:'out',until:Date.now()+2600});if(!before.alive&&p.alive)changeUntil.set(String(p.id),{kind:'back',until:Date.now()+3200})}}
-function triggerEventFx(next,prev){markRosterChanges(next,prev);if(prev&&prev.aliveCount>5&&next.aliveCount===5&&!finalFiveSeen){finalFiveSeen=true;showFx('finalfive','FINAL FIVE','SPECIAL EVENTS LOCK OUT','Ⅴ','burst',['Ⅴ','✦','◆'],22);$('hero').classList.add('final-five-glow');haptic('medium','warning');return}if(next.status==='finished'&&(!prev||prev.status!=='finished')){showFx('winner','ARENA CHAMPION','ONE PLAYER REMAINS','♛','confetti',['✦','◆','●','💜'],34);$('hero').classList.add('winner-glow');haptic('heavy','success');return}const ev=next.lastEvent;if(!ev)return;const key=[ev.type,ev.round,ev.at].join('|');if(key===lastFxKey)return;lastFxKey=key;const text=String(ev.text||'');if(text.includes('DWALLET GLITCH')){showFx('glitch','DWALLET GLITCH','SOMETHING IS OFF','◉','burst',['◉','✦','⌁'],24);$('wrap').classList.add('glitching');haptic('medium','warning');return}if(ev.type==='mass_brawl'){showFx('mass','MASS BRAWL','EVERYBODY MOVE','⚔','burst',['⚔','✕','💀','✦'],30);$('wrap').classList.add('screen-shake');haptic('heavy');return}if(ev.type==='revival'){showFx('revival','SECOND CHANCE','ONE PLAYER RETURNS','↟','rise',['✦','●','↟'],24);haptic('light','success');return}if(ev.type==='crowd_vote_open'){showFx('vote','THE CHAT CHOOSES','30 SECONDS TO VOTE','◉','burst',['◉','✦','◆'],20);haptic('medium','warning');return}if(ev.type==='crowd_result'){showFx('showdown','COMMUNITY SHOWDOWN','ONE SURVIVES','✕','burst',['✕','💀','✦'],26);$('wrap').classList.add('screen-shake');haptic('heavy');return}const lost=prev&&Number(prev.aliveCount)>Number(next.aliveCount);if(lost){showFx('elimination','ELIMINATION','THE ROSTER JUST GOT SMALLER','✕','burst',['✕','◆','✦'],16);$('wrap').classList.add('screen-shake');haptic('medium');return}document.body.classList.remove('ambient-pulse');void document.body.offsetWidth;document.body.classList.add('ambient-pulse');$('hero').classList.remove('hero-event');void $('hero').offsetWidth;$('hero').classList.add('hero-event');haptic('light')}
-function acceptState(next){const prev=state;state=next;triggerEventFx(next,prev);render()}
-async function act(action,extra={}){if(busy)return;busy=true;try{err();acceptState(await api('/telegram/api/action',{action,...extra}))}catch(e){err(e.message)}finally{busy=false}}
-function button(label,action,cls=''){return '<button class="'+cls+'" data-action="'+action+'">'+esc(label)+'</button>'}
-function render(){if(!state)return;$('status').textContent=state.status==='registration'?'REGISTRATION OPEN':state.status==='running'?'ARENA LIVE':state.status==='finished'?'ARENA COMPLETE':state.status.toUpperCase();$('round').textContent=state.round;$('players').textContent=state.playerCount;$('alive').textContent=state.aliveCount;let controls='';if(state.status==='registration'){if(!state.viewer.joined)controls+=button('JOIN ARENA','join','primary');else if(!state.viewer.isHost)controls+=button('LEAVE','leave');if(state.viewer.isHost){controls+=button('START ARENA','start','primary');if(state.testMode){controls+=button('ADD 4 TEST BOTS','add4');controls+=button('FILL TO 12','fill');controls+=button('RESET','reset','danger')}}}else if(state.testMode&&state.viewer.isHost&&state.status==='running')controls+=button('ABORT / RESET','reset','danger');$('controls').innerHTML=controls;const last=state.lastEvent?.text||state.displayLog?.at(-1)?.text||(state.status==='registration'?'Players are entering the Arena.':state.status==='running'?'Arena is moving…':'No event yet.');$('event').innerHTML=richText(last);const timer=$('timer');if(state.status==='running'&&state.nextAdvanceAt){const sec=Math.max(0,Math.ceil((state.nextAdvanceAt-Date.now())/1000));timer.textContent=sec?'Next event in '+sec+'s':'Resolving…'}else timer.textContent='';const now=Date.now();$('roster').innerHTML=(state.players||[]).map(p=>{const c=changeUntil.get(String(p.id));if(c&&c.until<=now)changeUntil.delete(String(p.id));const live=changeUntil.get(String(p.id));const fx=live?(live.kind==='out'?' new-dead':' revived-now'):'';return '<div class="player '+(p.alive?'':'dead')+fx+'"><span>'+esc(p.displayName)+(p.simulated?'<span class="sim">BOT</span>':'')+'</span><span>'+(p.alive?'ALIVE':'OUT')+(p.eliminations?' · '+p.eliminations+' KO':'')+'</span></div>'}).join('')||'<div class="small">No players yet.</div>';const vc=$('voteCard'),vg=$('voteGrid');if(state.crowdVote){vc.style.display='block';vc.classList.add('vote-live');if(state.viewer.canVote){vg.innerHTML=state.crowdVote.eligibleIds.map(id=>{const p=state.players.find(x=>x.id===id);const selected=state.crowdVote.selectedId===id;return '<button data-vote="'+esc(id)+'" class="'+(selected?'primary':'')+'">'+esc(p?.displayName||'Player')+'</button>'}).join('')}else vg.innerHTML='<div class="small" style="grid-column:1/-1">Spectators are voting. The top two go to a 1v1.</div>'}else{vc.style.display='none';vc.classList.remove('vote-live');vg.innerHTML=''}}
-document.addEventListener('click',e=>{const a=e.target.closest('[data-action]');if(a)act(a.dataset.action);const v=e.target.closest('[data-vote]');if(v)act('vote',{targetId:v.dataset.vote})});
-async function refresh(){if(!initData){err('Open this Arena from Telegram.');$('status').textContent='TELEGRAM REQUIRED';return}try{const next=await api('/telegram/api/state');err();acceptState(next)}catch(e){err(e.message);$('status').textContent='CONNECTION ERROR'}}
-refresh();setInterval(refresh,1500);setInterval(()=>{if(state)render()},500);
-</script></body></html>`;
+
+function err(message=''){
+  const box=$('error');
+  $('errorText').textContent=message;
+  box.style.display=message?'flex':'none';
+}
+
+async function api(path,body){
+  const r=await fetch(path,{
+    method:body?'POST':'GET',
+    headers:{'content-type':'application/json','x-telegram-init-data':initData},
+    body:body?JSON.stringify(body):undefined
+  });
+  const d=await r.json().catch(()=>({error:'Bad server response'}));
+  if(!r.ok||d.error)throw new Error(d.error||'Request failed');
+  return d;
+}
+
+function haptic(kind='light',notice=null){
+  try{
+    const h=tg&&tg.HapticFeedback;
+    if(!h)return;
+    if(notice)h.notificationOccurred(notice);
+    else h.impactOccurred(kind);
+  }catch{}
+}
+
+function clearFx(){
+  const layer=$('fxLayer');
+  layer.className='fx-layer';
+  $('fxParticles').innerHTML='';
+  $('app').classList.remove('screen-shake','glitching');
+  $('hero').classList.remove('hero-event','winner-glow','final-five-glow');
+  document.body.classList.remove('ambient-pulse');
+}
+
+function particles(mode,count,chars){
+  const box=$('fxParticles');
+  box.innerHTML='';
+  for(let i=0;i<count;i++){
+    const p=document.createElement('span');
+    p.className='fx-particle '+mode;
+    p.textContent=chars[i%chars.length];
+    const angle=(Math.PI*2*i/count)+(Math.random()*.4);
+    const dist=90+Math.random()*220;
+    p.style.setProperty('--x',Math.round(Math.cos(angle)*dist)+'px');
+    p.style.setProperty('--y',Math.round(Math.sin(angle)*dist)+'px');
+    p.style.setProperty('--r',(Math.round(Math.random()*620)-310)+'deg');
+    p.style.setProperty('--delay',Math.round(Math.random()*180)+'ms');
+    if(mode==='confetti'){
+      p.style.left=Math.round(Math.random()*100)+'%';
+      p.style.top=(-5-Math.random()*15)+'%';
+    }
+    box.appendChild(p);
+  }
+}
+
+function showFx(type,title,sub,iconKey,particleMode='burst',particleChars=['✦'],particleCount=18){
+  clearFx();
+  const layer=$('fxLayer');
+  $('fxIcon').src=icons[iconKey]||icons.arena;
+  $('fxTitle').textContent=title;
+  $('fxSub').textContent=sub||'';
+  layer.className='fx-layer active '+type;
+  if(particleCount)particles(particleMode,particleCount,particleChars);
+  $('hero').classList.add('hero-event');
+  setTimeout(clearFx,2500);
+}
+
+function markRosterChanges(next,prev){
+  if(!prev)return;
+  const old=new Map((prev.players||[]).map(p=>[String(p.id),p]));
+  for(const p of next.players||[]){
+    const before=old.get(String(p.id));
+    if(!before)continue;
+    if(before.alive&&!p.alive)changeUntil.set(String(p.id),{kind:'out',until:Date.now()+2600});
+    if(!before.alive&&p.alive)changeUntil.set(String(p.id),{kind:'back',until:Date.now()+3200});
+  }
+}
+
+function triggerEventFx(next,prev){
+  markRosterChanges(next,prev);
+  if(prev&&prev.aliveCount>5&&next.aliveCount===5&&!finalFiveSeen){
+    finalFiveSeen=true;
+    showFx('finalfive','FINAL FIVE','SPECIAL EVENTS LOCK OUT','crown','burst',['Ⅴ','✦','◆'],22);
+    $('hero').classList.add('final-five-glow');
+    haptic('medium','warning');
+    return;
+  }
+  if(next.status==='finished'&&(!prev||prev.status!=='finished')){
+    showFx('winner','ARENA CHAMPION','ONE PLAYER REMAINS','crown','confetti',['✦','◆','●','💜'],34);
+    $('hero').classList.add('winner-glow');
+    haptic('heavy','success');
+    return;
+  }
+  const ev=next.lastEvent;
+  if(!ev)return;
+  const key=[ev.type,ev.round,ev.at].join('|');
+  if(key===lastFxKey)return;
+  lastFxKey=key;
+  const text=String(ev.text||'');
+  if(text.includes('DWALLET GLITCH')){
+    showFx('glitch','DWALLET GLITCH','SOMETHING IS OFF','warning','burst',['◉','✦','⌁'],24);
+    $('app').classList.add('glitching');
+    haptic('medium','warning');
+    return;
+  }
+  if(ev.type==='mass_brawl'){
+    showFx('mass','MASS BRAWL','EVERYBODY MOVE','skull','burst',['⚔','✕','◆','✦'],30);
+    $('app').classList.add('screen-shake');
+    haptic('heavy');
+    return;
+  }
+  if(ev.type==='revival'){
+    showFx('revival','SECOND CHANCE','ONE PLAYER RETURNS','revive','rise',['✦','●','↟'],24);
+    haptic('light','success');
+    return;
+  }
+  if(ev.type==='crowd_vote_open'){
+    showFx('vote','THE CHAT CHOOSES','30 SECONDS TO VOTE','vote','burst',['◉','✦','◆'],20);
+    haptic('medium','warning');
+    return;
+  }
+  if(ev.type==='crowd_result'){
+    showFx('showdown','COMMUNITY SHOWDOWN','ONE SURVIVES','vote','burst',['✕','◆','✦'],26);
+    $('app').classList.add('screen-shake');
+    haptic('heavy');
+    return;
+  }
+  const lost=prev&&Number(prev.aliveCount)>Number(next.aliveCount);
+  if(lost){
+    showFx('elimination','ELIMINATION','THE ROSTER JUST GOT SMALLER','skull','burst',['✕','◆','✦'],16);
+    $('app').classList.add('screen-shake');
+    haptic('medium');
+    return;
+  }
+  document.body.classList.remove('ambient-pulse');
+  void document.body.offsetWidth;
+  document.body.classList.add('ambient-pulse');
+  $('hero').classList.remove('hero-event');
+  void $('hero').offsetWidth;
+  $('hero').classList.add('hero-event');
+  haptic('light');
+}
+
+function acceptState(next){
+  const prev=state;
+  state=next;
+  triggerEventFx(next,prev);
+  render();
+}
+
+async function act(action,extra={}){
+  if(busy)return;
+  busy=true;
+  document.body.classList.add('busy');
+  try{
+    err();
+    acceptState(await api('/telegram/api/action',{action,...extra}));
+  }catch(e){
+    err(e.message);
+    haptic('light','error');
+  }finally{
+    busy=false;
+    document.body.classList.remove('busy');
+  }
+}
+
+function button(label,action,cls='',iconKey=''){
+  const icon=iconKey?'<img src="'+esc(icons[iconKey]||icons.arena)+'" alt="" style="width:20px;height:20px;display:inline-block;vertical-align:-5px;margin-right:7px">':'';
+  return '<button type="button" class="veil-button '+cls+'" data-action="'+action+'">'+icon+esc(label)+'</button>';
+}
+
+function voteButton(label,id,selected){
+  return '<button type="button" class="veil-button '+(selected?'primary selected':'')+'" data-vote="'+esc(id)+'">'+esc(label)+'</button>';
+}
+
+function statusPresentation(){
+  if(!state)return {label:'CONNECTING',cls:'pending',icon:'timer'};
+  if(state.status==='registration'){
+    return state.playerCount>=2?{label:'READY',cls:'ready',icon:'success'}:{label:'PENDING',cls:'pending',icon:'timer'};
+  }
+  if(state.status==='running')return {label:'LIVE',cls:'live',icon:'arena'};
+  if(state.status==='finished')return {label:'COMPLETE',cls:'ready',icon:'success'};
+  return {label:String(state.status||'STATUS').toUpperCase(),cls:'pending',icon:'warning'};
+}
+
+function eventIconKey(){
+  const t=String(state?.lastEvent?.type||'');
+  const text=String(state?.lastEvent?.text||'');
+  if(state?.status==='finished')return 'crown';
+  if(text.includes('DWALLET GLITCH'))return 'warning';
+  if(t==='revival')return 'revive';
+  if(t==='crowd_vote_open'||t==='crowd_result')return 'vote';
+  if(t==='mass_brawl')return 'skull';
+  return 'timer';
+}
+
+function render(){
+  if(!state)return;
+  const present=statusPresentation();
+  const badge=$('stateBadge');
+  badge.className='status-badge '+present.cls;
+  badge.textContent=present.label;
+
+  const statusText=state.status==='registration'
+    ?'Registration is open'
+    :state.status==='running'
+      ?'Arena is live'
+      :state.status==='finished'
+        ?'Arena complete'
+        :String(state.status||'').toUpperCase();
+  $('status').textContent=statusText;
+  $('statusIcon').src=icons[present.icon]||icons.arena;
+  $('round').textContent=state.round;
+  $('players').textContent=state.playerCount;
+  $('alive').textContent=state.aliveCount;
+
+  const frameKey=state.crowdVote?'vote':state.status;
+  $('stateFrame').src=frames[frameKey]||frames.running;
+
+  let viewerText='';
+  let viewerIcon='spectate';
+  if(state.status==='registration'){
+    viewerText=state.viewer.joined
+      ?(state.viewer.isHost?'You are hosting this Arena.':'You are registered for this Arena.')
+      :'You are watching registration. Join before the host starts.';
+    viewerIcon=state.viewer.joined?'success':'spectate';
+  }else if(state.status==='running'){
+    if(state.viewer.alive){viewerText='You are still alive in the Arena.';viewerIcon='arena'}
+    else if(state.viewer.joined){viewerText='You are out. Keep watching for spectator votes.';viewerIcon='spectate'}
+    else{viewerText='Spectator mode. Community votes may open during the match.';viewerIcon='spectate'}
+  }else if(state.status==='finished'){
+    const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
+    viewerText=won?'You won the Arena.':'Match complete. Final result locked.';
+    viewerIcon=won?'crown':'success';
+  }else{
+    viewerText='Arena status: '+String(state.status||'unknown');
+    viewerIcon='warning';
+  }
+  $('viewerText').textContent=viewerText;
+  $('viewerIcon').src=icons[viewerIcon]||icons.spectate;
+
+  let controls='';
+  if(state.status==='registration'){
+    if(!state.viewer.joined)controls+=button('JOIN ARENA','join','primary','arena');
+    else if(!state.viewer.isHost)controls+=button('LEAVE','leave','','spectate');
+    if(state.viewer.isHost){
+      controls+=button('START ARENA','start','primary','success');
+      if(state.testMode){
+        controls+=button('ADD 4 TEST BOTS','add4','','stats');
+        controls+=button('FILL TO 12','fill','','leaderboard');
+        controls+=button('RESET','reset','danger','warning');
+      }
+    }
+  }else if(state.testMode&&state.viewer.isHost&&state.status==='running'){
+    controls+=button('ABORT / RESET','reset','danger','warning');
+  }
+  $('controls').innerHTML=controls;
+
+  const last=state.lastEvent?.text
+    ||state.displayLog?.at(-1)?.text
+    ||(state.status==='registration'
+      ?'Players are entering the Arena.'
+      :state.status==='running'
+        ?'Arena is moving…'
+        :'No event yet.');
+  $('event').innerHTML=richText(last);
+  $('eventIcon').src=icons[eventIconKey()]||icons.timer;
+
+  const timer=$('timer');
+  const timerRow=$('timerRow');
+  if(state.status==='running'&&state.nextAdvanceAt){
+    const sec=Math.max(0,Math.ceil((state.nextAdvanceAt-Date.now())/1000));
+    timer.textContent=sec?'Next event in '+sec+'s':'Resolving…';
+    timerRow.style.display='flex';
+  }else{
+    timer.textContent='';
+    timerRow.style.display='none';
+  }
+
+  const now=Date.now();
+  $('roster').innerHTML=(state.players||[]).map(p=>{
+    const c=changeUntil.get(String(p.id));
+    if(c&&c.until<=now)changeUntil.delete(String(p.id));
+    const live=changeUntil.get(String(p.id));
+    const fx=live?(live.kind==='out'?' new-dead':' revived-now'):'';
+    const badgeClass=p.alive?'alive':'dead';
+    const badgeText=p.alive?'ALIVE':'OUT';
+    return '<div class="player '+(p.alive?'':'dead-row')+fx+'">'
+      +'<div class="player-name">'+esc(p.displayName)+(p.simulated?'<span class="bot-tag">BOT</span>':'')+'</div>'
+      +'<div class="player-meta">'
+      +(p.eliminations?'<span class="player-kos">'+p.eliminations+' KO</span>':'')
+      +'<span class="player-badge '+badgeClass+'">'+badgeText+'</span>'
+      +'</div></div>';
+  }).join('')||'<div class="empty">No players yet.</div>';
+
+  const vc=$('voteCard');
+  const vg=$('voteGrid');
+  if(state.crowdVote){
+    vc.style.display='block';
+    vc.classList.add('live');
+    if(state.viewer.canVote){
+      vg.innerHTML=state.crowdVote.eligibleIds.map(id=>{
+        const p=state.players.find(x=>x.id===id);
+        const selected=state.crowdVote.selectedId===id;
+        return voteButton(p?.displayName||'Player',id,selected);
+      }).join('');
+    }else{
+      vg.innerHTML='<div class="vote-note">Spectators are voting. The top two go to a 1v1.</div>';
+    }
+  }else{
+    vc.style.display='none';
+    vc.classList.remove('live');
+    vg.innerHTML='';
+  }
+}
+
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-action]');
+  if(a)act(a.dataset.action);
+  const v=e.target.closest('[data-vote]');
+  if(v)act('vote',{targetId:v.dataset.vote});
+});
+
+async function refresh(){
+  if(!initData){
+    err('Open this Arena from Telegram.');
+    $('status').textContent='Telegram is required';
+    $('stateBadge').className='status-badge pending';
+    $('stateBadge').textContent='TELEGRAM';
+    $('viewerText').textContent='Launch Veil Arena from the button inside your Telegram group.';
+    return;
+  }
+  try{
+    const next=await api('/telegram/api/state');
+    err();
+    acceptState(next);
+  }catch(e){
+    err(e.message);
+    $('status').textContent='Connection error';
+    $('stateBadge').className='status-badge pending';
+    $('stateBadge').textContent='ERROR';
+  }
+}
+
+refresh();
+setInterval(refresh,1500);
+setInterval(()=>{if(state)render()},500);
+</script>
+</body>
+</html>`;
 }
