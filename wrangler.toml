@@ -1,5 +1,5 @@
 name = "veil-arena"
-main = "src/discord-recovery-entry.js"
+main = "src/activity-live-entry.js"
 compatibility_date = "2026-09-01"
 keep_vars = true
 
