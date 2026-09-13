@@ -27,7 +27,8 @@ for (const [poolName, count] of Object.entries(expectedPass)) {
     assert(line.length <= 600, `${poolName} contains an overlong line (${line.length} chars)`);
     assert(!/\b(?:undefined|null|NaN)\b/i.test(line), `${poolName} contains a broken value: ${line}`);
     assert(!/ {2,}/.test(line), `${poolName} contains repeated spaces: ${line}`);
-    assert(!/,,|\.\.|,,|;;/.test(line), `${poolName} contains broken punctuation: ${line}`);
+    assert(!/,,|\.\.|;;/.test(line), `${poolName} contains broken punctuation: ${line}`);
+    assert(!/\b(?:as|when|while|and|before|for),\s/i.test(line), `${poolName} contains a broken connective comma: ${line}`);
 
     const placeholders = [...line.matchAll(/\{([^}]+)\}/g)].map(match => match[1]);
     for (const key of placeholders) {
