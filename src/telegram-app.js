@@ -277,7 +277,7 @@ if(tg){try{tg.ready();tg.expand();tg.setHeaderColor('#100b17');tg.setBackgroundC
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function richText(value=''){
   let out=esc(value);
-  out=out.replace(/\\([\\`*_[\]{}()#+\-.!>])/g,'$1');
+  out=out.replaceAll(String.fromCharCode(92)+'.','.');
   out=out.replace(/^##\s+(.+)$/gm,'<span class="event-head">$1</span>');
   out=out.replace(/~~\*\*\*([^\n]+?)\*\*\*~~/g,'<s><strong><em>$1</em></strong></s>');
   out=out.replace(/\*\*\*([^\n]+?)\*\*\*/g,'<strong><em>$1</em></strong>');
