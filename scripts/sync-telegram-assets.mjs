@@ -8,10 +8,15 @@ await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
 
 const entries = await readdir(source, { withFileTypes: true });
-const files = entries.filter(entry => entry.isFile() && entry.name.toLowerCase().endsWith(".svg"));
+const supportedExtensions = new Set([".svg", ".png"]);
+const files = entries.filter(entry => {
+  if (!entry.isFile()) return false;
+  const name = entry.name.toLowerCase();
+  return [...supportedExtensions].some(extension => name.endsWith(extension));
+});
 
 for (const entry of files) {
   await cp(resolve(source, entry.name), resolve(destination, entry.name));
 }
 
-console.log(`Copied ${files.length} Telegram SVG assets into public/telegram.`);
+console.log(`Copied ${files.length} Telegram visual assets into public/telegram.`);
