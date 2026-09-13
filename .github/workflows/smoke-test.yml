@@ -30,6 +30,10 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/activity-live-entry.js
+          node --check src/activity-live.js
+          node --check src/activity-live-client.js
+          node --check src/discord-recovery-entry.js
           node --check src/test-entry.js
           node --check src/test-mode.js
           node --check src/test-panel-client.js
