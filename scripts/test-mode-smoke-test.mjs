@@ -21,6 +21,7 @@ for (const action of ["add_bots","fill_12","remove_bots","next_round","mass_braw
 }
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+const unifiedEntry = readFileSync(new URL("../src/veil-worker.js", import.meta.url), "utf8");
 const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
 const telegramWorker = readFileSync(new URL("../src/telegram-official-worker.js", import.meta.url), "utf8");
 const telegramMiniApp = readFileSync(new URL("../src/telegram-official-miniapp.js", import.meta.url), "utf8");
@@ -29,17 +30,17 @@ const officialBrowser = readFileSync(new URL("../src/activity-official-browser.j
 const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta.url), "utf8");
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
-assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
-assert(wrangler.includes('main = "src/telegram-official-worker.js"'));
-assert(wrangler.includes("[env.test.vars]"));
-assert(wrangler.includes('ARENA_TEST_MODE = "true"'));
-assert(wrangler.includes("[[env.test.durable_objects.bindings]]"));
-assert(wrangler.includes("[[env.test.d1_databases]]"));
+assert(wrangler.includes('main = "src/veil-worker.js"'));
+assert(!wrangler.includes("[env.test]"));
+assert(!wrangler.includes('name = "veil-arena-test-bot"'));
+assert(unifiedEntry.includes('from "./discord-bots-entry.js"'));
+assert(unifiedEntry.includes('from "./telegram-official-worker.js"'));
+assert(unifiedEntry.includes('url.pathname === "/tg"'));
+assert(unifiedEntry.includes('url.pathname.startsWith("/telegram/")'));
 
 assert(telegramWorker.includes('url.pathname === "/telegram/webhook"'));
 assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/state"'));
 assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/action"'));
-assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/test"'));
 assert(telegramWorker.includes("configureTelegramBot"));
 assert(telegramWorker.includes("telegramArenaLaunchUrl"));
 assert(!telegramWorker.includes("telegram-group-context-entry"));
@@ -69,5 +70,7 @@ assert(!officialBrowser.includes("rpc.voice.read"));
 assert(serverConfig.includes('VEIL_ACTIVITY_TEST_GUILD_ID = "1504257112094539798"'));
 assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
 assert(packageJson.includes('"build:activity-client"'));
+assert(!packageJson.includes('"deploy:test"'));
+assert(!packageJson.includes('"dev:test"'));
 
-console.log("Telegram QA official-flow smoke tests passed.");
+console.log("Single-Worker Telegram/Discord configuration smoke tests passed.");
