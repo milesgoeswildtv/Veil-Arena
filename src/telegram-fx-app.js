@@ -1,3 +1,5 @@
+import { arenaAudioClientSource } from "./audio/arena-audio.js";
+
 export function telegramFxMiniAppHtml() {
   return `<!doctype html>
 <html>
@@ -639,6 +641,7 @@ img{display:block;max-width:100%}
 </main>
 
 <script>
+const arenaAudio=${arenaAudioClientSource()};
 const tg=window.Telegram&&window.Telegram.WebApp;
 const initData=tg?.initData||'';
 const A='/telegram/';
@@ -836,6 +839,7 @@ function triggerEventFx(next,prev){
 }
 
 function acceptState(next){
+  arenaAudio.observe(next);
   const prev=state;
   state=next;
   triggerEventFx(next,prev);
@@ -849,6 +853,7 @@ async function act(action,extra={}){
   try{
     err();
     acceptState(await api('/telegram/api/action',{action,...extra}));
+    arenaAudio.confirmAction(action);
   }catch(e){
     err(e.message);
     haptic('light','error');
@@ -1029,6 +1034,7 @@ async function refresh(){
     err();
     acceptState(next);
   }catch(e){
+    arenaAudio.connectionLost();
     err(e.message);
     $('status').textContent='Connection error';
     $('stateBadge').className='status-badge pending';

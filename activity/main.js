@@ -1,6 +1,8 @@
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 import "./style.css";
 import "./discord-assets.css";
+import { installArenaAudio } from "../src/audio/arena-audio.js";
+const arenaAudio = installArenaAudio();
 
 // Vite packages only Discord artwork, with same-origin URLs for the Activity proxy.
 const discordAssets = import.meta.glob("../assets/discord/*.svg", { eager: true, query: "?url", import: "default" });
@@ -45,6 +47,7 @@ function status(text) {
 }
 
 function showError(error) {
+  arenaAudio.connectionLost();
   const message = String(error?.message || error || "Unknown error");
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
@@ -185,6 +188,7 @@ function controls(state) {
 }
 
 function render(state) {
+  arenaAudio.observe(state);
   const previousState = currentState;
   currentState = state;
   contentEl.classList.remove("hidden");
@@ -287,6 +291,7 @@ function bindControls() {
           body: JSON.stringify({ action: "vote", targetId: button.dataset.vote })
         });
         render(state);
+        arenaAudio.confirmAction("vote");
       } catch (error) {
         showError(error);
       }
