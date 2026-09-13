@@ -23,6 +23,26 @@ async function activityClient() {
   function text(el, value) { if (el) el.textContent = String(value ?? ""); }
   function escapeHtml(value = "") { return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
   function setNotice(message, error = false) { text(ui.notice, message); ui.notice?.classList.toggle("error", error); }
+  function authStage(connection, headline, detail) {
+    text(ui.connection, connection);
+    text(ui.system, "AUTHENTICATING");
+    text(ui.headline, headline);
+    text(ui.event, detail);
+    setNotice(detail);
+  }
+  async function withTimeout(promise, ms, label) {
+    let timer;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)} seconds.`)), ms);
+        })
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
   function button(label, action, cls = "", payload = {}) {
     const b = document.createElement("button");
     b.className = `btn ${cls}`.trim();
@@ -33,6 +53,14 @@ async function activityClient() {
   }
   function clearActions() { if (ui.actions) ui.actions.replaceChildren(); }
   function addAction(label, action, cls = "", payload = {}) { ui.actions?.appendChild(button(label, action, cls, payload)); }
+  function addReloadAction() {
+    if (!ui.actions) return;
+    const b = document.createElement("button");
+    b.className = "btn primary";
+    b.textContent = "RETRY CONNECTION";
+    b.addEventListener("click", () => window.location.reload());
+    ui.actions.appendChild(b);
+  }
   function closeFx() { if (fxTimer) clearTimeout(fxTimer); fxTimer = null; ui.overlay?.classList.remove("show"); }
   function showFx(kicker, title, sub, duration = 4200) {
     if (!ui.overlay) return;
@@ -59,38 +87,51 @@ async function activityClient() {
 
   async function setupDiscord() {
     if (!clientId) throw new Error("DISCORD_APPLICATION_ID is missing from the Activity Worker.");
-    text(ui.connection, "CONNECTING TO DISCORD");
+
+    authStage("CONNECTING TO DISCORD", "CONNECTING…", "Step 1/4 — Waiting for Discord SDK READY.");
     discordSdk = new DiscordSDK(clientId);
-    await discordSdk.ready();
+    await withTimeout(discordSdk.ready(), 12000, "Discord SDK READY");
+
     const guildId = discordSdk.guildId;
     const channelId = discordSdk.channelId;
-    if (!guildId || !channelId) throw new Error("Launch Veil Arena from a server voice channel.");
-    const { code } = await discordSdk.commands.authorize({
+    if (!guildId || !channelId) throw new Error("Discord SDK connected, but no server voice-channel context was provided. Launch Veil from a server voice channel.");
+    text(ui.location, "VOICE CHANNEL // CONNECTED");
+
+    authStage("DISCORD READY", "AUTHORIZING…", "Step 2/4 — Requesting Discord authorization.");
+    const authorization = await withTimeout(discordSdk.commands.authorize({
       client_id: clientId,
       response_type: "code",
       state: "",
       prompt: "none",
-      scope: ["identify", "guilds"]
-    });
-    const token = await fetch("/activity/oauth/token", {
+      scope: ["identify", "guilds", "applications.commands"]
+    }), 15000, "Discord AUTHORIZE");
+    const code = authorization?.code;
+    if (!code) throw new Error("Discord AUTHORIZE returned without an authorization code.");
+
+    authStage("DISCORD AUTHORIZED", "EXCHANGING TOKEN…", "Step 3/4 — Exchanging the Discord authorization code with Veil.");
+    const token = await withTimeout(fetch("/activity/oauth/token", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ code, guildId, channelId })
-    });
+    }), 15000, "Veil OAuth token exchange");
     const payload = await token.json().catch(() => ({}));
-    if (!token.ok || !payload.access_token || !payload.session) throw new Error(payload.error || "Discord OAuth failed.");
-    const auth = await discordSdk.commands.authenticate({ access_token: payload.access_token });
-    if (!auth?.user) throw new Error("Discord authenticate failed.");
+    if (!token.ok || !payload.access_token || !payload.session) throw new Error(payload.error || `Veil OAuth token exchange failed (${token.status}).`);
+
+    authStage("TOKEN READY", "AUTHENTICATING…", "Step 4/4 — Authenticating this Discord user inside the Activity.");
+    const auth = await withTimeout(discordSdk.commands.authenticate({ access_token: payload.access_token }), 15000, "Discord AUTHENTICATE");
+    if (!auth?.user) throw new Error("Discord AUTHENTICATE returned without a user.");
+
     sessionToken = payload.session;
     viewer = auth.user;
     text(ui.viewerName, viewer.global_name || viewer.username || "Discord User");
     text(ui.viewerStatus, "Connected to this Activity instance");
     text(ui.connection, "LIVE ACTIVITY");
+    text(ui.system, "ONLINE");
     try {
-      const channel = await discordSdk.commands.getChannel({ channel_id: channelId });
+      const channel = await withTimeout(discordSdk.commands.getChannel({ channel_id: channelId }), 6000, "Discord GET CHANNEL");
       text(ui.location, `VOICE CHANNEL // ${(channel?.name || "ARENA").toUpperCase()}`);
     } catch {
-      text(ui.location, "VOICE CHANNEL // ARENA");
+      text(ui.location, "VOICE CHANNEL // CONNECTED");
     }
     await refresh();
     pollTimer = setInterval(refresh, 1000);
@@ -255,10 +296,11 @@ async function activityClient() {
   setupDiscord().catch(error => {
     text(ui.connection, "SETUP REQUIRED");
     text(ui.system, "AUTH FAILED");
-    text(ui.headline, "ACTIVITY NEEDS ONE SETUP FIX");
+    text(ui.headline, "ACTIVITY CONNECTION FAILED");
     text(ui.event, error.message);
     setNotice(error.message, true);
     clearActions();
+    addReloadAction();
   });
 }
 
