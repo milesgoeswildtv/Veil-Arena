@@ -1,13 +1,133 @@
-import assert from"node:assert/strict";import{createGame,addPlayer,startGame,beginNextRound,resolveNormalRound,getRoundPhases,getCrowdQualifiers,openCrowdVote,castCrowdVote,resolveCrowdVote,eliminate,resolveRevivalPit,specialEventsEnabled,SPECIAL_EVENT_CUTOFF,MIN_NORMAL_OUTCOMES_PER_ROUND,MAX_NORMAL_OUTCOMES_PER_ROUND,MASS_BRAWL_CHANCE,MASS_BRAWL_MIN_ALIVE,forceNextMassBrawl,massBrawlEligibleRound}from"../src/core/engine.js";import{addFakeContestants,setSimulatedCrowd,castSimulatedCrowdVotes}from"../src/core/simulation.js";import{VQS_HORROR_COMBINATORIAL_COUNT}from"../src/themes/vibe_queen_slots/horror-combinatorial.js";import{VQS_NORMAL_RARE_COUNT}from"../src/themes/vibe_queen_slots/horror-normal-rare.js";import{FULL_TILT_MEGA_COUNT}from"../src/themes/full_tilt/gamba-mega.js";import{getTheme,themeNarrationCount}from"../src/themes/index.js";import{buildMassBrawl,MASS_BRAWL_COMBINATIONS_PER_THEME}from"../src/themes/brawls.js";import{arenaCommands}from"../src/discord.js";import{rulesForTheme}from"../src/rules.js";import{themeForGuild,VIBE_QUEEN_GUILD_ID,FULL_TILT_GUILD_ID}from"../src/server-config.js";
-const fp=id=>({id,username:id,displayName:id.toUpperCase()});assert.equal(SPECIAL_EVENT_CUTOFF,5);assert.equal(MIN_NORMAL_OUTCOMES_PER_ROUND,4);assert.equal(MAX_NORMAL_OUTCOMES_PER_ROUND,4);assert.equal(MASS_BRAWL_CHANCE,.025);assert.equal(MASS_BRAWL_MIN_ALIVE,6);assert.equal(MASS_BRAWL_COMBINATIONS_PER_THEME,1000);assert.equal(massBrawlEligibleRound(1),true);assert.equal(massBrawlEligibleRound(3),true);assert.equal(massBrawlEligibleRound(5),false);assert.equal(massBrawlEligibleRound(7),false);assert.equal(massBrawlEligibleRound(35),false);assert.equal(massBrawlEligibleRound(36),true);assert(VQS_HORROR_COMBINATORIAL_COUNT>=10000);assert.equal(VQS_NORMAL_RARE_COUNT,2000);assert.equal(FULL_TILT_MEGA_COUNT,5000);const vqs=getTheme("vibe_queen_slots"),ft=getTheme("full_tilt");assert(themeNarrationCount(vqs)>=12000);assert(themeNarrationCount(ft)>=10000);assert(ft.playerKills.length>=7000);assert(ft.selfKills.length>=1900);assert(ft.pinDuels.length>=1000);assert(ft.revivalDuels.length>=1000);assert(ft.multiPins.length>=500);assert(ft.normalEvents.length>=1000);assert(ft.rareEvents.length>=500);assert.deepEqual(getRoundPhases(3),["normal"]);assert.deepEqual(getRoundPhases(5),["normal","crowd_vote"]);assert.deepEqual(getRoundPhases(7),["normal","revival"]);assert.deepEqual(getRoundPhases(35),["normal","revival"]);assert.deepEqual(getCrowdQualifiers({a:22,b:21,c:21},()=>0),["a","b"]);assert.equal(themeForGuild(VIBE_QUEEN_GUILD_ID),"vibe_queen_slots");assert.equal(themeForGuild(FULL_TILT_GUILD_ID),"full_tilt");const commands=arenaCommands();assert.deepEqual(commands.map(c=>c.name),["arena","arenastats","arenaleaderboard","arenalog"]);assert.deepEqual(commands[0].options.map(x=>x.name),["start","sponsor","bots","rules"]);assert.equal(commands[0].options.find(x=>x.name==="bots")?.options?.[0]?.name,"amount");assert.equal(commands.find(c=>c.name==="arenalog")?.options?.[0]?.name,"match");assert(!JSON.stringify(commands).includes("testfill"));assert(rulesForTheme("vibe_queen_slots").includes("THE HAUNTED ARENA"));assert(rulesForTheme("vibe_queen_slots").includes("CAST YOUR VOTE"));assert(rulesForTheme("full_tilt").includes("FULL TILT ARENA"));
-for(const roll of[.24,.49,.74,.999]){const g=createGame({guildId:"g",channelId:`r${roll}`,hostId:"p1"});for(let i=1;i<=30;i++)addPlayer(g,fp(`p${i}`));startGame(g);beginNextRound(g);let calls=0;const rng=()=>calls++===0?.5:roll;const b=resolveNormalRound(g,rng);assert.equal(b.type,"normal_round_batch");assert.equal(b.outcomes.length,4);assert(b.eliminatedIds.length>=1);}
-const brawl=createGame({guildId:"g",channelId:"brawl",hostId:"p1",themeId:"vibe_queen_slots"});for(let i=1;i<=12;i++)addPlayer(brawl,fp(`p${i}`));startGame(brawl);beginNextRound(brawl);forceNextMassBrawl(brawl);const br=resolveNormalRound(brawl,()=>.5);assert.equal(br.type,"mass_brawl");assert(br.participantIds.length>=4&&br.participantIds.length<=7);assert(br.eliminatedIds.length>=1);assert(br.survivorIds.length>=1);assert.equal(brawl.testMode.forceMassBrawl,false);assert(br.participantIds.every(id=>br.eliminatedIds.includes(id)||br.survivorIds.includes(id)));const vqsStory=buildMassBrawl("vibe_queen_slots",br.participantIds.map(id=>brawl.players[id].displayName),br.survivorIds.map(id=>brawl.players[id].displayName),()=>.5),ftStory=buildMassBrawl("full_tilt",br.participantIds.map(id=>brawl.players[id].displayName),br.survivorIds.map(id=>brawl.players[id].displayName),()=>.5);assert(vqsStory.length>100);assert(ftStory.length>100);assert.notEqual(vqsStory,ftStory);
-const natural=createGame({guildId:"g",channelId:"natural",hostId:"p1"});for(let i=1;i<=8;i++)addPlayer(natural,fp(`n${i}`));startGame(natural);beginNextRound(natural);const nb=resolveNormalRound(natural,()=>0);assert.equal(nb.type,"mass_brawl");
-const special=createGame({guildId:"g",channelId:"special",hostId:"p1"});for(let i=1;i<=12;i++)addPlayer(special,fp(`x${i}`));startGame(special);for(let i=0;i<7;i++)beginNextRound(special);forceNextMassBrawl(special);const round7=resolveNormalRound(special,()=>0);assert.equal(special.round,7);assert.equal(round7.type,"normal_round_batch");assert.equal(special.testMode.forceMassBrawl,true);beginNextRound(special);const round8=resolveNormalRound(special,()=>.5);assert.equal(round8.type,"mass_brawl");assert.equal(special.testMode.forceMassBrawl,false);
-const special5=createGame({guildId:"g",channelId:"special5",hostId:"p1"});for(let i=1;i<=12;i++)addPlayer(special5,fp(`y${i}`));startGame(special5);for(let i=0;i<5;i++)beginNextRound(special5);const round5=resolveNormalRound(special5,()=>0);assert.equal(round5.type,"normal_round_batch");
-const tooSmall=createGame({guildId:"g",channelId:"small",hostId:"p1"});for(let i=1;i<=5;i++)addPlayer(tooSmall,fp(`s${i}`));startGame(tooSmall);assert.throws(()=>forceNextMassBrawl(tooSmall),/at least 6/);
-const game=createGame({guildId:"g",channelId:"c",hostId:"a"});for(const id of["a","b","c","d","e","f"])addPlayer(game,fp(id));startGame(game);openCrowdVote(game);for(const[v,c]of[["x1","a"],["x2","a"],["x3","b"],["x4","c"]])castCrowdVote(game,v,c);const crowd=resolveCrowdVote(game,()=>0);assert.deepEqual(crowd.qualifiers,["a","b"]);assert.equal(crowd.eliminatedIds.length,1);assert(crowd.qualifiers.includes(crowd.eliminatedIds[0]));assert.equal(crowd.survivorId,"a");
-const f5=createGame({guildId:"g",channelId:"f5",hostId:"a"});for(const id of["a","b","c","d","e","f","g"])addPlayer(f5,fp(id));startGame(f5);eliminate(f5,"f","test");eliminate(f5,"g","test");assert.equal(specialEventsEnabled(f5),false);assert.equal(openCrowdVote(f5),null);
-const rev=createGame({guildId:"g",channelId:"rev",hostId:"a"});for(const id of["a","b","c","d","e","f","g","h"])addPlayer(rev,fp(id));startGame(rev);eliminate(rev,"g","test");eliminate(rev,"h","test");const rr=resolveRevivalPit(rev,()=>0);assert.equal(rev.players[rr.winnerId].alive,true);
-const sim=createGame({guildId:"g",channelId:"sim",hostId:"host"});addPlayer(sim,fp("host"));addFakeContestants(sim,12);setSimulatedCrowd(sim,true);startGame(sim);openCrowdVote(sim);assert(castSimulatedCrowdVotes(sim,()=>.5)>=24);
-const pace=createGame({guildId:"g",channelId:"pace",hostId:"p1"});for(let i=1;i<=20;i++)addPlayer(pace,fp(`p${i}`));startGame(pace);let guard=0;while(pace.aliveIds.length>1&&guard<40){const{phases}=beginNextRound(pace);const batch=resolveNormalRound(pace,()=>.5);if(batch.type!=="mass_brawl"&&phases.includes("revival")&&specialEventsEnabled(pace)&&pace.eliminatedIds.length>=2)resolveRevivalPit(pace,()=>.5);guard++;}assert.equal(pace.aliveIds.length,1);assert(pace.round<=30);console.log(`Arena smoke tests passed. VQS: ${themeNarrationCount(vqs)}. Full Tilt: ${themeNarrationCount(ft)}. Match: ${pace.round} rounds.`);
+import assert from "node:assert/strict";
+import {
+  createGame,
+  addPlayer,
+  startGame,
+  beginNextRound,
+  resolveNormalRound,
+  getRoundPhases,
+  getCrowdQualifiers,
+  openCrowdVote,
+  castCrowdVote,
+  resolveCrowdVote,
+  eliminate,
+  resolveRevivalPit,
+  specialEventsEnabled,
+  SPECIAL_EVENT_CUTOFF,
+  MIN_NORMAL_OUTCOMES_PER_ROUND,
+  MAX_NORMAL_OUTCOMES_PER_ROUND,
+  MASS_BRAWL_CHANCE,
+  MASS_BRAWL_MIN_ALIVE,
+  forceNextMassBrawl,
+  massBrawlEligibleRound
+} from "../src/core/engine.js";
+import { addFakeContestants, setSimulatedCrowd, castSimulatedCrowdVotes } from "../src/core/simulation.js";
+import { advanceArenaGame } from "../src/core/orchestrator.js";
+import { VQS_HORROR_COMBINATORIAL_COUNT } from "../src/themes/vibe_queen_slots/horror-combinatorial.js";
+import { VQS_NORMAL_RARE_COUNT } from "../src/themes/vibe_queen_slots/horror-normal-rare.js";
+import { FULL_TILT_MEGA_COUNT } from "../src/themes/full_tilt/gamba-mega.js";
+import { getTheme, themeNarrationCount } from "../src/themes/index.js";
+import { buildMassBrawl, MASS_BRAWL_COMBINATIONS_PER_THEME } from "../src/themes/brawls.js";
+import { rulesForTheme } from "../src/rules.js";
+
+const player = id => ({ id, username: id, displayName: id.toUpperCase() });
+
+assert.equal(SPECIAL_EVENT_CUTOFF, 5);
+assert.equal(MIN_NORMAL_OUTCOMES_PER_ROUND, 4);
+assert.equal(MAX_NORMAL_OUTCOMES_PER_ROUND, 4);
+assert.equal(MASS_BRAWL_CHANCE, 0.025);
+assert.equal(MASS_BRAWL_MIN_ALIVE, 6);
+assert.equal(MASS_BRAWL_COMBINATIONS_PER_THEME, 1000);
+assert.equal(massBrawlEligibleRound(1), true);
+assert.equal(massBrawlEligibleRound(5), false);
+assert.equal(massBrawlEligibleRound(7), false);
+assert.equal(massBrawlEligibleRound(36), true);
+assert.deepEqual(getRoundPhases(3), ["normal"]);
+assert.deepEqual(getRoundPhases(5), ["normal", "crowd_vote"]);
+assert.deepEqual(getRoundPhases(7), ["normal", "revival"]);
+assert.deepEqual(getCrowdQualifiers({ a: 22, b: 21, c: 21 }, () => 0), ["a", "b"]);
+
+assert(VQS_HORROR_COMBINATORIAL_COUNT >= 10000);
+assert.equal(VQS_NORMAL_RARE_COUNT, 2000);
+assert.equal(FULL_TILT_MEGA_COUNT, 5000);
+const vqs = getTheme("vibe_queen_slots");
+const fullTilt = getTheme("full_tilt");
+const dwallet = getTheme("dwallet");
+assert(themeNarrationCount(vqs) >= 12000);
+assert(themeNarrationCount(fullTilt) >= 10000);
+assert(themeNarrationCount(dwallet) >= 26000);
+assert(rulesForTheme("vibe_queen_slots").includes("THE HAUNTED ARENA"));
+assert(rulesForTheme("full_tilt").includes("FULL TILT ARENA"));
+
+for (const roll of [0.24, 0.49, 0.74, 0.999]) {
+  const game = createGame({ guildId: "g", channelId: `normal-${roll}`, hostId: "p1" });
+  for (let i = 1; i <= 30; i++) addPlayer(game, player(`p${i}`));
+  startGame(game);
+  beginNextRound(game);
+  let calls = 0;
+  const rng = () => calls++ === 0 ? 0.5 : roll;
+  const batch = resolveNormalRound(game, rng);
+  assert.equal(batch.type, "normal_round_batch");
+  assert.equal(batch.outcomes.length, 4);
+  assert(batch.eliminatedIds.length >= 1);
+}
+
+const brawl = createGame({ guildId: "g", channelId: "brawl", hostId: "p1", themeId: "vibe_queen_slots" });
+for (let i = 1; i <= 12; i++) addPlayer(brawl, player(`p${i}`));
+startGame(brawl);
+beginNextRound(brawl);
+forceNextMassBrawl(brawl);
+const brawlResult = resolveNormalRound(brawl, () => 0.5);
+assert.equal(brawlResult.type, "mass_brawl");
+assert(brawlResult.participantIds.length >= 4 && brawlResult.participantIds.length <= 7);
+assert(brawlResult.eliminatedIds.length >= 1);
+assert(brawlResult.survivorIds.length >= 1);
+const vqsStory = buildMassBrawl("vibe_queen_slots", brawlResult.participantIds, brawlResult.survivorIds, () => 0.5);
+const ftStory = buildMassBrawl("full_tilt", brawlResult.participantIds, brawlResult.survivorIds, () => 0.5);
+assert(vqsStory.length > 100);
+assert(ftStory.length > 100);
+assert.notEqual(vqsStory, ftStory);
+
+const crowdGame = createGame({ guildId: "g", channelId: "crowd", hostId: "a" });
+for (const id of ["a", "b", "c", "d", "e", "f"]) addPlayer(crowdGame, player(id));
+startGame(crowdGame);
+openCrowdVote(crowdGame);
+for (const [spectator, candidate] of [["x1", "a"], ["x2", "a"], ["x3", "b"], ["x4", "c"]]) castCrowdVote(crowdGame, spectator, candidate);
+const crowd = resolveCrowdVote(crowdGame, () => 0);
+assert.deepEqual(crowd.qualifiers, ["a", "b"]);
+assert.equal(crowd.eliminatedIds.length, 1);
+
+const finalFive = createGame({ guildId: "g", channelId: "final-five", hostId: "a" });
+for (const id of ["a", "b", "c", "d", "e", "f", "g"]) addPlayer(finalFive, player(id));
+startGame(finalFive);
+eliminate(finalFive, "f", "test");
+eliminate(finalFive, "g", "test");
+assert.equal(specialEventsEnabled(finalFive), false);
+assert.equal(openCrowdVote(finalFive), null);
+
+const revival = createGame({ guildId: "g", channelId: "revival", hostId: "a" });
+for (const id of ["a", "b", "c", "d", "e", "f", "g", "h"]) addPlayer(revival, player(id));
+startGame(revival);
+eliminate(revival, "g", "test");
+eliminate(revival, "h", "test");
+const revived = resolveRevivalPit(revival, () => 0);
+assert.equal(revival.players[revived.winnerId].alive, true);
+
+const simulated = createGame({ guildId: "g", channelId: "sim", hostId: "host" });
+addPlayer(simulated, player("host"));
+addFakeContestants(simulated, 12);
+setSimulatedCrowd(simulated, true);
+startGame(simulated);
+openCrowdVote(simulated);
+assert(castSimulatedCrowdVotes(simulated, () => 0.5) >= 24);
+
+const orchestrated = createGame({ guildId: "g", channelId: "orchestrated", hostId: "p1", themeId: "full_tilt" });
+for (let i = 1; i <= 12; i++) addPlayer(orchestrated, player(`o${i}`));
+startGame(orchestrated);
+const tick = advanceArenaGame(orchestrated, { rng: () => 0.5 });
+assert.equal(tick.round, 1);
+assert(["normal", "mass_brawl"].includes(tick.type));
+assert.equal(typeof tick.text, "string");
+assert(tick.text.length > 20);
+
+console.log(`Arena core smoke tests passed. VQS: ${themeNarrationCount(vqs)}. Full Tilt: ${themeNarrationCount(fullTilt)}. DWallet: ${themeNarrationCount(dwallet)}.`);

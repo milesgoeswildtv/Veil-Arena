@@ -1,10 +1,10 @@
-name: Arena Smoke Test
+name: Arena Core Test
 
 on:
   push:
     branches:
       - main
-      - "build/**"
+      - "rebuild/**"
   pull_request:
     branches:
       - main
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  smoke-test:
+  core-test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -28,45 +28,22 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check production module syntax
+      - name: Check core module syntax
         run: |
-          node --check src/veil-worker.js
-          node --check src/telegram-official-worker.js
-          node --check src/telegram-official-miniapp.js
-          node --check src/activity-official-entry.js
-          node --check src/activity-official-browser.js
-          node --check src/activity-official-ui.js
-          node --check scripts/build-official-activity-client.mjs
-          node --check src/discord-bots-entry.js
-          node --check src/activity-doctor-entry.js
-          node --check src/activity-entrypoint-entry.js
-          node --check src/activity-reset-entry.js
-          node --check src/activity-live-entry.js
-          node --check src/discord-recovery-entry.js
-          node --check src/test-entry.js
-          node --check src/test-mode.js
-          node --check src/test-panel-client.js
-          node --check src/sponsor-panel-client.js
-          node --check src/sponsorships.js
-          node --check src/entry.js
-          node --check src/hub.js
-          node --check src/index.js
-          node --check src/coordinator.js
+          node --check src/worker.js
           node --check src/core/engine.js
           node --check src/core/simulation.js
+          node --check src/core/orchestrator.js
+          node --check src/rules.js
+          node --check src/sponsorships.js
           node --check src/storage.js
           node --check src/logs.js
+          node --check src/cooldown.js
           node --check src/themes/index.js
           node --check src/themes/brawls.js
-          node --check src/themes/dwallet.js
-          node --check src/themes/dwallet-hq.js
-          node --check src/telegram.js
-          node --check src/miniapp.js
-          node --check src/cooldown.js
-          node --check src/rules.js
 
-      - name: Run Arena smoke tests
+      - name: Run Arena core tests
         run: npm test
 
-      - name: Validate unified production Worker bundle
+      - name: Validate clean Cloudflare baseline
         run: npx wrangler deploy --dry-run

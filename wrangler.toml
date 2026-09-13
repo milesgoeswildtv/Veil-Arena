@@ -1,5 +1,5 @@
 name = "veil-arena"
-main = "src/veil-worker.js"
+main = "src/worker.js"
 compatibility_date = "2026-09-01"
 keep_vars = true
 
@@ -10,11 +10,3 @@ enabled = true
 binding = "DB"
 database_name = "veil-arena"
 database_id = "3474ca31-36e1-49c3-9901-57bb4eaf6f6c"
-
-[[durable_objects.bindings]]
-name = "ARENA_COORDINATOR"
-class_name = "ArenaCoordinator"
-
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["ArenaCoordinator"]

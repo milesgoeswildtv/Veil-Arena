@@ -1,18 +1,13 @@
 {
   "name": "veil-arena",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build:activity-client": "node scripts/build-official-activity-client.mjs",
-    "postinstall": "npm run build:activity-client",
-    "deploy": "npm run build:activity-client && wrangler deploy",
-    "dev": "npm run build:activity-client && wrangler dev",
-    "test": "npm run build:activity-client && node scripts/smoke-test.mjs && node scripts/telegram-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/test-mode-smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/activity-live-smoke-test.mjs"
-  },
-  "dependencies": {
-    "@discord/embedded-app-sdk": "2.5.0",
-    "esbuild": "^0.25.0"
+    "build:activity-client": "node -e \"console.log('Veil Arena clean baseline: no Activity client to build yet.')\"",
+    "build": "npm run build:activity-client",
+    "test": "node scripts/smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

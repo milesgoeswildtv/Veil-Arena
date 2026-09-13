@@ -1,4 +1,4 @@
-export const TELEGRAM_ARENA_COOLDOWN_MS = 30 * 60 * 1000;
+export const DEFAULT_ARENA_COOLDOWN_MS = 30 * 60 * 1000;
 
 async function ensureCooldownSchema(db) {
   if (!db) throw new Error("D1 binding DB is not configured.");
@@ -18,7 +18,7 @@ export async function getArenaCooldownRemaining(db, scopeKey, now = Date.now()) 
   return Math.max(0, Number(row.available_at) - now);
 }
 
-export async function startArenaCooldown(db, scopeKey, durationMs = TELEGRAM_ARENA_COOLDOWN_MS, now = Date.now()) {
+export async function startArenaCooldown(db, scopeKey, durationMs = DEFAULT_ARENA_COOLDOWN_MS, now = Date.now()) {
   await ensureCooldownSchema(db);
   const availableAt = now + Math.max(0, Number(durationMs) || 0);
   await db.prepare(`

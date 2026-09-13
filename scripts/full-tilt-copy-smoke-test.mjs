@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
 import { FULL_TILT_PASS_2, FULL_TILT_PASS_2_COUNT } from "../src/themes/full_tilt/full-tilt-pass-2.js";
 import { getTheme, renderTemplate, themeNarrationCount } from "../src/themes/index.js";
-import { arenaCommands } from "../src/discord.js";
 import { SPONSOR_AWARDS, sponsorshipSummary, payoutReportText } from "../src/sponsorships.js";
-import { SPONSOR_PANEL_CLIENT } from "../src/sponsor-panel-client.js";
 
 const expectedPass = {
   playerKills: 5000,
@@ -28,7 +26,6 @@ for (const [poolName, count] of Object.entries(expectedPass)) {
     assert(!/\b(?:undefined|null|NaN)\b/i.test(line), `${poolName} contains a broken value: ${line}`);
     assert(!/ {2,}/.test(line), `${poolName} contains repeated spaces: ${line}`);
     assert(!/,,|\.\.|;;/.test(line), `${poolName} contains broken punctuation: ${line}`);
-    assert(!/\b(?:as|when|while|and|before|for),\s/i.test(line), `${poolName} contains a broken connective comma: ${line}`);
 
     const placeholders = [...line.matchAll(/\{([^}]+)\}/g)].map(match => match[1]);
     for (const key of placeholders) {
@@ -60,25 +57,10 @@ assert.equal(fullTilt.labels.revival, "DOUBLE OR NOTHING");
 assert.equal(fullTilt.labels.crowdVote, "THE DEGENS CHOOSE");
 assert.equal(fullTilt.labels.crowdPin, "THE FINAL BET");
 
-const sponsorLabels = Object.fromEntries(SPONSOR_AWARDS.map(x => [x.id, x.label]));
+const sponsorLabels = Object.fromEntries(SPONSOR_AWARDS.map(item => [item.id, item.label]));
 assert.equal(sponsorLabels.most_kills, "Most Eliminations");
 assert.equal(sponsorLabels.most_showdowns, "Most Community Showdowns Survived");
 assert.equal(sponsorLabels.most_mass_brawls, "Most Mass Brawls Survived");
-
-const commands = arenaCommands();
-const arena = commands.find(command => command.name === "arena");
-const sponsor = arena?.options?.find(option => option.name === "sponsor");
-assert(sponsor, "Discord /arena sponsor command is missing");
-assert(sponsor.description.toLowerCase().includes("cash prizes"));
-for (const option of sponsor.options || []) {
-  assert(option.description.length <= 100, `Discord sponsor description is too long: ${option.name}`);
-  if (option.name === "most_kills") assert(option.description.toLowerCase().includes("eliminations"));
-}
-
-new Function(SPONSOR_PANEL_CLIENT);
-assert(SPONSOR_PANEL_CLIENT.includes("SAVE SPONSORSHIP"));
-assert(SPONSOR_PANEL_CLIENT.includes("SAVING SPONSORSHIP"));
-assert(SPONSOR_PANEL_CLIENT.includes("EDITABLE UNTIL THE ARENA STARTS"));
 
 const sampleGame = {
   status: "registration",

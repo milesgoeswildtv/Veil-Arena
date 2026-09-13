@@ -1,13 +1,10 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import { arenaCommands } from "../src/discord.js";
-import { ACTIVITY_PREVIEW_CLIENT } from "../src/activity-preview-client.js";
-import { SPONSOR_PANEL_CLIENT } from "../src/sponsor-panel-client.js";
 import {
   upsertSponsorship,
   calculatePayouts,
   payoutReportText,
-  sponsorshipSummary
+  sponsorshipSummary,
+  SPONSOR_AWARDS
 } from "../src/sponsorships.js";
 
 const game = {
@@ -34,7 +31,7 @@ assert.equal(game.sponsorships.length, 2);
 
 upsertSponsorship(game, { id: "s1", displayName: "Sam" }, { winner: 5, most_kills: 4 });
 assert.equal(game.sponsorships.length, 2);
-assert.equal(game.sponsorships.find(x => x.sponsorId === "s1").awards.most_kills, 400);
+assert.equal(game.sponsorships.find(item => item.sponsorId === "s1").awards.most_kills, 400);
 
 game.status = "finished";
 game.winnerId = "a";
@@ -50,42 +47,26 @@ game.history.push(
 );
 
 const result = calculatePayouts(game);
-const samKill = result.awards.find(x => x.sponsorId === "s1" && x.awardId === "most_kills");
+const samKill = result.awards.find(item => item.sponsorId === "s1" && item.awardId === "most_kills");
 assert.equal(samKill.shares.length, 2);
-assert.deepEqual(samKill.shares.map(x => x.cents), [200, 200]);
-const winnerAwards = result.awards.filter(x => x.awardId === "winner");
-assert.equal(winnerAwards.reduce((sum, x) => sum + x.shares[0].cents, 0), 1500);
-const runner = result.awards.find(x => x.awardId === "runner_up");
+assert.deepEqual(samKill.shares.map(item => item.cents), [200, 200]);
+const winnerAwards = result.awards.filter(item => item.awardId === "winner");
+assert.equal(winnerAwards.reduce((sum, item) => sum + item.shares[0].cents, 0), 1500);
+const runner = result.awards.find(item => item.awardId === "runner_up");
 assert.equal(runner.shares[0].playerId, "b");
 assert.equal(runner.shares[0].cents, 300);
+
 const report = payoutReportText(game);
 assert(report.includes("SPONSORED ARENA — PAYOUT REPORT"));
 assert(report.includes("Sam"));
 assert(report.includes("Crek"));
 assert(report.includes("$5.00"));
 assert(report.includes("$10.00"));
-
 assert.throws(() => upsertSponsorship(game, { id: "s3", displayName: "Late" }, { winner: 1 }), /lock/i);
 
-const arena = arenaCommands().find(x => x.name === "arena");
-const sponsor = arena.options.find(x => x.name === "sponsor");
-assert(sponsor);
-for (const field of ["winner","runner_up","most_kills","most_revivals","most_showdowns","most_mass_brawls"]) {
-  assert(sponsor.options.some(x => x.name === field), `Missing Discord sponsor field ${field}`);
-}
+const labels = Object.fromEntries(SPONSOR_AWARDS.map(item => [item.id, item.label]));
+assert.equal(labels.most_kills, "Most Eliminations");
+assert.equal(labels.most_showdowns, "Most Community Showdowns Survived");
+assert.equal(labels.most_mass_brawls, "Most Mass Brawls Survived");
 
-new Function(ACTIVITY_PREVIEW_CLIENT);
-new Function(SPONSOR_PANEL_CLIENT);
-assert(ACTIVITY_PREVIEW_CLIENT.includes("data-fx"));
-assert(ACTIVITY_PREVIEW_CLIENT.includes("CONTROLS ONLINE"));
-assert(ACTIVITY_PREVIEW_CLIENT.includes("CONTROLS FAILED"));
-assert(SPONSOR_PANEL_CLIENT.includes("/telegram/miniapp/sponsor"));
-
-const activityEntry = fs.readFileSync(new URL("../src/activity-entry.js", import.meta.url), "utf8");
-assert(activityEntry.includes('url.pathname === "/activity-preview/health"'));
-assert(activityEntry.includes('url.pathname === "/setup/discord"'));
-assert(activityEntry.includes('url.pathname === "/admin/discord/register"'));
-assert(activityEntry.includes("registerGuildCommands"));
-assert(activityEntry.includes("/arena sponsor"));
-
-console.log("Arena sponsorship + Discord Activity/setup smoke tests passed.");
+console.log("Arena sponsorship core tests passed.");
