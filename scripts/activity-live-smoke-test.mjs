@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { ACTIVITY_LIVE_CLIENT } from "../src/activity-live-client.js";
 import { liveActivityHtml } from "../src/activity-live.js";
 import { MINI_DISCORD_SDK_SOURCE } from "../src/activity-mini-sdk.js";
+import { VEIL_ACTIVITY_TEST_GUILD_ID, themeForGuild } from "../src/server-config.js";
 
 new Function(ACTIVITY_LIVE_CLIENT);
 new Function(MINI_DISCORD_SDK_SOURCE.replace("export class DiscordSDK", "class DiscordSDK"));
@@ -18,6 +19,9 @@ assert(ACTIVITY_LIVE_CLIENT.includes('FILL TO 12'));
 assert(ACTIVITY_LIVE_CLIENT.includes('ADD 4 TEST BOTS'));
 assert(ACTIVITY_LIVE_CLIENT.includes('START ARENA'));
 assert(ACTIVITY_LIVE_CLIENT.includes('Community Showdown'));
+
+assert.equal(VEIL_ACTIVITY_TEST_GUILD_ID, "1504257112094539798");
+assert.equal(themeForGuild(VEIL_ACTIVITY_TEST_GUILD_ID), "full_tilt");
 
 assert(MINI_DISCORD_SDK_SOURCE.includes('export class DiscordSDK'));
 assert(MINI_DISCORD_SDK_SOURCE.includes('Opcodes.HANDSHAKE'));
@@ -66,8 +70,10 @@ assert(localSdkEntry.includes('local-minimal'));
 const singleScriptEntry = readFileSync(new URL("../src/activity-single-script-entry.js", import.meta.url), "utf8");
 assert(singleScriptEntry.includes('from "./activity-local-sdk-entry.js"'));
 assert(singleScriptEntry.includes('Promise.resolve({ DiscordSDK: InlineDiscordSDK })'));
-assert(singleScriptEntry.includes('replaceAll'));
-assert(singleScriptEntry.includes('20260913-9'));
+assert(singleScriptEntry.includes('20260913-10'));
+assert(singleScriptEntry.includes('/activity/veil-arena-20260913-10.js'));
+assert(singleScriptEntry.includes('Expected test guild_id'));
+assert(singleScriptEntry.includes('1504257112094539798'));
 assert(singleScriptEntry.includes('Launch guild_id'));
 assert(singleScriptEntry.includes('Launch channel_id'));
 assert(singleScriptEntry.includes('Worker Application ID'));
