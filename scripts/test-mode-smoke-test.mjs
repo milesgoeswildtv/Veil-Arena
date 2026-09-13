@@ -49,13 +49,17 @@ const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.j
 const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
 const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
+const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta.url), "utf8");
 assert(wrangler.includes('main = "src/activity-single-script-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
 assert(singleScriptEntry.includes('from "./activity-local-sdk-entry.js"'));
 assert(singleScriptEntry.includes('InlineDiscordSDK'));
-assert(singleScriptEntry.includes('20260913-9'));
+assert(singleScriptEntry.includes('20260913-10'));
+assert(singleScriptEntry.includes('/activity/veil-arena-20260913-10.js'));
+assert(singleScriptEntry.includes('1504257112094539798'));
 assert(singleScriptEntry.includes('Launch guild_id'));
 assert(singleScriptEntry.includes('Launch channel_id'));
+assert(serverConfig.includes('VEIL_ACTIVITY_TEST_GUILD_ID = "1504257112094539798"'));
 assert(localSdkEntry.includes('MINI_DISCORD_SDK_SOURCE'));
 assert(miniSdk.includes('class DiscordSDK'));
 assert(miniSdk.includes('"AUTHORIZE"'));
