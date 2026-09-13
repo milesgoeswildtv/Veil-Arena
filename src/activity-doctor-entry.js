@@ -50,12 +50,17 @@ async function diagnostics(env) {
   const flags = Number(application?.flags || 0);
   const embedded = Boolean(flags & EMBEDDED_FLAG);
   const entry = Array.isArray(commands) ? commands.find(command => Number(command.type) === 4) : null;
+  const workerApplicationId = String(env.DISCORD_APPLICATION_ID || "");
+  const botApplicationId = String(application?.id || "");
   return {
     applicationName: application?.name || "Veil",
-    applicationIdMatches: String(application?.id || "") === String(env.DISCORD_APPLICATION_ID),
+    workerApplicationId,
+    botApplicationId,
+    applicationIdMatches: botApplicationId === workerApplicationId,
     embedded,
     entryPoint: Boolean(entry),
     entryPointName: entry?.name || null,
+    entryPointId: entry?.id || null,
     entryPointHandler: entry ? Number(entry.handler || 0) : null,
     entryPointDiscordLaunches: Number(entry?.handler || 0) === 2,
     globalCommandCount: Array.isArray(commands) ? commands.length : 0
@@ -108,17 +113,19 @@ function badge(label, ok, detail = "") {
 
 function page(origin, env, d = null, error = "") {
   const rows = d ? [
-    badge("Worker ↔ Discord app ID", d.applicationIdMatches, d.applicationIdMatches ? "MATCH" : "MISMATCH"),
+    badge("Worker Application ID", Boolean(d.workerApplicationId), d.workerApplicationId || "MISSING"),
+    badge("Bot Token Application ID", Boolean(d.botApplicationId), d.botApplicationId || "MISSING"),
+    badge("Worker ↔ Bot app ID", d.applicationIdMatches, d.applicationIdMatches ? "MATCH" : "MISMATCH"),
     badge("Discord Embedded / Activity flag", d.embedded, d.embedded ? "ENABLED" : "DISABLED"),
-    badge("Global Activity Entry Point", d.entryPoint, d.entryPoint ? String(d.entryPointName || "launch") : "MISSING"),
+    badge("Global Activity Entry Point", d.entryPoint, d.entryPoint ? `${String(d.entryPointName || "launch")} // ${String(d.entryPointId || "no-id")}` : "MISSING"),
     badge("Entry Point launches Activity", d.entryPointDiscordLaunches, d.entryPointHandler == null ? "NO HANDLER" : `HANDLER ${d.entryPointHandler}`)
   ].join("") : badge("Discord live diagnostics", false, "UNAVAILABLE");
 
   const ready = Boolean(d?.applicationIdMatches && d?.embedded && d?.entryPoint && d?.entryPointDiscordLaunches);
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Veil Activity Doctor</title><style>
-body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#09070d;color:#fff;display:grid;place-items:center;min-height:100vh;padding:18px}.card{width:min(94vw,650px);background:linear-gradient(180deg,#1d1429,#100b17);border:1px solid #49345f;padding:22px;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.4)}h1{margin:0 0 6px}.muted{color:#bbaac8;font-size:13px;line-height:1.5}.rows{display:grid;gap:7px;margin:16px 0}.row{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:10px 11px;border-radius:11px;background:#0b0810;font-size:12px}.row em{font-style:normal;font-size:10px;font-weight:950;letter-spacing:.06em}.good{color:#98efbd}.bad{color:#ff9bb4}.status{padding:12px;border-radius:11px;background:#0b0810;border:1px solid #392849;margin:14px 0;color:${ready ? "#98efbd" : "#ffb1c4"};font-weight:850}label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#cfb8e6;margin:14px 0}input,button{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;font-size:16px}input{background:#09070d;color:#fff;border:1px solid #463356}button{border:0;background:#8f59f7;color:#fff;font-weight:950}.err{white-space:pre-wrap;word-break:break-word;color:#ff9bb4;background:#150a10;padding:10px;border-radius:10px}.hint{font-size:11px;color:#9789a1;margin-top:14px;line-height:1.5}code{background:#08060b;padding:2px 5px;border-radius:5px}</style></head><body><div class="card">
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#09070d;color:#fff;display:grid;place-items:center;min-height:100vh;padding:18px}.card{width:min(94vw,650px);background:linear-gradient(180deg,#1d1429,#100b17);border:1px solid #49345f;padding:22px;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.4)}h1{margin:0 0 6px}.muted{color:#bbaac8;font-size:13px;line-height:1.5}.rows{display:grid;gap:7px;margin:16px 0}.row{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:10px 11px;border-radius:11px;background:#0b0810;font-size:12px}.row em{font-style:normal;font-size:10px;font-weight:950;letter-spacing:.03em;word-break:break-all;text-align:right}.good{color:#98efbd}.bad{color:#ff9bb4}.status{padding:12px;border-radius:11px;background:#0b0810;border:1px solid #392849;margin:14px 0;color:${ready ? "#98efbd" : "#ffb1c4"};font-weight:850}label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#cfb8e6;margin:14px 0}input,button{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;font-size:16px}input{background:#09070d;color:#fff;border:1px solid #463356}button{border:0;background:#8f59f7;color:#fff;font-weight:950}.err{white-space:pre-wrap;word-break:break-word;color:#ff9bb4;background:#150a10;padding:10px;border-radius:10px}.hint{font-size:11px;color:#9789a1;margin-top:14px;line-height:1.5}code{background:#08060b;padding:2px 5px;border-radius:5px}</style></head><body><div class="card">
 <h1>🎮 Veil Activity Doctor</h1>
-<p class="muted">This page asks Discord directly whether Veil is actually an Activity and whether its Launch Entry Point exists. It does not rely on the Discord mobile cache.</p>
+<p class="muted">This page asks Discord directly which application your Worker bot token belongs to, whether that exact application is Activity-enabled, and whether its global Launch Entry Point exists. No secret values are shown.</p>
 <div class="rows">${rows}</div>
 <div class="status">${ready ? "✓ DISCORD SAYS VEIL IS LAUNCHABLE" : "⚠ VEIL IS NOT FULLY LAUNCHABLE YET"}</div>
 ${error ? `<div class="err">${esc(error)}</div>` : ""}
@@ -126,7 +133,7 @@ ${error ? `<div class="err">${esc(error)}</div>` : ""}
 <label>Cloudflare ADMIN_SECRET<input type="password" name="adminSecret" required autocomplete="current-password"></label>
 <button type="submit">VERIFY + FORCE REPAIR ACTIVITY</button>
 </form>
-<p class="hint">Worker: ${esc(origin)}<br>If <b>Embedded / Activity flag</b> is red, code cannot turn that flag on; Discord requires it in Developer Portal → Activities → Settings. If you are testing on this iPhone, <b>iOS must be enabled under Supported Platforms</b>.</p>
+<p class="hint">Worker: ${esc(origin)}<br>The server you launch from does not have to be Full Tilt. Guild and voice-channel IDs come from the Activity launch itself.</p>
 </div></body></html>`;
 }
 
