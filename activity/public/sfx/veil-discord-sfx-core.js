@@ -30,9 +30,8 @@
     glitch: [5.500045, 1.650000]
   };
 
-  let ctx = null;
-  let buffer = null;
-  let loading = null;
+  let spriteSource = "";
+  let spriteLoading = null;
   let previous = null;
   let deadline = null;
   let deadlineCueKey = "";
@@ -48,34 +47,26 @@
     return [name, audio];
   }));
 
-  function audioContext() {
-    if (!ctx) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return null;
-      ctx = new Ctx();
-    }
-    return ctx;
-  }
+  async function loadSpriteSource() {
+    if (spriteSource) return spriteSource;
+    if (spriteLoading) return spriteLoading;
 
-  async function loadSprite() {
-    if (buffer) return buffer;
-    if (loading) return loading;
-    const c = audioContext();
-    if (!c) return null;
-    loading = Promise.all(CHUNKS.map(url => fetch(url).then(r => {
-      if (!r.ok) throw new Error(`SFX chunk failed: ${url}`);
-      return r.text();
+    spriteLoading = Promise.all(CHUNKS.map(url => fetch(url).then(response => {
+      if (!response.ok) throw new Error(`SFX chunk failed: ${url}`);
+      return response.text();
     })))
-      .then(parts => parts.join(""))
-      .then(text => {
-        const raw = atob(text.trim());
-        const bytes = new Uint8Array(raw.length);
-        for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-        return c.decodeAudioData(bytes.buffer);
+      .then(parts => parts.join("").replace(/\s+/g, ""))
+      .then(base64 => {
+        if (!base64) throw new Error("SFX sprite is empty");
+        spriteSource = `data:audio/mpeg;base64,${base64}`;
+        return spriteSource;
       })
-      .then(decoded => (buffer = decoded))
-      .catch(() => null);
-    return loading;
+      .catch(() => {
+        spriteLoading = null;
+        return "";
+      });
+
+    return spriteLoading;
   }
 
   async function play(name, delay = 0) {
@@ -83,21 +74,39 @@
       setTimeout(() => play(name), delay);
       return;
     }
+
     const cue = CUES[name];
     if (!cue) return;
+
     try {
-      const c = audioContext();
-      if (!c) return;
-      if (c.state === "suspended") await c.resume().catch(() => {});
-      const decoded = await loadSprite();
-      if (!decoded || c.state !== "running") return;
-      const source = c.createBufferSource();
-      const gain = c.createGain();
-      source.buffer = decoded;
-      gain.gain.value = VOLUME;
-      source.connect(gain);
-      gain.connect(c.destination);
-      source.start(0, cue[0], cue[1]);
+      const source = await loadSpriteSource();
+      if (!source) return;
+
+      const audio = new Audio(source);
+      audio.preload = "auto";
+      audio.volume = VOLUME;
+
+      let started = false;
+      const begin = () => {
+        if (started) return;
+        started = true;
+        try {
+          audio.currentTime = cue[0];
+          const result = audio.play();
+          if (result?.catch) result.catch(() => {});
+          setTimeout(() => {
+            audio.pause();
+            audio.removeAttribute("src");
+            audio.load();
+          }, Math.ceil((cue[1] + 0.08) * 1000));
+        } catch {}
+      };
+
+      if (audio.readyState >= 1) begin();
+      else {
+        audio.addEventListener("loadedmetadata", begin, { once: true });
+        audio.load();
+      }
     } catch {}
   }
 
@@ -304,6 +313,9 @@
     }
     if (desiredMusic) applyMusic();
   });
+
+  // Preload the short-cue sprite immediately so button taps do not wait on network/decode.
+  loadSpriteSource();
 
   // Attempt lobby music immediately. Discord/iOS may require the first user gesture;
   // the pointerdown handler above retries automatically if autoplay is blocked.
