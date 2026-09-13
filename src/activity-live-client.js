@@ -1,5 +1,6 @@
 async function activityClient() {
-  const { DiscordSDK } = await import("/activity/sdk.js");
+  const sdkPath = "/activity/sdk.js";
+  const { DiscordSDK } = await import(sdkPath);
   const $ = id => document.getElementById(id);
   const clientId = document.body.dataset.discordClientId || "";
   const ui = {
