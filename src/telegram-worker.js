@@ -35,8 +35,11 @@ function commandParts(text = "") {
 }
 
 async function launchKeyboard(env, game, label = "⚔️ OPEN ARENA") {
-  const url = game.telegramLaunchUrl || await arenaLaunchUrl(env.TELEGRAM_BOT_TOKEN, game.id);
-  if (!game.telegramLaunchUrl) {
+  // Always rebuild the deep link from the bot token currently deployed.
+  // This prevents an active Arena from retaining a link to an old/test bot
+  // after TELEGRAM_BOT_TOKEN is changed.
+  const url = await arenaLaunchUrl(env.TELEGRAM_BOT_TOKEN, game.id);
+  if (game.telegramLaunchUrl !== url) {
     game.telegramLaunchUrl = url;
     await saveGame(env.DB, game);
   }
