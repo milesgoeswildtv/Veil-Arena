@@ -30,6 +30,7 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/activity-sdk-route-fix-entry.js
           node --check src/activity-bootstrap-fix-entry.js
           node --check src/activity-doctor-entry.js
           node --check src/activity-entrypoint-entry.js
