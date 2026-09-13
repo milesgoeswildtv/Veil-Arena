@@ -21,7 +21,7 @@ new_sqlite_classes = ["ArenaCoordinator"]
 
 [env.test]
 name = "veil-arena-test-bot"
-main = "src/telegram-start-entry.js"
+main = "src/telegram-group-context-entry.js"
 
 [env.test.vars]
 ARENA_TEST_MODE = "true"
