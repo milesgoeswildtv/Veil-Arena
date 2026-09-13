@@ -3,6 +3,8 @@ import app, { ArenaCoordinator } from "./activity-doctor-entry.js";
 export { ArenaCoordinator };
 
 const ACTIVITY_SESSION_MS = 12 * 60 * 60 * 1000;
+const ACTIVITY_BUILD = "20260913-4";
+const SDK_STANDALONE_URL = "https://esm.sh/@discord/embedded-app-sdk@2.5.0?standalone&target=es2020";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -117,14 +119,47 @@ async function handleActivityOAuth(request, env) {
   }
 }
 
+async function standaloneSdk() {
+  try {
+    const upstream = await fetch(SDK_STANDALONE_URL, {
+      headers: { "user-agent": "Veil-Arena-Activity/1.0" },
+      cf: { cacheTtl: 0, cacheEverything: false }
+    });
+    if (!upstream.ok) {
+      return new Response(`Veil could not fetch Discord Embedded App SDK (${upstream.status}).`, {
+        status: 502,
+        headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" }
+      });
+    }
+    return new Response(await upstream.text(), {
+      headers: {
+        "content-type": "application/javascript; charset=utf-8",
+        "cache-control": "no-store",
+        "x-content-type-options": "nosniff",
+        "x-veil-sdk": `standalone-${ACTIVITY_BUILD}`
+      }
+    });
+  } catch (error) {
+    return new Response(`throw new Error(${JSON.stringify(`Discord SDK server fetch failed: ${String(error?.message || error)}`)});`, {
+      status: 200,
+      headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" }
+    });
+  }
+}
+
 async function patchedLiveClient(request, env, ctx) {
   const original = await app.fetch(request, env, ctx);
   if (!original.ok) return original;
   let source = await original.text();
 
   source = source.replace(
+    'const sdkPath = "/activity/sdk.js";',
+    `const sdkPath = "/activity/sdk.js?v=${ACTIVITY_BUILD}";`
+  );
+
+  source = source.replace(
     'const { DiscordSDK } = await import(sdkPath);',
-    `let DiscordSDK;\n  try {\n    ({ DiscordSDK } = await import(sdkPath));\n  } catch (error) {\n    const message = error?.message || String(error || "Unknown SDK load error");\n    const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n    put("connection", "SDK LOAD FAILED");\n    put("system", "CLIENT ERROR");\n    put("round", "DISCORD SDK FAILED");\n    put("headline", "VEIL COULD NOT LOAD DISCORD");\n    put("event", message);\n    put("notice", "Discord SDK load failed: " + message);\n    throw error;\n  }`
+    `const bootPut = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n  bootPut("connection", "CLIENT BOOTING");\n  bootPut("round", "CLIENT BOOTING");\n  bootPut("headline", "LOADING DISCORD SDK…");\n  bootPut("event", "Veil client ${ACTIVITY_BUILD} loaded. Loading Discord Embedded App SDK now.");\n  bootPut("notice", "Client loaded // waiting for Discord SDK");\n  let DiscordSDK;\n  try {\n    ({ DiscordSDK } = await import(sdkPath));\n  } catch (error) {\n    const message = error?.message || String(error || "Unknown SDK load error");\n    bootPut("connection", "SDK LOAD FAILED");\n    bootPut("system", "CLIENT ERROR");\n    bootPut("round", "DISCORD SDK FAILED");\n    bootPut("headline", "VEIL COULD NOT LOAD DISCORD");\n    bootPut("event", message);\n    bootPut("notice", "Discord SDK load failed: " + message);\n    throw error;\n  }`
   );
 
   source = source.replace(
@@ -134,7 +169,7 @@ async function patchedLiveClient(request, env, ctx) {
 
   const headers = new Headers(original.headers);
   headers.set("cache-control", "no-store");
-  headers.set("x-veil-bootstrap", "sdk-guard-v1");
+  headers.set("x-veil-bootstrap", `cache-bust-${ACTIVITY_BUILD}`);
   return new Response(source, { status: original.status, headers });
 }
 
@@ -143,10 +178,20 @@ async function patchedActivityHtml(request, env, ctx) {
   if (!original.ok) return original;
   const type = original.headers.get("content-type") || "";
   if (!type.includes("text/html")) return original;
-  const source = (await original.text()).replace("ARENA OFFLINE", "CONNECTING TO DISCORD");
+  let source = await original.text();
+  source = source.replace("ARENA OFFLINE", "CONNECTING TO DISCORD");
+  source = source.replace('src="/activity/live.js"', `src="/activity/live.js?v=${ACTIVITY_BUILD}"`);
+  source = source.replace(
+    '<div class="event" id="event"><div class="spinner"></div></div>',
+    `<div class="event" id="event">Loading Veil client ${ACTIVITY_BUILD}…<div class="spinner"></div></div>`
+  );
+  source = source.replace(
+    "The Activity is connecting to the Arena engine.",
+    `Loading Veil Activity client ${ACTIVITY_BUILD}…`
+  );
   const headers = new Headers(original.headers);
   headers.set("cache-control", "no-store");
-  headers.set("x-veil-bootstrap", "sdk-guard-v1");
+  headers.set("x-veil-bootstrap", `cache-bust-${ACTIVITY_BUILD}`);
   return new Response(source, { status: original.status, headers });
 }
 
@@ -156,6 +201,10 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/activity/oauth/token") {
       return handleActivityOAuth(request, env);
+    }
+
+    if (request.method === "GET" && url.pathname === "/activity/sdk.js") {
+      return standaloneSdk();
     }
 
     if (request.method === "GET" && url.pathname === "/activity/live.js") {
