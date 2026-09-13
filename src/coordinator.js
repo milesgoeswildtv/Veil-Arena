@@ -15,12 +15,13 @@ import { startArenaCooldown, TELEGRAM_ARENA_COOLDOWN_MS } from "./cooldown.js";
 import { getTheme, chooseNarration } from "./themes/index.js";
 import { buildMassBrawl } from "./themes/brawls.js";
 import { payoutReportText } from "./sponsorships.js";
+import { payArenaWinner, payoutStatusText } from "./dwallet-payout.js";
 
 const CROWD_VOTE_MS = 30000;
 const RARE_EVENT_CHANCE = 0.035;
 
 const name = (g, id) => g.players[id]?.displayName || "Unknown";
-const delayFor = brawl => brawl ? 14000 + Math.floor(Math.random() * 2001) : 12000 + Math.floor(Math.random() * 2001);
+const delayFor = brawl => brawl ? 19000 + Math.floor(Math.random() * 2001) : 17000 + Math.floor(Math.random() * 2001);
 const esc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const platformOf = g => g?.platform === "telegram" ? "telegram" : g?.platform === "activity" ? "activity" : "discord";
 const themeIcon = t => t.id === "full_tilt" ? "🎰" : t.id === "dwallet" ? "💜" : "👻";
@@ -250,10 +251,15 @@ async function finish(env, g) {
   const platform = platformOf(g);
   const base = winner(g);
   const payout = payoutReportText(g);
+  if (platform === "discord" && g.dwalletWinnerPayout) {
+    await payArenaWinner(env, g, saveGame);
+  }
+  const automaticPayout = payoutStatusText(g);
   const msg = platform === "telegram" ? `${base}\n\n⏳ **Next DWallet Arena: 30 minutes.**` : base;
   g.payoutReport = payout || null;
   rememberDisplayed(g, base);
   if (payout) rememberDisplayed(g, payout);
+  if (automaticPayout) rememberDisplayed(g, automaticPayout);
   await saveGame(env.DB, g);
   await recordFinishedGame(env.DB, g);
   if (platform !== "activity") {
@@ -261,6 +267,7 @@ async function finish(env, g) {
     if (payout) {
       for (const chunk of messageChunks(payout)) await sendTransport(env, platform, g.channelId, chunk);
     }
+    if (automaticPayout) await sendTransport(env, platform, g.channelId, automaticPayout);
   }
   if (platform === "telegram") {
     await startArenaCooldown(env.DB, g.channelId, TELEGRAM_ARENA_COOLDOWN_MS);
