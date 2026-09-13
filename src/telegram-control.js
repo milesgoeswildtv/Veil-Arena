@@ -14,6 +14,13 @@ function commandParts(text = "") {
   return { command: (parts.shift() || "").toLowerCase().split("@")[0], args: parts };
 }
 
+function webhookAck() {
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { "content-type": "application/json; charset=utf-8" }
+  });
+}
+
 async function isTelegramAdmin(message, env) {
   try {
     const member = await telegramRequest(env.TELEGRAM_BOT_TOKEN, "getChatMember", {
@@ -29,20 +36,23 @@ async function isTelegramAdmin(message, env) {
 async function forceCloseTelegramArena(message, env) {
   const scope = telegramScope(message?.chat?.id);
   if (!isTelegramGroup(message?.chat)) {
-    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Use /arena forceclose inside the Telegram group with the stuck Arena.");
+    await sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Use /arena forceclose inside the Telegram group with the stuck Arena.");
+    return;
   }
 
   await ensureSchema(env.DB);
   const game = await loadActiveGameForChannel(env.DB, scope);
   if (!game || game.platform !== "telegram") {
-    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "No active Telegram Arena exists in this group. You can start a new one now.");
+    await sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "No active Telegram Arena exists in this group. You can start a new one now.");
+    return;
   }
 
   const user = userFromTelegram(message.from);
   if (!user) return;
   const allowed = user.id === String(game.hostId) || await isTelegramAdmin(message, env);
   if (!allowed) {
-    return sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Only the Arena host or a Telegram group admin can force-close it.");
+    await sendTelegramMessage(scope, env.TELEGRAM_BOT_TOKEN, "Only the Arena host or a Telegram group admin can force-close it.");
+    return;
   }
 
   game.status = "aborted";
@@ -56,7 +66,7 @@ async function forceCloseTelegramArena(message, env) {
     ? "\n\n⚠️ This Arena had a funded DWallet prize. The Arena state is cleared, but that funded prize still needs to be reconciled/refunded before reuse."
     : "";
 
-  return sendTelegramMessage(
+  await sendTelegramMessage(
     scope,
     env.TELEGRAM_BOT_TOKEN,
     `🛑 Arena force-closed. The stuck active state is cleared. You can use /arena to start a fresh one now.${prizeWarning}`
@@ -73,7 +83,8 @@ export async function handleTelegramRoute(request, env) {
       const { command, args } = commandParts(message.text);
       const sub = String(args[0] || "").toLowerCase();
       if (command === "/arenaforceclose" || (command === "/arena" && (sub === "forceclose" || sub === "close" || sub === "reset"))) {
-        return forceCloseTelegramArena(message, env);
+        await forceCloseTelegramArena(message, env);
+        return webhookAck();
       }
     }
   }
