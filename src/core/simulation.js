@@ -13,14 +13,32 @@ const FAKE_NAMES = [
   "Loose Battery", "Shady Craig", "Possessed Toaster", "Swamp Accountant", "Discount Exorcist"
 ];
 
+const DWALLET_FAKE_NAMES = [
+  "Gas Fee Gary", "Wallet Gremlin", "Bridge Bandit", "Chain Hopper", "Slippage Steve",
+  "Pending Penny", "Nonce Nancy", "Ledger Larry", "Cold Wallet Carl", "Hot Wallet Holly",
+  "Seed Phrase Sam", "Rugcheck Randy", "Token Tony", "Minty Mike", "Block Explorer Bob",
+  "Dust Attack Dave", "Liquidity Linda", "Hashrate Harry", "Moonbag Molly", "Airdrop Andy",
+  "DeFi Danny", "Staking Stacy", "Validator Vince", "Swap Shop Sue", "Crypto Karen",
+  "Peach's Intern", "Crek's Accountant", "HQ Night Shift", "Red Button Randy", "Lair Dweller",
+  "Wallet Watcher", "Chain Goblin", "Fee Collector", "Blockhead Brian", "Transfer Terry",
+  "Approval Alice", "Multisig Max", "Recovery Rick", "Portfolio Pete", "Whale Watch Wendy",
+  "Token Goblin", "Gasless Greg", "Send It Sally", "Bridge Troll", "Hash Brown",
+  "Node Runner", "QR Carl", "Claim Clicker", "Balance Zero", "Last Confirmed"
+];
+
+function fakeNamesForGame(game) {
+  return game?.themeId === "dwallet" ? DWALLET_FAKE_NAMES : FAKE_NAMES;
+}
+
 export function addFakeContestants(game, count = 20) {
   if (game.status !== "registration") throw new Error("Fake contestants can only be added during registration.");
   const safeCount = Math.max(1, Math.min(Number(count) || 20, 50));
   const added = [];
   const existing = new Set(Object.values(game.players).map(p => p.displayName));
+  const names = fakeNamesForGame(game);
 
   for (let i = 0; i < safeCount; i++) {
-    const base = FAKE_NAMES[(Object.keys(game.players).length + i) % FAKE_NAMES.length];
+    const base = names[(Object.keys(game.players).length + i) % names.length];
     let displayName = base;
     let suffix = 2;
     while (existing.has(displayName)) displayName = `${base} ${suffix++}`;
