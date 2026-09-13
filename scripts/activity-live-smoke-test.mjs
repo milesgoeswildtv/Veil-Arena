@@ -30,7 +30,13 @@ assert(resetEntry.includes('ABORT / RESET ARENA'));
 assert(resetEntry.includes('body.action === "abort"'));
 assert(resetEntry.includes('status === "cancelled"'));
 
+const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
+assert(entryPointEntry.includes('type: 4'));
+assert(entryPointEntry.includes('handler: 2'));
+assert(entryPointEntry.includes('/setup/activity'));
+assert(entryPointEntry.includes('/admin/activity/register'));
+
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-reset-entry.js"'));
+assert(wrangler.includes('main = "src/activity-entrypoint-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
