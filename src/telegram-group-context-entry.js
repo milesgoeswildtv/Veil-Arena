@@ -73,7 +73,7 @@ async function withOriginatingGroupContext(request, env) {
   // Main Mini App links may omit chat_type/chat_instance on some Telegram clients even
   // when the user opens the Arena button from the group message. The Arena game already
   // stores the originating Telegram group ID, and membership is verified above, so give
-  // the existing Mini App handler a stable server-signed group context for that game.
+  // the existing Mini App and QA handlers a stable server-signed group context for that game.
   const chatInstance = `veil:${String(game.channelId).replace(/^tg:/, "")}`;
   const resigned = await resignInitData(initData, env.TELEGRAM_BOT_TOKEN, chatInstance);
   const headers = new Headers(request.headers);
@@ -84,12 +84,16 @@ async function withOriginatingGroupContext(request, env) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    const miniAppApi = url.pathname === "/telegram/miniapp/state" || url.pathname === "/telegram/miniapp/action";
-    if (miniAppApi) {
+    const needsTelegramGroupContext =
+      url.pathname === "/telegram/miniapp/state" ||
+      url.pathname === "/telegram/miniapp/action" ||
+      url.pathname === "/telegram/miniapp/test";
+
+    if (needsTelegramGroupContext) {
       try {
         request = await withOriginatingGroupContext(request, env);
       } catch {
-        // Fall through unchanged so the existing Mini App handler returns its normal,
+        // Fall through unchanged so the existing handlers return their normal,
         // user-facing authentication/context error rather than masking the real cause.
       }
     }
