@@ -1,4 +1,4 @@
-import app, { ArenaCoordinator } from "./activity-entry.js";
+import app, { ArenaCoordinator } from "./test-entry.js";
 import { InteractionType, verifyDiscordRequest, interactionMessage, interactionUpdate, button, actionRow, userFromInteraction } from "./discord.js";
 import { ensureSchema, loadActiveGameForChannel, loadGame, saveGame } from "./storage.js";
 
