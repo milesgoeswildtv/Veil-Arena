@@ -40,14 +40,18 @@ for (const action of [
 }
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+const sdkRouteEntry = readFileSync(new URL("../src/activity-sdk-route-fix-entry.js", import.meta.url), "utf8");
 const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
 const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
 const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
 const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
 const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-bootstrap-fix-entry.js"'));
+assert(wrangler.includes('main = "src/activity-sdk-route-fix-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
+assert(sdkRouteEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
+assert(sdkRouteEntry.includes('/activity/sdk-dep/'));
+assert(sdkRouteEntry.includes('application/javascript'));
 assert(bootstrapEntry.includes('from "./activity-doctor-entry.js"'));
 assert(bootstrapEntry.includes('SDK LOAD FAILED'));
 assert(bootstrapEntry.includes('url.pathname === "/activity/oauth/token"'));
