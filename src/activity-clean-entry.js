@@ -5,7 +5,7 @@ import { cleanActivityHtml } from "./activity-clean-ui.js";
 
 export { ArenaCoordinator };
 
-const BUILD = "20260913-16";
+const BUILD = "20260913-17";
 const CLIENT_PATH = `/activity/veil-clean-${BUILD}.js`;
 const DISCORD_API = "https://discord.com/api/v10";
 let cachedApplication = null;
@@ -15,7 +15,7 @@ function noStore(headers = new Headers()) {
   headers.set("pragma", "no-cache");
   headers.set("expires", "0");
   headers.set("x-veil-activity-build", BUILD);
-  headers.set("x-veil-activity-stack", "clean");
+  headers.set("x-veil-activity-stack", "clean-proxy-identity");
   return headers;
 }
 
@@ -70,6 +70,45 @@ async function forward(request, env, ctx, pathname) {
   return app.fetch(forwarded, env, ctx);
 }
 
+function launchIdentityBootstrap(workerApplicationId) {
+  return `(() => {
+    const body = document.body;
+    const workerId = ${JSON.stringify(String(workerApplicationId || ""))};
+    const host = window.location.hostname;
+    const match = host.match(/^(\\d+)\\.discordsays\\.com$/i);
+    const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+    body.dataset.workerDiscordClientId = workerId;
+    body.dataset.activityHost = host;
+
+    if (!match) {
+      globalThis.__VEIL_PROXY_BLOCKED__ = true;
+      put("status", "CONFIGURATION ERROR");
+      put("step", "DISCORD ACTIVITY PROXY MISSING");
+      put("detail", "Veil loaded from " + host + " instead of <application-id>.discordsays.com. Disable Application URL Override and keep the Activity URL Mapping on /.");
+      put("notice", "Discord READY cannot work until Veil is launched through the Activity proxy.");
+      return;
+    }
+
+    const launchId = match[1];
+    body.dataset.discordClientId = launchId;
+    body.dataset.launchDiscordClientId = launchId;
+    body.dataset.appIdMismatch = workerId && workerId !== launchId ? "YES" : "NO";
+
+    if (workerId && workerId !== launchId) {
+      put("detail", "APP ID MISMATCH — Discord launched " + launchId + " but the Worker/bot credentials belong to " + workerId + ". Veil will use the launch app for READY so the mismatch becomes explicit at OAuth.");
+      put("notice", "Your Discord Activity app and Worker credentials are from different applications.");
+    }
+
+    if (window.parent === window) {
+      globalThis.__VEIL_PROXY_BLOCKED__ = true;
+      put("status", "CONFIGURATION ERROR");
+      put("step", "DISCORD PARENT RPC MISSING");
+      put("detail", "Veil is not inside Discord's Activity iframe. The SDK has no parent RPC server to answer READY.");
+      put("notice", "Launch Veil from Discord's Activity surface, not a direct web URL.");
+    }
+  })();`;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -85,7 +124,9 @@ export default {
     }
 
     if (request.method === "GET" && url.pathname === CLIENT_PATH) {
-      const source = `${OFFICIAL_DISCORD_SDK_SOURCE}\n${activityCleanClientSource()}`;
+      const bootstrap = launchIdentityBootstrap(application.id);
+      const client = `if (!globalThis.__VEIL_PROXY_BLOCKED__) {\n${activityCleanClientSource()}\n}`;
+      const source = `${OFFICIAL_DISCORD_SDK_SOURCE}\n${bootstrap}\n${client}`;
       return new Response(source, {
         status: 200,
         headers: noStore(new Headers({
