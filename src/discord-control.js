@@ -1,6 +1,6 @@
 import { handleDiscordRoute as baseHandleDiscordRoute } from "./discord-worker.js";
 import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction } from "./discord.js";
-import { ensureSchema, loadActiveGameForChannel, saveGame } from "./storage.js";
+import { ensureSchema, loadActiveGameForChannel, saveGame, setGuildTheme } from "./storage.js";
 import { isVeilTipAdmin, veilTipAdminEntry, sendDirectDwalletTip } from "./dwallet-direct-tip.js";
 import { discordSetupPage, getDiscordSetupStatus, registerDiscordGuildFromRequest } from "./discord-setup.js";
 
@@ -104,6 +104,29 @@ async function handleForceClose(interaction, env) {
   return interactionMessage(`🛑 **Arena force-closed hard.** The stuck Discord Activity scope and its registration/tick state were cleared. You can start a new Arena now.${prizeWarning}`);
 }
 
+async function handleTheme(interaction, env) {
+  if (!interaction.guild_id) return interactionMessage("Arena themes can only be changed inside a Discord server.", [], true);
+  if (!env.DB) return interactionMessage("Arena database is not configured yet.", [], true);
+  if (!canManageGuild(interaction)) return interactionMessage("Only a server admin or member with Manage Server can change the Arena theme.", [], true);
+
+  const sub = interaction.data?.options?.[0];
+  const themeId = String(sub?.options?.find(option => option.name === "style")?.value || "");
+  const names = {
+    full_tilt: "Full Tilt",
+    dwallet: "DWallet",
+    base: "Veil Default"
+  };
+  if (!names[themeId]) return interactionMessage("That Arena theme is not available.", [], true);
+
+  await ensureSchema(env.DB);
+  await setGuildTheme(env.DB, String(interaction.guild_id), themeId);
+  return interactionMessage(
+    `🎭 **Arena theme set to ${names[themeId]}.**\n\nThe next Discord Arena **and Discord Activity** game opened in this server will use it. A game already in progress keeps the theme it started with.`,
+    [],
+    true
+  );
+}
+
 function optionValue(interaction, name) {
   return interaction?.data?.options?.find(option => option.name === name)?.value;
 }
@@ -179,12 +202,13 @@ export async function handleDiscordRoute(request, env) {
     const isCommand = interaction?.type === InteractionType.APPLICATION_COMMAND;
     const commandName = isCommand ? interaction?.data?.name : "";
     const sub = commandName === "arena" ? interaction?.data?.options?.[0]?.name : "";
-    if (sub === "status" || sub === "forceclose" || commandName === "veiltip" || commandName === "ping") {
+    if (sub === "status" || sub === "forceclose" || sub === "theme" || commandName === "veiltip" || commandName === "ping") {
       if (!await verifyDiscordRequest(request, env.DISCORD_PUBLIC_KEY, raw)) return new Response("Bad signature", { status: 401 });
       if (commandName === "ping") return interactionMessage("💜 Veil Discord interactions are online.", [], true);
       if (commandName === "veiltip") return handleVeilTip(interaction, env);
       if (!interaction.guild_id) return interactionMessage("Arena controls can only be used inside a Discord server.", [], true);
       if (sub === "status") return handleStatus(interaction, env);
+      if (sub === "theme") return handleTheme(interaction, env);
       return handleForceClose(interaction, env);
     }
   }
