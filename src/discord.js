@@ -15,6 +15,8 @@ const sponsorAmount=(name,description)=>({name,description,type:10,required:fals
 export function arenaCommands(){return[
   {name:"arena",description:"Enter the Arena.",type:1,options:[
     {name:"start",description:"Open Arena registration.",type:1},
+    {name:"status",description:"Check the active Arena in this channel.",type:1},
+    {name:"forceclose",description:"Host or server admin: force-close a stuck Arena.",type:1},
     {name:"sponsor",description:"Sponsor optional cash prizes for the active Arena.",type:1,options:[
       sponsorAmount("winner","Dollar amount for the Arena winner."),
       sponsorAmount("runner_up","Dollar amount for the runner-up."),
