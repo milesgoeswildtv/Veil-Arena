@@ -28,13 +28,15 @@ async function activeDiscordGame(interaction, env) {
     return activityGame;
   }
 
-  // Emergency fallback: let /arena forceclose be run from any channel in the same
-  // Discord server when the embedded Activity itself (often a voice channel) is stuck.
+  // Emergency fallback: the Activity UI can remain visually stuck on the latest
+  // persisted Activity record even after that game reached "finished". In that
+  // situation there is no "active" game for the normal loader to find, so
+  // /arena forceclose deliberately targets the most recently updated Activity
+  // record in this guild regardless of its current status.
   const row = await env.DB.prepare(`
     SELECT state_json FROM games
     WHERE guild_id = ?
       AND channel_id LIKE 'activity:%'
-      AND status IN ('registration', 'starting', 'running')
     ORDER BY updated_at DESC, created_at DESC
     LIMIT 1
   `).bind(String(interaction.guild_id)).first();
@@ -48,7 +50,7 @@ async function activeDiscordGame(interaction, env) {
 
 async function handleStatus(interaction, env) {
   const game = await activeDiscordGame(interaction, env);
-  if (!game) return interactionMessage("No Arena is active in this channel or stuck Discord Activity in this server.", [], true);
+  if (!game) return interactionMessage("No Arena or Discord Activity record was found in this server.", [], true);
   return interactionMessage(
     `⚔️ Arena is **${game.status}**. Round **${Number(game.round) || 0}**. **${game.aliveIds?.length || 0}/${Object.keys(game.players || {}).length}** players alive. Host: <@${game.hostId}>.`,
     [],
@@ -58,23 +60,29 @@ async function handleStatus(interaction, env) {
 
 async function handleForceClose(interaction, env) {
   const game = await activeDiscordGame(interaction, env);
-  if (!game) return interactionMessage("No active Arena or stuck Discord Activity exists in this server. You can start a new one now.", [], true);
+  if (!game) return interactionMessage("No Arena or Discord Activity record exists in this server.", [], true);
   const user = userFromInteraction(interaction);
   if (!user || (user.id !== game.hostId && !canManageGuild(interaction))) {
     return interactionMessage("Only the Arena host or a server admin can force-close it.", [], true);
   }
 
   game.status = "aborted";
+  game.nextAdvanceAt = null;
   game.abortedAt = new Date().toISOString();
   game.abortedBy = user.id;
   game.history = Array.isArray(game.history) ? game.history : [];
   game.history.push({ type: "force_closed", byUserId: user.id, round: game.round || 0, at: game.abortedAt });
   await saveGame(env.DB, game);
 
+  if (game.id) {
+    await env.DB.prepare("DELETE FROM arena_registrations WHERE game_id = ?").bind(game.id).run().catch(() => null);
+    await env.DB.prepare("DELETE FROM activity_tick_leases WHERE game_id = ?").bind(game.id).run().catch(() => null);
+  }
+
   const prizeWarning = game.dwalletWinnerPayout?.status === "funded"
     ? "\n\n⚠️ This Arena had a funded DWallet prize. The Arena is closed, but that funded prize still needs to be reconciled/refunded before reuse."
     : "";
-  return interactionMessage(`🛑 **Arena force-closed.** The stuck active state is cleared. A new Arena can be started in this server immediately.${prizeWarning}`);
+  return interactionMessage(`🛑 **Arena force-closed hard.** The latest Discord Activity state was marked aborted and its registration/tick state was cleared. You can start a new Arena now.${prizeWarning}`);
 }
 
 function optionValue(interaction, name) {
