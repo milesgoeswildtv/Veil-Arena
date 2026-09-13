@@ -1,5 +1,10 @@
 export const DEFAULT_ARENA_COOLDOWN_MS = 30 * 60 * 1000;
 export const TELEGRAM_ARENA_COOLDOWN_MS = DEFAULT_ARENA_COOLDOWN_MS;
+export const TEMPORARY_TELEGRAM_COOLDOWN_DISABLED = true;
+
+function isTelegramScope(scopeKey) {
+  return String(scopeKey || "").startsWith("tg:");
+}
 
 async function ensureCooldownSchema(db) {
   if (!db) throw new Error("D1 binding DB is not configured.");
@@ -11,6 +16,7 @@ async function ensureCooldownSchema(db) {
 }
 
 export async function getArenaCooldownRemaining(db, scopeKey, now = Date.now()) {
+  if (TEMPORARY_TELEGRAM_COOLDOWN_DISABLED && isTelegramScope(scopeKey)) return 0;
   await ensureCooldownSchema(db);
   const row = await db.prepare("SELECT available_at FROM arena_cooldowns WHERE scope_key = ?")
     .bind(String(scopeKey))
@@ -20,6 +26,7 @@ export async function getArenaCooldownRemaining(db, scopeKey, now = Date.now()) 
 }
 
 export async function startArenaCooldown(db, scopeKey, durationMs = DEFAULT_ARENA_COOLDOWN_MS, now = Date.now()) {
+  if (TEMPORARY_TELEGRAM_COOLDOWN_DISABLED && isTelegramScope(scopeKey)) return now;
   await ensureCooldownSchema(db);
   const availableAt = now + Math.max(0, Number(durationMs) || 0);
   await db.prepare(`
