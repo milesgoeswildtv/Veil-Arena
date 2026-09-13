@@ -32,8 +32,6 @@ import { miniAppHtml } from "./miniapp.js";
 import { injectMiniAppHubHtml } from "./hub.js";
 import { upsertSponsorship } from "./sponsorships.js";
 import { SPONSOR_PANEL_CLIENT } from "./sponsor-panel-client.js";
-import { TEST_PANEL_CLIENT } from "./test-panel-client.js";
-import { arenaTestModeEnabled, handleTelegramTestMode, markNewTestGame } from "./test-mode.js";
 
 export { ArenaCoordinator };
 
@@ -118,20 +116,17 @@ async function startArenaFromGroup(message, env) {
     });
   }
 
-  if (!arenaTestModeEnabled(env)) {
-    const remaining = await getArenaCooldownRemaining(env.DB, channelId);
-    if (remaining > 0) {
-      return sendTelegramMessage(channelId, env.TELEGRAM_BOT_TOKEN, {
-        text: `⏳ DWallet Arena is cooling down. Try again in **${formatCooldown(remaining)}**.`
-      });
-    }
+  const remaining = await getArenaCooldownRemaining(env.DB, channelId);
+  if (remaining > 0) {
+    return sendTelegramMessage(channelId, env.TELEGRAM_BOT_TOKEN, {
+      text: `⏳ DWallet Arena is cooling down. Try again in **${formatCooldown(remaining)}**.`
+    });
   }
 
   game = createGame({ guildId: channelId, channelId, hostId: user.id, themeId: "dwallet", platform: "telegram" });
   addPlayer(game, user);
-  if (arenaTestModeEnabled(env)) markNewTestGame(game);
   await saveGame(env.DB, game);
-  return postArenaLauncher(env, game, user, arenaTestModeEnabled(env) ? "🧪 ENTER / WATCH QA ARENA" : "⚔️ ENTER / WATCH ARENA");
+  return postArenaLauncher(env, game, user);
 }
 
 async function commandStatus(message, env) {
@@ -146,7 +141,7 @@ async function commandStatus(message, env) {
       reply_markup: telegramArenaLauncherKeyboard(url, "⚔️ OPEN ARENA")
     });
   }
-  const remaining = arenaTestModeEnabled(env) ? 0 : await getArenaCooldownRemaining(env.DB, channelId);
+  const remaining = await getArenaCooldownRemaining(env.DB, channelId);
   return sendTelegramMessage(channelId, env.TELEGRAM_BOT_TOKEN, {
     text: remaining > 0 ? `⏳ No Arena is active. Cooldown: **${formatCooldown(remaining)}**.` : "No Arena is active. Use `/arena` to open one."
   });
@@ -225,8 +220,8 @@ async function handleWebhook(request, env) {
   return json({ ok: true });
 }
 
-function setupPage(origin, env) {
-  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Veil Telegram Setup</title><style>body{font-family:system-ui;margin:0;background:#0d0d10;color:#fff;display:grid;place-items:center;min-height:100vh;padding:18px}.card{width:min(92vw,620px);background:#19191d;border:1px solid #34343b;padding:24px;border-radius:20px}input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;font-size:16px}input{background:#0b0b0e;color:#fff;border:1px solid #41414b}button{margin-top:10px;border:0;background:#8f59f7;color:#fff;font-weight:900}.url{background:#0b0b0e;padding:12px;border-radius:10px;word-break:break-all;color:#d4baff}.muted{color:#aaa;font-size:13px;line-height:1.5}</style></head><body><div class="card"><h1>💜 Veil Telegram Arena</h1><p class="muted">Clean Telegram setup. BotFather Main Mini App URL:</p><div class="url">${esc(origin)}/tg</div><p class="muted">REGISTER TELEGRAM clears the old webhook, registers this Worker's <code>/telegram/webhook</code>, applies Telegram's secret-token header, allowed updates, and commands.</p><form method="post" action="/admin/telegram/register"><input type="password" name="adminSecret" placeholder="ADMIN_SECRET" autocomplete="current-password" required><button type="submit">REGISTER TELEGRAM</button></form><p class="muted">Required Worker secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_WEBHOOK_SECRET, ADMIN_SECRET.</p></div></body></html>`;
+function setupPage(origin) {
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Veil Telegram Setup</title><style>body{font-family:system-ui;margin:0;background:#0d0d10;color:#fff;display:grid;place-items:center;min-height:100vh;padding:18px}.card{width:min(92vw,620px);background:#19191d;border:1px solid #34343b;padding:24px;border-radius:20px}input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;font-size:16px}input{background:#0b0b0e;color:#fff;border:1px solid #41414b}button{margin-top:10px;border:0;background:#8f59f7;color:#fff;font-weight:900}.url{background:#0b0b0e;padding:12px;border-radius:10px;word-break:break-all;color:#d4baff}.muted{color:#aaa;font-size:13px;line-height:1.5}</style></head><body><div class="card"><h1>💜 Veil Telegram Arena</h1><p class="muted">One bot. One production Worker. BotFather Main Mini App URL:</p><div class="url">${esc(origin)}/tg</div><p class="muted">REGISTER TELEGRAM clears any previous webhook for this bot token, registers this Worker's <code>/telegram/webhook</code>, and installs the Arena commands.</p><form method="post" action="/admin/telegram/register"><input type="password" name="adminSecret" placeholder="ADMIN_SECRET" autocomplete="current-password" required><button type="submit">REGISTER TELEGRAM</button></form><p class="muted">Required production Worker secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_WEBHOOK_SECRET, ADMIN_SECRET.</p></div></body></html>`;
 }
 
 async function setupTelegram(request, env) {
@@ -261,13 +256,9 @@ function sponsorPanelHtml() {
   return `<section id="arenaSponsorPanel" class="arenaSponsorPanel"><style>.arenaSponsorPanel{max-width:760px;margin:10px auto 24px;padding:15px;border:1px solid #3a2a4d;border-radius:18px;background:linear-gradient(180deg,#1b1327,#120e1a);color:#f7f3ff;font-family:Inter,system-ui,sans-serif}.arenaSponsorPanel h3{margin:0 0 5px}.arenaSponsorPanel .spMeta{font-size:10px;letter-spacing:.1em;color:#cdb3ff;font-weight:900;margin-bottom:12px}.arenaSponsorGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.arenaSponsorField{display:grid;gap:5px;font-size:11px;font-weight:850;color:#c8bed2}.arenaSponsorField input{width:100%;box-sizing:border-box;border:1px solid #403050;border-radius:11px;background:#0c0911;color:#fff;padding:11px;font-size:15px}.arenaSponsorActions{display:flex;gap:8px;margin-top:10px}.arenaSponsorActions button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:900;background:#8f59f7;color:white}.arenaSponsorActions button.secondary{background:#2a2037}.sponsorEntry{padding:10px 0;border-top:1px solid #30233f;font-size:12px;line-height:1.45}.sponsorEmpty{color:#93889e;font-size:12px;padding:7px 0}@media(max-width:560px){.arenaSponsorGrid{grid-template-columns:1fr}}</style><h3>💸 Sponsor this Arena</h3><div class="spMeta" data-sponsor-status>LOADING SPONSORSHIPS…</div><form data-sponsor-form><div class="arenaSponsorGrid"><label class="arenaSponsorField">🏆 Winner ($)<input name="winner" inputmode="decimal" type="number" min="0" step="0.01" placeholder="5.00"></label><label class="arenaSponsorField">💀 Most Eliminations ($)<input name="most_kills" inputmode="decimal" type="number" min="0" step="0.01" placeholder="2.00"></label></div><div data-sponsor-extras hidden><div class="arenaSponsorGrid" style="margin-top:8px"><label class="arenaSponsorField">🥈 Runner-Up ($)<input name="runner_up" inputmode="decimal" type="number" min="0" step="0.01"></label><label class="arenaSponsorField">⚡ Most Revivals ($)<input name="most_revivals" inputmode="decimal" type="number" min="0" step="0.01"></label><label class="arenaSponsorField">👁 Most Showdowns Survived ($)<input name="most_showdowns" inputmode="decimal" type="number" min="0" step="0.01"></label><label class="arenaSponsorField">💥 Most Mass Brawls Survived ($)<input name="most_mass_brawls" inputmode="decimal" type="number" min="0" step="0.01"></label></div></div><div class="arenaSponsorActions"><button type="button" class="secondary" data-sponsor-more>＋ MORE PRIZE OPTIONS</button><button type="submit" data-sponsor-submit>SAVE SPONSORSHIP</button></div></form><div data-sponsor-list style="margin-top:12px"></div><script src="/telegram/sponsor/app.js"></script></section>`;
 }
 
-function testPanelHtml() {
-  return `<section id="arenaTestPanel" class="arenaTestPanel"><style>.arenaTestPanel{max-width:760px;margin:12px auto 24px;padding:15px;border:1px solid #78445f;border-radius:18px;background:linear-gradient(180deg,#24101b,#120b12);color:#fff;font-family:Inter,system-ui,sans-serif}.arenaTestPanel h3{margin:0 0 4px}.qaStripe{font:900 10px ui-monospace;letter-spacing:.12em;color:#ff97b4;margin-bottom:10px}.qaSummary{font-size:11px;line-height:1.45;color:#d2bec8;background:#10090e;border:1px solid #3e2632;border-radius:11px;padding:9px;margin-bottom:10px}.qaWarning{font-size:11px;color:#ffb8ca;margin-bottom:10px}.qaControls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.qaControls button{display:grid;gap:3px;text-align:left;border:1px solid #603346;background:#351523;color:white;border-radius:12px;padding:11px;min-height:64px}.qaControls button b{font-size:12px}.qaControls button span{font-size:9px;color:#d5afbd;font-weight:700}.qaControls button:disabled{opacity:.5}.qaHost{font-size:9px;color:#9b818c;margin:8px 0 0}@media(max-width:560px){.qaControls{grid-template-columns:1fr}}</style><div class="qaStripe">⚠ TEST WORKER // PRIVATE QA ONLY</div><h3>🧪 Arena Test Controls</h3><div class="qaWarning">QA uses the same Telegram group-bound Mini App authentication as production. The 30-minute production cooldown is bypassed.</div><div class="qaSummary" data-test-summary>CONNECTING TO QA ENGINE…</div><div data-test-host-only class="qaHost">HOST CONTROLS</div><div class="qaControls" data-test-controls></div><script src="/telegram/test/app.js"></script></section>`;
-}
-
-function appHtml(env) {
+function appHtml() {
   let source = injectMiniAppHubHtml(miniAppHtml());
-  source = source.replace("</body>", `${sponsorPanelHtml()}${arenaTestModeEnabled(env) ? testPanelHtml() : ""}</body>`);
+  source = source.replace("</body>", `${sponsorPanelHtml()}</body>`);
   return source;
 }
 
@@ -305,20 +296,17 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/health") return json({ ok: true, worker: "telegram-official", testMode: arenaTestModeEnabled(env) });
-    if (request.method === "GET" && url.pathname === "/setup/telegram") return html(setupPage(url.origin, env));
+    if (request.method === "GET" && url.pathname === "/setup/telegram") return html(setupPage(url.origin));
     if (request.method === "POST" && url.pathname === "/admin/telegram/register") return setupTelegram(request, env);
     if (request.method === "POST" && url.pathname === "/telegram/webhook") return handleWebhook(request, env);
 
-    if (request.method === "GET" && (url.pathname === "/tg" || url.pathname === "/telegram/arena")) return html(appHtml(env));
+    if (request.method === "GET" && (url.pathname === "/tg" || url.pathname === "/telegram/arena")) return html(appHtml());
     if (request.method === "GET" && url.pathname === "/telegram/sponsor/app.js") return new Response(SPONSOR_PANEL_CLIENT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" } });
-    if (arenaTestModeEnabled(env) && request.method === "GET" && url.pathname === "/telegram/test/app.js") return new Response(TEST_PANEL_CLIENT, { headers: { "content-type": "application/javascript; charset=utf-8", "cache-control": "no-store" } });
 
     if (request.method === "GET" && url.pathname === "/telegram/miniapp/state") return handleOfficialMiniAppState(request, env);
     if (request.method === "POST" && url.pathname === "/telegram/miniapp/action") return handleOfficialMiniAppAction(request, env);
     if (request.method === "GET" && url.pathname === "/telegram/miniapp/hub") return handleHub(request, env);
     if (["GET", "POST"].includes(request.method) && url.pathname === "/telegram/miniapp/sponsor") return handleSponsor(request, env);
-    if (arenaTestModeEnabled(env) && ["GET", "POST"].includes(request.method) && url.pathname === "/telegram/miniapp/test") return handleTelegramTestMode(request, env);
 
     return new Response("Not found", { status: 404 });
   }
