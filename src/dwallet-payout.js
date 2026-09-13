@@ -17,9 +17,23 @@ function configuredAuth(env) {
   return { [header]: `${prefix}${key}` };
 }
 
+export function isDwalletUsdAmount(value) {
+  return /^\$\d+(?:\.\d{1,2})?$/.test(String(value ?? "").trim().replace(/,/g, ""));
+}
+
 export function normalizeDwalletAmount(value) {
-  const amount = String(value ?? "").trim();
-  if (!/^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/.test(amount)) throw new Error("Enter a valid positive crypto amount.");
+  let amount = String(value ?? "").trim().replace(/,/g, "");
+  if (/^\d+(?:\.\d{1,2})?\$$/.test(amount)) amount = `$${amount.slice(0, -1)}`;
+
+  if (isDwalletUsdAmount(amount)) {
+    const dollars = amount.slice(1);
+    if (!/[1-9]/.test(dollars)) throw new Error("Winner payout must be greater than zero.");
+    return `$${dollars}`;
+  }
+
+  if (!/^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/.test(amount)) {
+    throw new Error("Enter a crypto amount like 0.001, or a dollar amount like $1 or $5.");
+  }
   if (!/[1-9]/.test(amount)) throw new Error("Winner payout must be greater than zero.");
   return amount;
 }
@@ -47,9 +61,8 @@ async function requestOnce(env, path, init, auth) {
 async function dwalletRequest(env, path, init = {}) {
   let { response, body } = await requestOnce(env, path, init, configuredAuth(env));
 
-  // The DWallet docs confirm API-key auth but not the header name in the screenshots.
+  // The current public docs confirm API-key auth and dollar-amount handling.
   // If x-api-key is rejected and no explicit header was configured, try Bearer once.
-  // A 401 means no payout was executed by the first request.
   if (response.status === 401 && !env.DWALLET_API_KEY_HEADER) {
     ({ response, body } = await requestOnce(env, path, init, { authorization: `Bearer ${apiKey(env)}` }));
   }
@@ -70,7 +83,27 @@ function decimalToUnits(amount, decimals) {
   return `${whole}${padded}`.replace(/^0+(?=\d)/, "") || "0";
 }
 
+function unitsToDecimal(units, decimals) {
+  const d = Math.max(0, Math.min(30, Number(decimals) || 0));
+  const digits = String(units ?? "0").replace(/^0+(?=\d)/, "") || "0";
+  if (!d) return digits;
+  const padded = digits.padStart(d + 1, "0");
+  const whole = padded.slice(0, -d) || "0";
+  const fraction = padded.slice(-d).replace(/0+$/, "");
+  return fraction ? `${whole}.${fraction}` : whole;
+}
+
+function rowAssetAmount(row) {
+  if (row?.decimals != null) return unitsToDecimal(row.amount, row.decimals);
+  return String(row?.amount || "");
+}
+
+function transferAmount(payout) {
+  return String(payout?.fundedAmount || payout?.amount || "");
+}
+
 function rowMatchesAmount(row, amount) {
+  if (isDwalletUsdAmount(amount)) return false;
   if (row?.decimals != null) return String(row.amount) === decimalToUnits(amount, row.decimals);
   return String(row?.amount || "") === String(amount);
 }
@@ -100,13 +133,20 @@ async function recentFundingMatches(env, payout) {
   const result = await dwalletRequest(env, `/tips?${qs.toString()}`, { method: "GET" });
   const rows = Array.isArray(result?.data) ? result.data : [];
   const configuredMs = Date.parse(payout.configuredAt || "") || 0;
+  const usdPrize = isDwalletUsdAmount(payout.amount);
 
   return rows.filter(row => {
     if (String(row?.from_user_id || "") !== String(payout.hostId)) return false;
     if (String(row?.currency || "").toUpperCase() !== payout.currency) return false;
-    if (!rowMatchesAmount(row, payout.amount)) return false;
     const ts = Date.parse(row?.timestamp || "") || 0;
     if (configuredMs && ts && ts < configuredMs - 5000) return false;
+
+    // For a raw crypto prize we can verify the exact asset amount directly.
+    // For a $ prize, DWallet converts the host's dollar instruction to crypto at
+    // the live rate. GET /tips then reports the resulting asset units, so we bind
+    // the single matching post-configuration transfer and preserve those exact
+    // crypto units for the winner payout.
+    if (!usdPrize && !rowMatchesAmount(row, payout.amount)) return false;
     return true;
   });
 }
@@ -135,6 +175,7 @@ export async function verifyArenaFunding(env, game, saveGame) {
   payout.fundingTipId = funding.tip_id ?? null;
   payout.fundedAt = funding.timestamp || new Date().toISOString();
   payout.potUserId = payout.potUserId || await discoverDwalletPotUserId(env);
+  payout.fundedAmount = rowAssetAmount(funding) || (isDwalletUsdAmount(payout.amount) ? null : payout.amount);
   payout.error = null;
   await saveGame(env.DB, game);
   return payout;
@@ -145,12 +186,13 @@ async function reconcileRecentTip(env, payout, toUserId) {
   const result = await dwalletRequest(env, `/tips?${qs.toString()}`, { method: "GET" });
   const rows = Array.isArray(result?.data) ? result.data : [];
   const attemptMs = Date.parse(payout.attemptedAt || "") || 0;
+  const actualAmount = transferAmount(payout);
   const matches = rows.filter(row => {
     if (String(row?.to_user_id || "") !== String(toUserId)) return false;
     if (String(row?.currency || "").toUpperCase() !== payout.currency) return false;
     const ts = Date.parse(row?.timestamp || "") || 0;
     if (attemptMs && ts && ts < attemptMs - 30000) return false;
-    return rowMatchesAmount(row, payout.amount);
+    return rowMatchesAmount(row, actualAmount);
   });
   if (matches.length === 1) return matches[0];
   if (matches.length > 1) throw new Error("Multiple matching recent DWallet tips found; refusing an automatic retry.");
@@ -158,11 +200,15 @@ async function reconcileRecentTip(env, payout, toUserId) {
 }
 
 async function sendTipToUser(env, game, payout, toUserId, note) {
+  const actualAmount = transferAmount(payout);
+  if (!actualAmount || isDwalletUsdAmount(actualAmount)) {
+    throw new Error("The funded crypto amount is missing; refusing to send an unbacked payout.");
+  }
   return dwalletRequest(env, "/tips", {
     method: "POST",
     body: JSON.stringify({
       to_user_id: String(toUserId),
-      amount: payout.amount,
+      amount: actualAmount,
       currency: payout.currency,
       note,
       channel_id: String(game.channelId),
@@ -235,8 +281,8 @@ export async function payArenaWinner(env, game, saveGame) {
   if (!game.winnerId || !winner) return null;
   payout.amount = normalizeDwalletAmount(payout.amount);
   payout.currency = normalizeDwalletCurrency(payout.currency);
+  if (!payout.fundedAmount && !isDwalletUsdAmount(payout.amount)) payout.fundedAmount = payout.amount;
 
-  // Give the helper a non-serialized callback so all status changes are persisted.
   Object.defineProperty(game, "__saveGame", { value: saveGame, configurable: true });
   try {
     if (winner.simulated) {
@@ -262,20 +308,33 @@ export async function payArenaWinner(env, game, saveGame) {
   }
 }
 
+function prizeDisplay(payout) {
+  if (!payout) return "";
+  if (isDwalletUsdAmount(payout.amount)) {
+    const actual = payout.fundedAmount ? ` (${payout.fundedAmount} ${payout.currency} locked)` : "";
+    return `${payout.amount} in ${payout.currency}${actual}`;
+  }
+  return `${payout.amount} ${payout.currency}`;
+}
+
 export function fundingStatusText(game) {
   const payout = game?.dwalletWinnerPayout;
   if (!payout) return "";
-  if (payout.status === "funded") return `✅ **Prize pot funded:** ${payout.amount} ${payout.currency}${payout.fundingTipId ? ` (incoming tip #${payout.fundingTipId})` : ""}`;
+  if (payout.status === "funded") return `✅ **Prize pot funded:** ${prizeDisplay(payout)}${payout.fundingTipId ? ` (incoming tip #${payout.fundingTipId})` : ""}`;
   if (payout.status === "funding_ambiguous") return `⚠️ **Prize funding needs review:** ${payout.error}`;
-  return `⏳ **Prize pot awaiting host funding:** ${payout.amount} ${payout.currency}`;
+  return `⏳ **Prize pot awaiting host funding:** ${payout.amount} in ${payout.currency}`;
 }
 
 export function payoutStatusText(game) {
   const payout = game?.dwalletWinnerPayout;
   if (!payout) return "";
   const winner = game.players?.[game.winnerId];
-  if (payout.status === "paid") return `💜 **DWallet payout sent from the funded prize pot:** ${payout.amount} ${payout.currency} → **${winner?.displayName || "winner"}**${payout.tipId ? ` (tip #${payout.tipId})` : ""}`;
-  if (payout.status === "refunded") return `↩️ **DWallet prize refunded to the host:** ${payout.amount} ${payout.currency}${payout.tipId ? ` (tip #${payout.tipId})` : ""}`;
+  const actual = transferAmount(payout);
+  const label = isDwalletUsdAmount(payout.amount)
+    ? `${payout.amount} in ${payout.currency}${actual ? ` (${actual} ${payout.currency})` : ""}`
+    : `${payout.amount} ${payout.currency}`;
+  if (payout.status === "paid") return `💜 **DWallet payout sent from the funded prize pot:** ${label} → **${winner?.displayName || "winner"}**${payout.tipId ? ` (tip #${payout.tipId})` : ""}`;
+  if (payout.status === "refunded") return `↩️ **DWallet prize refunded to the host:** ${label}${payout.tipId ? ` (tip #${payout.tipId})` : ""}`;
   if (payout.status === "failed") return `⚠️ **DWallet payout failed:** ${payout.error}`;
   if (payout.status === "needs_reconciliation") return `⚠️ **DWallet payout needs reconciliation before any resend.** ${payout.error || ""}`.trim();
   return "";
