@@ -5,7 +5,7 @@ export function rulesForTheme(themeId){
 Arena is a mostly RNG-driven elimination game. Enter the lobby, then watch the casino decide who survives until only one player remains.
 
 **NORMAL ROUNDS**
-Each normal round contains **4 events** and guarantees at least **1 elimination**. The narration, matchups and outcomes are driven by chance.
+Each normal round contains **4 events** and guarantees at least **1 elimination**. Narration, matchups and outcomes are driven by chance.
 
 ## 💀 MASS BRAWL
 A rare full-round event. **4–7 players** can be dragged into one chaotic fight and multiple eliminations can happen. Nothing else happens during a Mass Brawl round.
@@ -16,9 +16,12 @@ Every **7th round** while special events are active, two eliminated players can 
 ## 👁️ THE DEGENS CHOOSE — CROWD VOTE
 Every **5th round** while special events are active, the audience gets involved. **Spectators and eliminated players can press CAST YOUR VOTE and choose who gets thrown into the fight.** Active fighters cannot vote.
 
-The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** Crowd Vote takes the entire round.
+The top two vote-getters enter a strict **1v1**. Ties for a qualifying spot are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The Crowd Vote takes the entire round.
 
 Special rounds stop once the Arena reaches the **Final Five**.
+
+**SPONSORSHIPS**
+During registration, anyone can use \`/arena sponsor\` to attach optional fixed-dollar prizes such as Winner or Most Eliminations. Sponsors choose only the categories they want and can edit their own pledge until **START** is pressed. If a statistical category ties, that sponsor's category amount is split across the tied winners. Veil tracks and reports what is owed; it does **not** move money automatically.
 
 **STATS**
 \`/arenastats\` — View your lifetime Arena record in this server.
@@ -48,9 +51,12 @@ Every **7th round** while special events are active, two eliminated players get 
 ## 👁️ THE CHAT CHOOSES — COMMUNITY SHOWDOWN
 Every **5th round** while special events are active, spectators and eliminated players get **30 seconds** to vote inside the live Arena window. Active fighters cannot vote.
 
-The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The vote takes the entire round.
+The top two vote-getters enter a strict **1v1**. Ties for a qualifying spot are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The Community Showdown takes the entire round.
 
 Special rounds stop once the Arena reaches the **Final Five**.
+
+**SPONSORSHIPS**
+During registration, the Mini App can attach optional fixed-dollar prizes such as Winner or Most Eliminations. Sponsors choose only the categories they want and can edit their own pledge until **START ARENA** is pressed. If a statistical category ties, that sponsor's category amount is split across the tied winners. Veil tracks and reports what is owed; it does **not** move money automatically.
 
 **COOLDOWN**
 After an Arena finishes, that Telegram group has a **30-minute cooldown** before another one can open. The cooldown belongs to the group, not the player.
@@ -85,9 +91,12 @@ Every **7th round** while special events are active, the Veil can open for two e
 ## 👁️ THE AUDIENCE CHOOSES — FINAL SCARE
 Every **5th round** while special events are active, the house turns toward the audience. **Spectators and eliminated players can press CAST YOUR VOTE and choose who gets sent into the Final Scare.** Active fighters cannot vote.
 
-The top two voting positions enter a strict **1v1**. Ties for a qualifying position are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The vote takes the entire round.
+The top two vote-getters enter a strict **1v1**. Ties for a qualifying spot are broken randomly before the fight. **Only the loser of that 1v1 is eliminated.** The Final Scare takes the entire round.
 
 Special rounds stop once the Arena reaches the **Final Five**.
+
+**SPONSORSHIPS**
+During registration, anyone can use \`/arena sponsor\` to attach optional fixed-dollar prizes such as Winner or Most Eliminations. Sponsors choose only the categories they want and can edit their own pledge until **START** is pressed. If a statistical category ties, that sponsor's category amount is split across the tied winners. Veil tracks and reports what is owed; it does **not** move money automatically.
 
 **STATS**
 \`/arenastats\` — View your lifetime Haunted Arena record in this server.
