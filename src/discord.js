@@ -26,7 +26,7 @@ export function arenaCommands(){return[
       sponsorAmount("most_mass_brawls","Dollar amount for most Mass Brawls survived.")
     ]},
     {name:"payout",description:"Host only: create a DWallet-funded winner prize.",type:1,options:[
-      {name:"amount",description:"Crypto amount for the winner, e.g. 5 or 0.001.",type:3,required:true,min_length:1,max_length:32},
+      {name:"amount",description:"Use $5 for USD value, or a raw crypto amount like 0.001.",type:3,required:true,min_length:1,max_length:32},
       {name:"currency",description:"DWallet asset ticker, e.g. USDT, SOL, XRP.",type:3,required:true,min_length:2,max_length:16}
     ]},
     {name:"fund",description:"Host only: verify your DWallet prize-pot funding.",type:1},
