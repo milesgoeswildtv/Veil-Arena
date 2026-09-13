@@ -40,7 +40,14 @@ assert(doctorEntry.includes('/applications/@me'));
 assert(doctorEntry.includes('VERIFY + FORCE REPAIR ACTIVITY'));
 assert(doctorEntry.includes('/admin/activity/doctor-repair'));
 
+const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
+assert(bootstrapEntry.includes('from "./activity-doctor-entry.js"'));
+assert(bootstrapEntry.includes('SDK LOAD FAILED'));
+assert(bootstrapEntry.includes('CONNECTING TO DISCORD'));
+assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
+assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
+
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-doctor-entry.js"'));
+assert(wrangler.includes('main = "src/activity-bootstrap-fix-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
