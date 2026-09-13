@@ -44,6 +44,7 @@ assert.equal(OFFICIAL_DISCORD_SDK_VERSION, "2.5.0");
 assert(OFFICIAL_DISCORD_SDK_SOURCE.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
 const directEntry = readFileSync(new URL("../src/activity-direct-entry.js", import.meta.url), "utf8");
 const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
 const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
@@ -53,8 +54,10 @@ const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", i
 const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta.url), "utf8");
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
-assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
+assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
+assert(botsEntry.includes('from "./activity-direct-entry.js"'));
+assert(botsEntry.includes('addFakeContestants'));
 assert(directEntry.includes('ACTIVITY_BUILD = "20260913-13"'));
 assert(directEntry.includes('/activity/veil-arena-20260913-13.js'));
 assert(directEntry.includes('__VEIL_OFFICIAL_DISCORD_SDK__'));
