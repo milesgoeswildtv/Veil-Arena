@@ -51,10 +51,13 @@ const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta
 
 assert(wrangler.includes('main = "src/activity-direct-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
-assert(directEntry.includes('ACTIVITY_BUILD = "20260913-11"'));
-assert(directEntry.includes('/activity/veil-arena-20260913-11.js'));
+assert(directEntry.includes('ACTIVITY_BUILD = "20260913-12"'));
+assert(directEntry.includes('/activity/veil-arena-20260913-12.js'));
 assert(directEntry.includes('const DiscordSDK = InlineDiscordSDK'));
 assert(directEntry.includes('DIRECT / NO DYNAMIC IMPORT'));
+assert(directEntry.includes('/applications/@me'));
+assert(directEntry.includes('discord-bot-token'));
+assert(directEntry.includes('correctedEnv'));
 assert(directEntry.includes('1504257112094539798'));
 assert(serverConfig.includes('VEIL_ACTIVITY_TEST_GUILD_ID = "1504257112094539798"'));
 assert(miniSdk.includes('class DiscordSDK'));
