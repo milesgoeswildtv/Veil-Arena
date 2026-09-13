@@ -65,10 +65,14 @@ assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
 
 const directEntry = readFileSync(new URL("../src/activity-direct-entry.js", import.meta.url), "utf8");
 assert(directEntry.includes('from "./activity-single-script-entry.js"'));
-assert(directEntry.includes('ACTIVITY_BUILD = "20260913-11"'));
-assert(directEntry.includes('/activity/veil-arena-20260913-11.js'));
+assert(directEntry.includes('ACTIVITY_BUILD = "20260913-12"'));
+assert(directEntry.includes('/activity/veil-arena-20260913-12.js'));
 assert(directEntry.includes('const DiscordSDK = InlineDiscordSDK'));
 assert(directEntry.includes('DIRECT / NO DYNAMIC IMPORT'));
+assert(directEntry.includes('/applications/@me'));
+assert(directEntry.includes('discord-bot-token'));
+assert(directEntry.includes('ID auto-corrected'));
+assert(directEntry.includes('correctedEnv'));
 assert(directEntry.includes('Expected test guild_id: ${TEST_GUILD_ID}'));
 assert(directEntry.includes('1504257112094539798'));
 assert(directEntry.includes('x-veil-direct-client'));
