@@ -1,4 +1,4 @@
-import app, { ArenaCoordinator } from "./activity-doctor-entry.js";
+import app, { ArenaCoordinator } from "./activity-bootstrap-fix-entry.js";
 import { OFFICIAL_DISCORD_SDK_SOURCE, OFFICIAL_DISCORD_SDK_VERSION } from "./generated/discord-sdk-source.js";
 import { activityCleanClientSource } from "./activity-clean-client.js";
 import { cleanActivityHtml } from "./activity-clean-ui.js";
