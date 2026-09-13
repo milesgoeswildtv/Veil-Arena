@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+  <title>Veil UI Icon Revive</title>
+  <desc>96x96 transparent Veil revive icon. Broken circular return-to-life sigil in silver/gunmetal with controlled emerald and faint violet accents. Designed for 18–32 CSS px rendering.</desc>
+
+  <metadata>
+    asset: veil_ui_icon_revive.svg
+    family: veil_ui_icon_arena.svg
+    canvas: 96x96
+    aspect-ratio: 1:1
+    transparent-background: true
+    intended-css-size: 18-32px
+    safe-padding: 10px
+    text: none
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0F1F3"/>
+      <stop offset="0.22" stop-color="#83868E"/>
+      <stop offset="0.50" stop-color="#D6D8DD"/>
+      <stop offset="0.78" stop-color="#565962"/>
+      <stop offset="1" stop-color="#A5A8B0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#202228"/>
+      <stop offset="0.50" stop-color="#090A0D"/>
+      <stop offset="1" stop-color="#15171C"/>
+    </linearGradient>
+
+    <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2C7F64"/>
+      <stop offset="0.55" stop-color="#51C79A"/>
+      <stop offset="1" stop-color="#1E5B49"/>
+    </linearGradient>
+
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7650A1"/>
+      <stop offset="0.55" stop-color="#A570CF"/>
+      <stop offset="1" stop-color="#5A377A"/>
+    </linearGradient>
+
+    <radialGradient id="lifeCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#D5FFF0" stop-opacity="0.98"/>
+      <stop offset="0.38" stop-color="#62D7A8" stop-opacity="0.88"/>
+      <stop offset="0.78" stop-color="#5F4C85" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#5F4C85" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="coreGlow" x="-110%" y="-110%" width="320%" height="320%">
+      <feGaussianBlur stdDeviation="1.3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer broken return ring -->
+  <path d="M24 26
+           C31 18 40 14 49 14
+           C62 14 73 20 80 31
+           C84 37 86 44 85 51"
+        stroke="url(#silver)"
+        stroke-width="5"
+        stroke-linecap="round"/>
+
+  <path d="M82 61
+           C77 73 65 82 51 83
+           C38 84 27 78 20 68
+           C15 61 13 53 14 45"
+        stroke="url(#silver)"
+        stroke-width="5"
+        stroke-linecap="round"/>
+
+  <!-- Gunmetal inner rail -->
+  <path d="M27 29
+           C33 22 41 19 49 19
+           C60 19 69 24 75 33
+           C78 38 80 43 80 48"
+        stroke="url(#gunmetal)"
+        stroke-width="2.2"
+        stroke-linecap="round"/>
+
+  <path d="M77 59
+           C72 69 62 76 51 77
+           C40 78 31 73 25 65
+           C21 59 19 53 19 47"
+        stroke="url(#gunmetal)"
+        stroke-width="2.2"
+        stroke-linecap="round"/>
+
+  <!-- Reconnection terminals -->
+  <path d="M82 48L88 42L88 52Z"
+        fill="url(#silver)"
+        stroke="#2C2F35"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <path d="M14 48L8 54L8 44Z"
+        fill="url(#silver)"
+        stroke="#2C2F35"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <!-- Emerald energy bridging the broken circle -->
+  <path d="M84 53
+           C86 56 86 59 83 62"
+        stroke="url(#emerald)"
+        stroke-width="2.1"
+        stroke-linecap="round"/>
+
+  <path d="M12 43
+           C10 40 10 37 13 34"
+        stroke="url(#emerald)"
+        stroke-width="2.1"
+        stroke-linecap="round"/>
+
+  <!-- Inner life-sigil plate -->
+  <circle cx="48" cy="48" r="23"
+          fill="#08090C"
+          stroke="#2C2F35"
+          stroke-width="1.8"/>
+
+  <circle cx="48" cy="48" r="19"
+          fill="none"
+          stroke="url(#violet)"
+          stroke-opacity="0.30"
+          stroke-width="1.2"/>
+
+  <!-- Heartbeat / return-to-life glyph -->
+  <path d="M28 50
+           H37
+           L41 42
+           L46 58
+           L51 35
+           L56 52
+           L60 46
+           H68"
+        stroke="url(#emerald)"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Central energy core -->
+  <circle cx="48" cy="48" r="6.2"
+          fill="url(#lifeCore)"
+          filter="url(#coreGlow)"/>
+
+  <circle cx="48" cy="48" r="2.0"
+          fill="#E7FFF5"/>
+
+  <!-- Subtle violet Veil signature, kept secondary -->
+  <path d="M48 24L44.5 29L48 32L51.5 29Z"
+        fill="#090A0D"
+        stroke="url(#violet)"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <path d="M48 72L51.5 67L48 64L44.5 67Z"
+        fill="#090A0D"
+        stroke="url(#violet)"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <!-- Four tiny gate ticks matching the icon family -->
+  <g stroke="#B181D3" stroke-width="1.1" stroke-linecap="round" opacity="0.42">
+    <path d="M48 18V21"/>
+    <path d="M48 75V78"/>
+    <path d="M18 48H21"/>
+    <path d="M75 48H78"/>
+  </g>
+</svg>

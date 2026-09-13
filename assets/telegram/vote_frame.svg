@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none"
+  role="img"
+  aria-label="Veil Arena Community Showdown responsive nine-slice frame">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#242028"/>
+      <stop offset="10%" stop-color="#6d6674"/>
+      <stop offset="20%" stop-color="#f1edf5"/>
+      <stop offset="32%" stop-color="#77707e"/>
+      <stop offset="50%" stop-color="#fff"/>
+      <stop offset="68%" stop-color="#77707e"/>
+      <stop offset="80%" stop-color="#e9e4ee"/>
+      <stop offset="90%" stop-color="#615969"/>
+      <stop offset="100%" stop-color="#211d25"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#242028"/>
+      <stop offset="10%" stop-color="#6d6674"/>
+      <stop offset="20%" stop-color="#f1edf5"/>
+      <stop offset="32%" stop-color="#77707e"/>
+      <stop offset="50%" stop-color="#fff"/>
+      <stop offset="68%" stop-color="#77707e"/>
+      <stop offset="80%" stop-color="#e9e4ee"/>
+      <stop offset="90%" stop-color="#615969"/>
+      <stop offset="100%" stop-color="#211d25"/>
+    </linearGradient>
+
+    <linearGradient id="electricH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4a1a78" stop-opacity=".1"/>
+      <stop offset="16%" stop-color="#7a31d8" stop-opacity=".7"/>
+      <stop offset="36%" stop-color="#b64dff"/>
+      <stop offset="50%" stop-color="#e77dff"/>
+      <stop offset="64%" stop-color="#b64dff"/>
+      <stop offset="84%" stop-color="#7a31d8" stop-opacity=".7"/>
+      <stop offset="100%" stop-color="#4a1a78" stop-opacity=".1"/>
+    </linearGradient>
+
+    <linearGradient id="electricV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a1a78" stop-opacity=".1"/>
+      <stop offset="16%" stop-color="#7a31d8" stop-opacity=".7"/>
+      <stop offset="36%" stop-color="#b64dff"/>
+      <stop offset="50%" stop-color="#e77dff"/>
+      <stop offset="64%" stop-color="#b64dff"/>
+      <stop offset="84%" stop-color="#7a31d8" stop-opacity=".7"/>
+      <stop offset="100%" stop-color="#4a1a78" stop-opacity=".1"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08070a"/>
+      <stop offset="34%" stop-color="#2a2430"/>
+      <stop offset="64%" stop-color="#0d0b10"/>
+      <stop offset="100%" stop-color="#3c3442"/>
+    </linearGradient>
+
+    <radialGradient id="violetGem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#f8e0ff"/>
+      <stop offset="22%" stop-color="#d389ff"/>
+      <stop offset="58%" stop-color="#9a42dd"/>
+      <stop offset="100%" stop-color="#2f1042"/>
+    </radialGradient>
+
+    <radialGradient id="whiteGem" cx="45%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#e7c8ff"/>
+      <stop offset="60%" stop-color="#a254e0"/>
+      <stop offset="100%" stop-color="#281033"/>
+    </radialGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3.6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- TOP RAIL -->
+  <g>
+    <path d="M192 52 H832" stroke="#070609" stroke-width="40" fill="none"/>
+    <path d="M192 52 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 76 H832" stroke="#4f2366" stroke-width="7" fill="none"/>
+    <path d="M192 90 H832" stroke="url(#electricH)" stroke-width="4.5" fill="none" filter="url(#glow)"/>
+
+    <!-- split-choice tension motif kept in border band -->
+    <path d="M266 122 H470" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M554 122 H758" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M486 122 L512 106 L538 122" stroke="#c868ff" stroke-width="3" opacity=".58" fill="none"/>
+  </g>
+
+  <!-- BOTTOM RAIL -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M192 52 H832" stroke="#070609" stroke-width="40" fill="none"/>
+    <path d="M192 52 H832" stroke="url(#chromeH)" stroke-width="12" fill="none"/>
+    <path d="M192 76 H832" stroke="#4f2366" stroke-width="7" fill="none"/>
+    <path d="M192 90 H832" stroke="url(#electricH)" stroke-width="4.5" fill="none" filter="url(#glow)"/>
+    <path d="M266 122 H470" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M554 122 H758" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M486 122 L512 106 L538 122" stroke="#c868ff" stroke-width="3" opacity=".58" fill="none"/>
+  </g>
+
+  <!-- LEFT RAIL -->
+  <g>
+    <path d="M52 192 V832" stroke="#070609" stroke-width="40" fill="none"/>
+    <path d="M52 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M76 192 V832" stroke="#4f2366" stroke-width="7" fill="none"/>
+    <path d="M90 192 V832" stroke="url(#electricV)" stroke-width="4.5" fill="none" filter="url(#glow)"/>
+    <path d="M122 266 V470" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M122 554 V758" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M122 486 L106 512 L122 538" stroke="#c868ff" stroke-width="3" opacity=".58" fill="none"/>
+  </g>
+
+  <!-- RIGHT RAIL -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M52 192 V832" stroke="#070609" stroke-width="40" fill="none"/>
+    <path d="M52 192 V832" stroke="url(#chromeV)" stroke-width="12" fill="none"/>
+    <path d="M76 192 V832" stroke="#4f2366" stroke-width="7" fill="none"/>
+    <path d="M90 192 V832" stroke="url(#electricV)" stroke-width="4.5" fill="none" filter="url(#glow)"/>
+    <path d="M122 266 V470" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M122 554 V758" stroke="#7e38c5" stroke-width="2.5" opacity=".42" fill="none"/>
+    <path d="M122 486 L106 512 L122 538" stroke="#c868ff" stroke-width="3" opacity=".58" fill="none"/>
+  </g>
+
+  <!-- TOP LEFT CORNER -->
+  <g>
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="#070609" stroke-width="40" fill="none" stroke-linejoin="round"/>
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 76 H126 Q76 76 76 126 V192"
+      stroke="#4f2366" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 90 H136 Q90 90 90 136 V192"
+      stroke="#be55ff" stroke-width="4.5" opacity=".76" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+
+    <!-- forked decision ornament -->
+    <path d="M24 78 L49 30 L82 43 L111 20 L145 49 L119 74 L86 82 L59 121 L25 105 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M46 71 L63 50 L83 70 L64 94 Z"
+      fill="url(#violetGem)" stroke="#efe0f7" stroke-width="3" filter="url(#glow)"/>
+    <path d="M99 42 L115 28 L132 48 L116 64 Z"
+      fill="url(#whiteGem)" stroke="#d59bf1" stroke-width="2.5"/>
+
+    <!-- choice/split blades -->
+    <path d="M101 96 L158 83 L128 114 Z"
+      fill="#351248" stroke="#a94de3" stroke-width="3"/>
+    <path d="M119 114 L170 113 L135 136 Z"
+      fill="#1a1026" stroke="#7650be" stroke-width="3"/>
+    <path d="M21 127 L53 111 L72 135 L50 163 L18 151 Z"
+      fill="#141018" stroke="#756b7b" stroke-width="4"/>
+  </g>
+
+  <!-- TOP RIGHT CORNER -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="#070609" stroke-width="40" fill="none" stroke-linejoin="round"/>
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 76 H126 Q76 76 76 126 V192"
+      stroke="#4f2366" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 90 H136 Q90 90 90 136 V192"
+      stroke="#be55ff" stroke-width="4.5" opacity=".76" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M24 78 L49 30 L82 43 L111 20 L145 49 L119 74 L86 82 L59 121 L25 105 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M46 71 L63 50 L83 70 L64 94 Z"
+      fill="url(#violetGem)" stroke="#efe0f7" stroke-width="3" filter="url(#glow)"/>
+    <path d="M99 42 L115 28 L132 48 L116 64 Z"
+      fill="url(#whiteGem)" stroke="#d59bf1" stroke-width="2.5"/>
+    <path d="M101 96 L158 83 L128 114 Z"
+      fill="#351248" stroke="#a94de3" stroke-width="3"/>
+    <path d="M119 114 L170 113 L135 136 Z"
+      fill="#1a1026" stroke="#7650be" stroke-width="3"/>
+    <path d="M21 127 L53 111 L72 135 L50 163 L18 151 Z"
+      fill="#141018" stroke="#756b7b" stroke-width="4"/>
+  </g>
+
+  <!-- BOTTOM LEFT CORNER -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="#070609" stroke-width="40" fill="none" stroke-linejoin="round"/>
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 76 H126 Q76 76 76 126 V192"
+      stroke="#4f2366" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 90 H136 Q90 90 90 136 V192"
+      stroke="#be55ff" stroke-width="4.5" opacity=".76" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M24 78 L49 30 L82 43 L111 20 L145 49 L119 74 L86 82 L59 121 L25 105 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M46 71 L63 50 L83 70 L64 94 Z"
+      fill="url(#violetGem)" stroke="#efe0f7" stroke-width="3" filter="url(#glow)"/>
+    <path d="M99 42 L115 28 L132 48 L116 64 Z"
+      fill="url(#whiteGem)" stroke="#d59bf1" stroke-width="2.5"/>
+    <path d="M101 96 L158 83 L128 114 Z"
+      fill="#351248" stroke="#a94de3" stroke-width="3"/>
+    <path d="M119 114 L170 113 L135 136 Z"
+      fill="#1a1026" stroke="#7650be" stroke-width="3"/>
+    <path d="M21 127 L53 111 L72 135 L50 163 L18 151 Z"
+      fill="#141018" stroke="#756b7b" stroke-width="4"/>
+  </g>
+
+  <!-- BOTTOM RIGHT CORNER -->
+  <g transform="translate(1024 1024) scale(-1 -1)">
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="#070609" stroke-width="40" fill="none" stroke-linejoin="round"/>
+    <path d="M192 52 H112 Q52 52 52 112 V192"
+      stroke="url(#chromeH)" stroke-width="12" fill="none" stroke-linejoin="round"/>
+    <path d="M192 76 H126 Q76 76 76 126 V192"
+      stroke="#4f2366" stroke-width="7" fill="none" stroke-linejoin="round"/>
+    <path d="M192 90 H136 Q90 90 90 136 V192"
+      stroke="#be55ff" stroke-width="4.5" opacity=".76" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+    <path d="M24 78 L49 30 L82 43 L111 20 L145 49 L119 74 L86 82 L59 121 L25 105 Z"
+      fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="7"/>
+    <path d="M46 71 L63 50 L83 70 L64 94 Z"
+      fill="url(#violetGem)" stroke="#efe0f7" stroke-width="3" filter="url(#glow)"/>
+    <path d="M99 42 L115 28 L132 48 L116 64 Z"
+      fill="url(#whiteGem)" stroke="#d59bf1" stroke-width="2.5"/>
+    <path d="M101 96 L158 83 L128 114 Z"
+      fill="#351248" stroke="#a94de3" stroke-width="3"/>
+    <path d="M119 114 L170 113 L135 136 Z"
+      fill="#1a1026" stroke="#7650be" stroke-width="3"/>
+    <path d="M21 127 L53 111 L72 135 L50 163 L18 151 Z"
+      fill="#141018" stroke="#756b7b" stroke-width="4"/>
+  </g>
+
+  <!-- electric spark anchors confined to border bands -->
+  <g fill="#d56cff" opacity=".82" filter="url(#glow)">
+    <circle cx="153" cy="153" r="4.5"/>
+    <circle cx="871" cy="153" r="4.5"/>
+    <circle cx="153" cy="871" r="4.5"/>
+    <circle cx="871" cy="871" r="4.5"/>
+  </g>
+
+  <!-- Center intentionally transparent -->
+</svg>
