@@ -40,8 +40,10 @@ for (const action of [
 }
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
 const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/discord-recovery-entry.js"'));
+assert(wrangler.includes('main = "src/activity-live-entry.js"'));
+assert(liveEntry.includes('from "./discord-recovery-entry.js"'));
 assert(recoveryEntry.includes('from "./test-entry.js"'));
 assert(wrangler.includes("[env.test.vars]"));
 assert(wrangler.includes('ARENA_TEST_MODE = "true"'));
