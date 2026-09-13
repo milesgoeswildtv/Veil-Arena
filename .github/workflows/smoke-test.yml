@@ -30,6 +30,8 @@ jobs:
 
       - name: Check production module syntax
         run: |
+          node --check src/activity-rpc-trace-entry.js
+          node --check src/discord-bots-entry.js
           node --check src/activity-direct-entry.js
           node --check src/activity-single-script-entry.js
           node --check src/activity-local-sdk-entry.js
