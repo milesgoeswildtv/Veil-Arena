@@ -1,0 +1,328 @@
+export function applyTelegramMiniAppAssetBatch2(html) {
+  if (typeof html !== "string" || !html) return html;
+
+  const css = `
+/* Telegram Mini App asset batch 2 */
+.state-shell{background:linear-gradient(165deg,#0d0912f2,#050407f8 48%,#09060df2)}
+.arena-splash-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 18%;
+  opacity:.20;
+  filter:saturate(.92) brightness(.58) contrast(1.08);
+  pointer-events:none;
+  user-select:none;
+}
+.state-shell:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,#07050a1c 0,#07050a8a 35%,#07050ae8 84%,#07050af7 100%);
+}
+.state-frame{z-index:1}
+.state-content{z-index:2}
+.panel{
+  border:0!important;
+  overflow:hidden;
+  background:linear-gradient(155deg,#120e18ed,#08060ced)!important;
+  filter:drop-shadow(0 16px 25px #0008);
+}
+.panel:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:url("/telegram/panel_frame.svg") center/100% 100% no-repeat;
+}
+.panel>*{position:relative;z-index:1}
+.fx-banner{
+  border:0!important;
+  overflow:hidden;
+  background:#08050cee!important;
+}
+.fx-banner:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:url("/telegram/panel_frame.svg") center/100% 100% no-repeat;
+}
+.roster{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
+.player.asset-player-card{
+  --veil-player-state:url("/telegram/veil_ui_player_state_alive.svg");
+  position:relative;
+  display:block;
+  width:100%;
+  aspect-ratio:2/1;
+  min-height:0;
+  padding:0;
+  border:0!important;
+  border-radius:0;
+  overflow:hidden;
+  opacity:1;
+  background-color:transparent!important;
+  background-image:var(--veil-player-state),url("/telegram/veil_ui_player_card.svg")!important;
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  background-size:100% 100%,100% 100%;
+  box-shadow:none;
+  filter:drop-shadow(0 10px 18px #0008);
+}
+.player.asset-alive{--veil-player-state:url("/telegram/veil_ui_player_state_alive.svg")}
+.player.asset-dead{--veil-player-state:url("/telegram/veil_ui_player_state_dead.svg");opacity:.72}
+.player.asset-revived{--veil-player-state:url("/telegram/veil_ui_player_state_revived.svg")}
+.player.asset-winner{--veil-player-state:url("/telegram/veil_ui_player_state_winner.svg");opacity:1;filter:drop-shadow(0 0 20px #a56cff66) drop-shadow(0 10px 18px #0008)}
+.player.asset-player-card .player-name{
+  position:absolute;
+  left:34.5%;
+  right:6.5%;
+  top:24%;
+  z-index:2;
+  font-size:clamp(11px,1.45vw,16px);
+  line-height:1.15;
+  font-weight:950;
+  letter-spacing:.015em;
+  text-shadow:0 2px 8px #000;
+}
+.player.asset-player-card .player-meta{
+  position:absolute;
+  left:34.5%;
+  right:6.5%;
+  bottom:16%;
+  z-index:2;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+}
+.player.asset-player-card .player-kos{font-size:9px;color:#c0b0ca}
+.player.asset-player-card .player-badge{min-width:68px;height:24px;font-size:7px}
+.player-portrait-token{
+  position:absolute;
+  left:7.1%;
+  top:22%;
+  width:21.5%;
+  height:56%;
+  z-index:2;
+  display:grid;
+  grid-template-rows:1fr auto;
+  place-items:center;
+  padding:10% 8%;
+  color:#efe8f5;
+  text-shadow:0 2px 7px #000;
+  pointer-events:none;
+}
+.player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
+.player-portrait-token span{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#bcaec7;
+  font:900 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+}
+.viewer-state-card{
+  --viewer-state:url("/telegram/veil_ui_player_state_spectator.svg");
+  position:relative;
+  display:none;
+  width:min(520px,100%);
+  aspect-ratio:2/1;
+  margin:14px 0 0 auto;
+  overflow:hidden;
+  background-image:var(--viewer-state),url("/telegram/veil_ui_player_card.svg");
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  background-size:100% 100%,100% 100%;
+  filter:drop-shadow(0 12px 24px #0009);
+}
+.viewer-state-card.asset-alive{--viewer-state:url("/telegram/veil_ui_player_state_alive.svg")}
+.viewer-state-card.asset-dead{--viewer-state:url("/telegram/veil_ui_player_state_dead.svg")}
+.viewer-state-card.asset-spectator{--viewer-state:url("/telegram/veil_ui_player_state_spectator.svg")}
+.viewer-state-card.asset-winner{--viewer-state:url("/telegram/veil_ui_player_state_winner.svg")}
+.viewer-state-card .viewer-portrait{
+  position:absolute;
+  left:7.3%;
+  top:23%;
+  width:21%;
+  height:54%;
+  display:grid;
+  place-items:center;
+}
+.viewer-state-card .viewer-portrait img{width:46%;filter:drop-shadow(0 0 10px #a966ff88)}
+.viewer-state-copy{
+  position:absolute;
+  left:34.5%;
+  right:7%;
+  top:24%;
+  bottom:17%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-width:0;
+}
+.viewer-state-copy strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(14px,2vw,20px);
+  font-weight:1000;
+  letter-spacing:.02em;
+}
+.viewer-state-copy span{
+  color:#b8a9c3;
+  font-size:clamp(10px,1.3vw,12px);
+  line-height:1.35;
+}
+.viewer-state-label{
+  align-self:flex-start;
+  color:#e5d8ed!important;
+  font:950 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.sponsorship-card{
+  position:relative;
+  width:min(660px,100%);
+  min-height:116px;
+  margin:16px auto 0;
+  padding:30px 44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  text-align:center;
+  background:url("/telegram/sponsorship_frame.svg") center/100% 100% no-repeat;
+  filter:drop-shadow(0 14px 24px #0008);
+}
+.sponsorship-card img{width:30px;height:30px;filter:drop-shadow(0 0 10px #ba69ff77)}
+.sponsorship-copy small{
+  display:block;
+  color:#a99ab6;
+  font:900 8px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.sponsorship-copy strong{display:block;margin-top:5px;font-size:14px;letter-spacing:.08em}
+@media(max-width:760px){
+  .arena-splash-bg{opacity:.17;object-position:center top}
+  .roster{grid-template-columns:1fr!important}
+  .viewer-state-card{width:100%;margin-top:10px}
+  .sponsorship-card{min-height:94px;padding:24px 34px}
+}
+@media(max-width:440px){
+  .player.asset-player-card .player-name{font-size:12px}
+  .player.asset-player-card .player-meta{left:34%;right:6%;bottom:15%}
+  .player.asset-player-card .player-badge{min-width:62px;height:22px}
+  .sponsorship-card{min-height:84px;padding:20px 28px;gap:10px}
+  .sponsorship-card img{width:25px;height:25px}
+  .sponsorship-copy strong{font-size:12px}
+}
+`;
+
+  html = html.replace("</style>", css + "\n</style>");
+
+  html = html.replace(
+    '<section class="state-shell" id="stateShell">\n    <img class="state-frame"',
+    '<section class="state-shell" id="stateShell">\n    <img class="arena-splash-bg" src="/telegram/Veil%20Arena%20Universal%20Master%20Splash%20Art.PNG" alt="" aria-hidden="true">\n    <img class="state-frame"'
+  );
+
+  html = html.replace(
+    '      <section class="panel roster-panel">',
+    `      <section class="viewer-state-card asset-spectator" id="viewerStateCard" aria-label="Your Arena state">
+        <div class="viewer-portrait"><img id="viewerStateIcon" src="/telegram/veil_ui_icon_spectate.svg" alt=""></div>
+        <div class="viewer-state-copy">
+          <div>
+            <span class="viewer-state-label" id="viewerStateLabel">SPECTATOR</span>
+            <strong id="viewerStateTitle">YOU</strong>
+          </div>
+          <span id="viewerStateDetail">Watching Arena.</span>
+        </div>
+      </section>
+
+      <section class="panel roster-panel">`
+  );
+
+  html = html.replace(
+    '      <div class="footer-row">',
+    `      <section class="sponsorship-card" aria-label="Arena sponsor">
+        <img src="/telegram/veil_ui_icon_sponsor.svg" alt="">
+        <div class="sponsorship-copy">
+          <small>Telegram Arena</small>
+          <strong>DWALLET × VEIL</strong>
+        </div>
+      </section>
+
+      <div class="footer-row">`
+  );
+
+  const js = `
+function decorateAssetBatch2(){
+  if(!state)return;
+  const rows=Array.from(document.querySelectorAll('#roster .player'));
+  const players=state.players||[];
+  rows.forEach((row,index)=>{
+    const p=players[index];
+    if(!p)return;
+    row.classList.add('asset-player-card');
+    row.classList.remove('asset-alive','asset-dead','asset-revived','asset-winner');
+    let mode=p.alive?'alive':'dead';
+    if(row.classList.contains('revived-now'))mode='revived';
+    if(state.status==='finished'&&state.winnerId&&String(state.winnerId)===String(p.id))mode='winner';
+    row.classList.add('asset-'+mode);
+
+    if(!row.querySelector('.player-portrait-token')){
+      const portrait=document.createElement('div');
+      portrait.className='player-portrait-token';
+      const icon=document.createElement('img');
+      icon.alt='';
+      icon.src=mode==='winner'?icons.crown:(mode==='dead'?icons.skull:icons.arena);
+      const tag=document.createElement('span');
+      tag.textContent=p.simulated?'BOT':String(p.displayName||'PLAYER').slice(0,10).toUpperCase();
+      portrait.appendChild(icon);
+      portrait.appendChild(tag);
+      row.prepend(portrait);
+    }
+  });
+
+  const card=$('viewerStateCard');
+  if(card){
+    let mode='spectator';
+    let label='SPECTATOR';
+    let title='YOU';
+    let icon='spectate';
+    if(state.status==='registration'&&state.viewer.joined){mode='alive';label='REGISTERED';icon='success'}
+    if(state.status==='running'&&state.viewer.alive){mode='alive';label='ALIVE';icon='arena'}
+    if(state.status==='running'&&state.viewer.joined&&!state.viewer.alive){mode='spectator';label='SPECTATING';icon='spectate'}
+    if(state.status==='finished'){
+      const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
+      if(won){mode='winner';label='WINNER';title='ARENA CHAMPION';icon='crown'}
+      else{mode='spectator';label='COMPLETE';icon='success'}
+    }
+    card.className='viewer-state-card asset-'+mode;
+    card.style.display='block';
+    $('viewerStateLabel').textContent=label;
+    $('viewerStateTitle').textContent=title;
+    $('viewerStateDetail').textContent=$('viewerText').textContent||'Arena viewer state.';
+    $('viewerStateIcon').src=icons[icon]||icons.spectate;
+  }
+}
+
+const renderBeforeAssetBatch2=render;
+render=function(){
+  renderBeforeAssetBatch2();
+  decorateAssetBatch2();
+};
+`;
+
+  html = html.replace("\nrefresh();\nsetInterval(refresh,1500);", "\n" + js + "\nrefresh();\nsetInterval(refresh,1500);");
+  return html;
+}
