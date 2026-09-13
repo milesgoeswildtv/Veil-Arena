@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+  <title>Veil UI Icon Vote</title>
+  <desc>96x96 transparent Veil vote/cast choice icon. Angular ballot-selection crest with a metallic vote shard entering a recessed slot and restrained violet confirmation energy. Designed for 18–32 CSS px rendering.</desc>
+
+  <metadata>
+    asset: veil_ui_icon_vote.svg
+    family: veil_ui_icon_arena.svg
+    canvas: 96x96
+    aspect-ratio: 1:1
+    transparent-background: true
+    intended-css-size: 18-32px
+    safe-padding: 10px
+    text: none
+  </metadata>
+
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0F1F3"/>
+      <stop offset="0.22" stop-color="#83868E"/>
+      <stop offset="0.50" stop-color="#D6D8DD"/>
+      <stop offset="0.78" stop-color="#565962"/>
+      <stop offset="1" stop-color="#A5A8B0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#202228"/>
+      <stop offset="0.50" stop-color="#090A0D"/>
+      <stop offset="1" stop-color="#15171C"/>
+    </linearGradient>
+
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#744B9E"/>
+      <stop offset="0.55" stop-color="#A86FD0"/>
+      <stop offset="1" stop-color="#593576"/>
+    </linearGradient>
+
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#F0DEFF" stop-opacity="1"/>
+      <stop offset="0.35" stop-color="#C88DEB" stop-opacity="0.95"/>
+      <stop offset="0.72" stop-color="#7B4A9E" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#593576" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="coreBloom" x="-130%" y="-130%" width="360%" height="360%">
+      <feGaussianBlur stdDeviation="1.15" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Veil crest -->
+  <path d="M48 10
+           L60 17
+           L73 18
+           L78 30
+           L86 39
+           L81 51
+           L79 66
+           L65 70
+           L48 86
+           L31 70
+           L17 66
+           L15 51
+           L10 39
+           L18 30
+           L23 18
+           L36 17
+           Z"
+        fill="url(#gunmetal)"
+        stroke="url(#silver)"
+        stroke-width="2.2"
+        stroke-linejoin="round"/>
+
+  <!-- Recessed ballot housing -->
+  <path d="M23 48
+           L31 28
+           H61
+           L73 40
+           L65 66
+           H33
+           L23 56
+           Z"
+        fill="#0A0B0F"
+        stroke="url(#silver)"
+        stroke-width="1.9"
+        stroke-linejoin="round"/>
+
+  <!-- Inner plate -->
+  <path d="M30 46
+           L35 33
+           H58
+           L66 41
+           L60 61
+           H37
+           L30 54
+           Z"
+        fill="url(#gunmetal)"
+        stroke="#34373D"
+        stroke-width="1.0"
+        stroke-linejoin="round"/>
+
+  <!-- Vote slot -->
+  <path d="M39 45H58"
+        stroke="url(#silver)"
+        stroke-width="2.2"
+        stroke-linecap="round"/>
+
+  <path d="M40.5 45H56.5"
+        stroke="#0A0B0F"
+        stroke-width="1.2"
+        stroke-linecap="round"/>
+
+  <!-- Incoming vote shard / ballot token -->
+  <path d="M51 19
+           L63 24
+           L58 37
+           L45 32Z"
+        fill="#090A0D"
+        stroke="url(#silver)"
+        stroke-width="1.5"
+        stroke-linejoin="round"/>
+
+  <path d="M51 22L59 25L56 33L48 30Z"
+        fill="url(#gunmetal)"
+        stroke="#353840"
+        stroke-width="0.95"
+        stroke-linejoin="round"/>
+
+  <!-- Directional insertion cue -->
+  <path d="M51 34
+           C50 38 49 40.5 48.5 42.5"
+        fill="none"
+        stroke="url(#violet)"
+        stroke-width="1.45"
+        stroke-linecap="round"
+        opacity="0.82"/>
+
+  <!-- Confirmation energy / selected core -->
+  <circle cx="54.5" cy="54.5" r="7.0"
+          fill="#090A0D"
+          stroke="url(#silver)"
+          stroke-width="1.35"/>
+
+  <circle cx="54.5" cy="54.5" r="3.8"
+          fill="url(#coreGlow)"
+          filter="url(#coreBloom)"/>
+  <circle cx="54.5" cy="54.5" r="1.35" fill="#F3E7FF"/>
+
+  <!-- Selection check-like shard, Veil-style not generic -->
+  <path d="M50 54.5L53 57.3L59.2 51.2"
+        fill="none"
+        stroke="url(#violet)"
+        stroke-width="1.55"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Supporting decision rails -->
+  <path d="M38 53H48"
+        stroke="url(#violet)"
+        stroke-width="1.2"
+        stroke-linecap="round"
+        opacity="0.70"/>
+  <path d="M38 58H45"
+        stroke="url(#silver)"
+        stroke-width="1.0"
+        stroke-linecap="round"
+        opacity="0.72"/>
+
+  <!-- Side cue tabs -->
+  <path d="M24 42H18" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M24 54H18" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M72 42H78" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M72 54H78" stroke="url(#silver)" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Small side fins / family details -->
+  <path d="M21 39L15 44L22 46"
+        fill="#0E1014"
+        stroke="url(#silver)"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <path d="M75 39L81 44L74 46"
+        fill="#0E1014"
+        stroke="url(#silver)"
+        stroke-width="1.1"
+        stroke-linejoin="round"/>
+
+  <!-- Tiny family gate ticks -->
+  <g stroke="#B181D3" stroke-width="1.1" stroke-linecap="round" opacity="0.44">
+    <path d="M48 15V18"/>
+    <path d="M48 75V78"/>
+    <path d="M18 48H21"/>
+    <path d="M75 48H78"/>
+  </g>
+</svg>
