@@ -1,10 +1,10 @@
-import { handleTelegramRoute } from "./telegram-worker.js";
+import { handleTelegramRoute } from "./telegram-control.js";
 import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-dwallet-live";
-const TELEGRAM_BUILD = "2026-09-13-telegram-clean-1";
+const TELEGRAM_BUILD = "2026-09-13-telegram-forceclose-2";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
