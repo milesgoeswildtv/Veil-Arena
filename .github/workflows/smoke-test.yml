@@ -28,12 +28,17 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check core and Telegram module syntax
+      - name: Check core, platform controls, and wallet syntax
         run: |
           node --check src/worker.js
+          node --check src/discord.js
+          node --check src/discord-control.js
           node --check src/telegram.js
+          node --check src/telegram-control.js
           node --check src/telegram-app.js
           node --check src/telegram-worker.js
+          node --check src/dwallet-direct-tip.js
+          node --check src/dwallet-payout.js
           node --check src/core/engine.js
           node --check src/core/simulation.js
           node --check src/core/orchestrator.js
