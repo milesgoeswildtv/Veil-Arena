@@ -1,9 +1,10 @@
 import { handleTelegramRoute } from "./telegram-control.js";
 import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
+import { handleDiscordActivityRoute } from "./discord-activity.js";
 
 export { ArenaCoordinator };
 
-const BASELINE = "2026-09-13-discord-dwallet-live";
+const BASELINE = "2026-09-13-discord-activity-official-1";
 const TELEGRAM_BUILD = "2026-09-13-telegram-round-narration-1";
 
 function json(data, status = 200) {
@@ -29,10 +30,7 @@ async function preserveFinishedRoundNarration(url, response) {
   const roundText = String(roundEntry.text).trim();
   const combined = finishText && finishText !== roundText ? `${roundText}\n\n${finishText}` : roundText;
 
-  data.lastEvent = {
-    ...(data.lastEvent || {}),
-    text: combined
-  };
+  data.lastEvent = { ...(data.lastEvent || {}), text: combined };
   return json(data, response.status);
 }
 
@@ -45,6 +43,11 @@ export default {
       if (response) return preserveFinishedRoundNarration(url, response);
     }
 
+    if (url.pathname === "/api/token" || url.pathname.startsWith("/api/activity/")) {
+      const response = await handleDiscordActivityRoute(request, env);
+      if (response) return response;
+    }
+
     const discordResponse = await handleDiscordRoute(request, env);
     if (discordResponse) return discordResponse;
 
@@ -55,6 +58,8 @@ export default {
         baseline: BASELINE,
         gameCore: "preserved",
         discord: env.DISCORD_BOT_TOKEN && env.DISCORD_PUBLIC_KEY && env.DISCORD_APPLICATION_ID ? "configured" : "waiting-for-keys",
+        discordActivity: env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET ? "ready-for-portal" : "waiting-for-oauth-keys",
+        discordActivityTestMode: env.DISCORD_ACTIVITY_TEST_MODE === "true",
         dwalletPayouts: env.DWALLET_API_KEY ? "configured" : "waiting-for-api-key",
         veilTipAdminsConfigured: Boolean(String(env.VEIL_TIP_ADMIN_IDS || "").trim()),
         veilTipPlatformAdminsEnabled: env.VEIL_TIP_ALLOW_PLATFORM_ADMINS === "true",
@@ -66,17 +71,14 @@ export default {
       });
     }
 
-    return new Response(
-      "Veil Arena is online. Discord Arena and Telegram Arena are both connected.",
-      {
-        status: 200,
-        headers: {
-          "content-type": "text/plain; charset=utf-8",
-          "cache-control": "no-store",
-          "x-veil-baseline": BASELINE,
-          "x-veil-telegram-build": TELEGRAM_BUILD
-        }
+    return new Response("Veil Arena backend is online.", {
+      status: 200,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+        "x-veil-baseline": BASELINE,
+        "x-veil-telegram-build": TELEGRAM_BUILD
       }
-    );
+    });
   }
 };
