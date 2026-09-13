@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <title>Veil UI Player State Selected</title>
+  <desc>720x360 transparent overlay for the Veil UI player card. Adds SELECTED state treatment only: crisp violet-white targeting rails, brighter corner brackets, stronger central pulse, and clean selection emphasis around the card. No base card body, portrait, or text is duplicated.</desc>
+
+  <metadata>
+    asset: veil_ui_player_state_selected.svg
+    family: veil_ui_player_card.svg
+    canvas: 720x360
+    aspect-ratio: 2:1
+    transparent-background: true
+    overlay-only: true
+    alignment: exact match to veil_ui_player_card.svg
+    text: none
+    intended-use: selected state overlay
+  </metadata>
+
+  <defs>
+    <linearGradient id="targetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#463068"/>
+      <stop offset="0.18" stop-color="#7752A6"/>
+      <stop offset="0.50" stop-color="#F6F8FF"/>
+      <stop offset="0.82" stop-color="#7752A6"/>
+      <stop offset="1" stop-color="#463068"/>
+    </linearGradient>
+
+    <linearGradient id="violetRail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3E255D"/>
+      <stop offset="0.20" stop-color="#6E49A0"/>
+      <stop offset="0.50" stop-color="#C58FFF"/>
+      <stop offset="0.80" stop-color="#6E49A0"/>
+      <stop offset="1" stop-color="#3E255D"/>
+    </linearGradient>
+
+    <linearGradient id="whiteTrace" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
+      <stop offset="0.42" stop-color="#EEF2FF" stop-opacity="0.86"/>
+      <stop offset="1" stop-color="#B4BED3" stop-opacity="0.58"/>
+    </linearGradient>
+
+    <linearGradient id="selectSoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F5ECFF" stop-opacity="0.94"/>
+      <stop offset="0.24" stop-color="#DBB3FF" stop-opacity="0.70"/>
+      <stop offset="0.62" stop-color="#8B63B9" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#4E3366" stop-opacity="0.05"/>
+    </linearGradient>
+
+    <radialGradient id="violetCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.18" stop-color="#F5ECFF" stop-opacity="0.98"/>
+      <stop offset="0.44" stop-color="#D9A9FF" stop-opacity="0.82"/>
+      <stop offset="0.74" stop-color="#875AB3" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#875AB3" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="whiteCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
+      <stop offset="0.36" stop-color="#F6F9FF" stop-opacity="0.76"/>
+      <stop offset="0.82" stop-color="#B7C2D8" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#B7C2D8" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0"/>
+    </filter>
+
+    <filter id="edgeGlow" x="-20%" y="-140%" width="140%" height="380%">
+      <feGaussianBlur stdDeviation="1.9" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="portraitGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="3.0" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Clean selection rail aligned to card silhouette -->
+  <path d="M94 52
+           H307
+           L320 40
+           H400
+           L413 52
+           H626
+           L660 83
+           V143
+           L673 156
+           V204
+           L660 217
+           V277
+           L626 308
+           H413
+           L400 320
+           H320
+           L307 308
+           H94
+           L60 277
+           V217
+           L47 204
+           V156
+           L60 143
+           V83
+           Z"
+        fill="none"
+        stroke="url(#targetRail)"
+        stroke-width="2.25"
+        stroke-linejoin="round"
+        opacity="0.92"
+        filter="url(#edgeGlow)"/>
+
+  <!-- top/bottom selection rails -->
+  <path d="M108 68H612" stroke="url(#targetRail)" stroke-width="2.55" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 80H596" stroke="url(#whiteTrace)" stroke-opacity="0.18" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M150 74H570" stroke="url(#violetRail)" stroke-width="1.1" stroke-linecap="round" opacity="0.24"/>
+
+  <path d="M108 292H612" stroke="url(#targetRail)" stroke-width="2.55" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M124 280H596" stroke="url(#whiteTrace)" stroke-opacity="0.18" stroke-width="1.0" stroke-linecap="round"/>
+  <path d="M150 286H570" stroke="url(#violetRail)" stroke-width="1.1" stroke-linecap="round" opacity="0.22"/>
+
+  <!-- stronger side response -->
+  <path d="M76 114V246" stroke="url(#targetRail)" stroke-width="2.05" stroke-linecap="round" filter="url(#edgeGlow)"/>
+  <path d="M644 114V246" stroke="url(#targetRail)" stroke-width="1.90" stroke-linecap="round" opacity="0.82" filter="url(#edgeGlow)"/>
+
+  <!-- portrait edge response -->
+  <path d="M52 74H190L220 104V256L190 286H52L34 268V92Z"
+        fill="none"
+        stroke="url(#selectSoft)"
+        stroke-width="2.45"
+        stroke-linejoin="round"
+        filter="url(#portraitGlow)"/>
+  <path d="M60 82H184L210 108V252L184 278H60L42 262V98Z"
+        fill="none"
+        stroke="#F4F7FF"
+        stroke-opacity="0.22"
+        stroke-width="1.08"
+        stroke-linejoin="round"/>
+
+  <!-- targeting brackets around portrait module -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M54 108V92H70" stroke="url(#whiteTrace)" stroke-width="1.9" opacity="0.92"/>
+    <path d="M200 108V92H184" stroke="url(#whiteTrace)" stroke-width="1.9" opacity="0.92"/>
+    <path d="M54 252V268H70" stroke="url(#whiteTrace)" stroke-width="1.9" opacity="0.92"/>
+    <path d="M200 252V268H184" stroke="url(#whiteTrace)" stroke-width="1.9" opacity="0.92"/>
+
+    <path d="M58 112V98H72" stroke="url(#violetRail)" stroke-width="1.1" opacity="0.66"/>
+    <path d="M196 112V98H182" stroke="url(#violetRail)" stroke-width="1.1" opacity="0.66"/>
+    <path d="M58 248V262H72" stroke="url(#violetRail)" stroke-width="1.1" opacity="0.60"/>
+    <path d="M196 248V262H182" stroke="url(#violetRail)" stroke-width="1.1" opacity="0.60"/>
+  </g>
+
+  <!-- portrait subtle target arcs -->
+  <path d="M72 102C97 85 127 82 155 90" fill="none" stroke="url(#violetRail)" stroke-width="1.22" stroke-linecap="round" opacity="0.54"/>
+  <path d="M80 258C105 271 135 271 160 261" fill="none" stroke="url(#whiteTrace)" stroke-width="1.08" stroke-linecap="round" opacity="0.38"/>
+
+  <!-- center pulse, immediate selection feel -->
+  <path d="M360 18V92" stroke="url(#targetRail)" stroke-width="2.75" stroke-linecap="round" opacity="0.98" filter="url(#edgeGlow)"/>
+  <path d="M360 28V82" stroke="url(#violetRail)" stroke-width="1.05" stroke-linecap="round" opacity="0.30"/>
+  <circle cx="360" cy="70" r="13.0" fill="url(#violetCore)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="8.8" fill="url(#whiteCore)" opacity="0.90" filter="url(#softGlow)"/>
+  <circle cx="360" cy="70" r="5.0" fill="#FFFFFF" fill-opacity="0.98"/>
+
+  <!-- bottom echo pulse -->
+  <path d="M360 268V342" stroke="url(#targetRail)" stroke-width="2.45" stroke-linecap="round" opacity="0.86" filter="url(#edgeGlow)"/>
+  <path d="M360 278V332" stroke="url(#violetRail)" stroke-width="0.98" stroke-linecap="round" opacity="0.22"/>
+  <circle cx="360" cy="290" r="11.1" fill="url(#violetCore)" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="7.4" fill="url(#whiteCore)" opacity="0.82" filter="url(#softGlow)"/>
+  <circle cx="360" cy="290" r="4.2" fill="#FFFFFF" fill-opacity="0.94"/>
+
+  <!-- selection target accents around center node -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M339 70H348" stroke="url(#whiteTrace)" stroke-width="1.7" opacity="0.90"/>
+    <path d="M372 70H381" stroke="url(#whiteTrace)" stroke-width="1.7" opacity="0.90"/>
+    <path d="M360 49V58" stroke="url(#whiteTrace)" stroke-width="1.7" opacity="0.90"/>
+    <path d="M360 82V91" stroke="url(#whiteTrace)" stroke-width="1.7" opacity="0.90"/>
+  </g>
+
+  <!-- card corner selection brackets -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M94 71H116M94 71V92" stroke="url(#whiteTrace)" stroke-width="1.85" opacity="0.92"/>
+    <path d="M626 71H604M626 71V92" stroke="url(#whiteTrace)" stroke-width="1.85" opacity="0.92"/>
+    <path d="M94 289H116M94 289V268" stroke="url(#whiteTrace)" stroke-width="1.85" opacity="0.92"/>
+    <path d="M626 289H604M626 289V268" stroke="url(#whiteTrace)" stroke-width="1.85" opacity="0.92"/>
+
+    <path d="M99 76H116M99 76V93" stroke="url(#violetRail)" stroke-width="1.05" opacity="0.64"/>
+    <path d="M621 76H604M621 76V93" stroke="url(#violetRail)" stroke-width="1.05" opacity="0.64"/>
+    <path d="M99 284H116M99 284V267" stroke="url(#violetRail)" stroke-width="1.05" opacity="0.58"/>
+    <path d="M621 284H604M621 284V267" stroke="url(#violetRail)" stroke-width="1.05" opacity="0.58"/>
+  </g>
+
+  <!-- corner cores brighter than standard states -->
+  <g>
+    <circle cx="78" cy="78" r="28" fill="url(#violetCore)" opacity="0.38" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="19" fill="url(#whiteCore)" opacity="0.26" filter="url(#softGlow)"/>
+    <circle cx="78" cy="78" r="7.6" fill="#FFFFFF" fill-opacity="0.98"/>
+    <path d="M61 78A17 17 0 0 1 78 61" fill="none" stroke="url(#targetRail)" stroke-width="1.8" stroke-linecap="round" opacity="0.84"/>
+  </g>
+  <g>
+    <circle cx="642" cy="78" r="28" fill="url(#violetCore)" opacity="0.36" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="19" fill="url(#whiteCore)" opacity="0.24" filter="url(#softGlow)"/>
+    <circle cx="642" cy="78" r="7.3" fill="#FFFFFF" fill-opacity="0.95"/>
+    <path d="M659 78A17 17 0 0 0 642 61" fill="none" stroke="url(#targetRail)" stroke-width="1.72" stroke-linecap="round" opacity="0.78"/>
+  </g>
+  <g>
+    <circle cx="78" cy="282" r="27" fill="url(#violetCore)" opacity="0.28" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="18" fill="url(#whiteCore)" opacity="0.18" filter="url(#softGlow)"/>
+    <circle cx="78" cy="282" r="6.4" fill="#FFFFFF" fill-opacity="0.86"/>
+    <path d="M61 282A17 17 0 0 0 78 299" fill="none" stroke="url(#targetRail)" stroke-width="1.5" stroke-linecap="round" opacity="0.66"/>
+  </g>
+  <g>
+    <circle cx="642" cy="282" r="27" fill="url(#violetCore)" opacity="0.26" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="18" fill="url(#whiteCore)" opacity="0.17" filter="url(#softGlow)"/>
+    <circle cx="642" cy="282" r="6.1" fill="#FFFFFF" fill-opacity="0.82"/>
+    <path d="M659 282A17 17 0 0 1 642 299" fill="none" stroke="url(#targetRail)" stroke-width="1.5" stroke-linecap="round" opacity="0.62"/>
+  </g>
+
+  <!-- lower strip selection readiness -->
+  <path d="M259 257H642" stroke="url(#targetRail)" stroke-width="1.22" stroke-linecap="round" opacity="0.30"/>
+  <path d="M282 272H620" stroke="url(#whiteTrace)" stroke-width="0.96" stroke-linecap="round" opacity="0.16"/>
+  <path d="M272 278H632" stroke="url(#violetRail)" stroke-opacity="0.12" stroke-width="0.96" stroke-linecap="round"/>
+</svg>

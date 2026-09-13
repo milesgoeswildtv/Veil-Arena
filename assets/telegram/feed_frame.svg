@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none"
+  role="img"
+  aria-label="Veil Arena live feed frame">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1f1b23"/>
+      <stop offset="12%" stop-color="#61596a"/>
+      <stop offset="24%" stop-color="#f1ecf7"/>
+      <stop offset="38%" stop-color="#827a8b"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="62%" stop-color="#827a8b"/>
+      <stop offset="76%" stop-color="#f1ecf7"/>
+      <stop offset="88%" stop-color="#61596a"/>
+      <stop offset="100%" stop-color="#1f1b23"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f1b23"/>
+      <stop offset="12%" stop-color="#61596a"/>
+      <stop offset="24%" stop-color="#f1ecf7"/>
+      <stop offset="38%" stop-color="#827a8b"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="62%" stop-color="#827a8b"/>
+      <stop offset="76%" stop-color="#f1ecf7"/>
+      <stop offset="88%" stop-color="#61596a"/>
+      <stop offset="100%" stop-color="#1f1b23"/>
+    </linearGradient>
+
+    <linearGradient id="violetH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7034b8" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#8d50e1" stop-opacity=".42"/>
+      <stop offset="50%" stop-color="#e2a0ff" stop-opacity=".92"/>
+      <stop offset="82%" stop-color="#8d50e1" stop-opacity=".42"/>
+      <stop offset="100%" stop-color="#7034b8" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="violetV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7034b8" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#8d50e1" stop-opacity=".42"/>
+      <stop offset="50%" stop-color="#e2a0ff" stop-opacity=".92"/>
+      <stop offset="82%" stop-color="#8d50e1" stop-opacity=".42"/>
+      <stop offset="100%" stop-color="#7034b8" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="innerGlowH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6a30af" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#9555e6" stop-opacity=".18"/>
+      <stop offset="50%" stop-color="#f0b7ff" stop-opacity=".40"/>
+      <stop offset="78%" stop-color="#9555e6" stop-opacity=".18"/>
+      <stop offset="100%" stop-color="#6a30af" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="innerGlowV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6a30af" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#9555e6" stop-opacity=".18"/>
+      <stop offset="50%" stop-color="#f0b7ff" stop-opacity=".40"/>
+      <stop offset="78%" stop-color="#9555e6" stop-opacity=".18"/>
+      <stop offset="100%" stop-color="#6a30af" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="gunmetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c0a0f"/>
+      <stop offset="45%" stop-color="#28202d"/>
+      <stop offset="100%" stop-color="#17131b"/>
+    </linearGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="2.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Corner primitive kept entirely within the fixed 128x128 slice -->
+    <g id="corner">
+      <path d="M128 42 H82 Q42 42 42 82 V128"
+        stroke="#0b090e" stroke-width="26" fill="none" stroke-linejoin="round"/>
+      <path d="M128 42 H82 Q42 42 42 82 V128"
+        stroke="url(#chromeH)" stroke-width="8" fill="none" stroke-linejoin="round"/>
+      <path d="M128 58 H92 Q58 58 58 92 V128"
+        stroke="#593377" stroke-width="4.6" fill="none" stroke-linejoin="round"/>
+      <path d="M128 70 H100 Q70 70 70 100 V128"
+        stroke="#da98ff" stroke-width="2.4" opacity=".76" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+      <path d="M128 80 H108 Q80 80 80 108 V128"
+        stroke="#ebb8ff" stroke-width="1.3" opacity=".44" fill="none" stroke-linejoin="round" filter="url(#glow)"/>
+
+      <!-- restrained live-feed corner plate -->
+      <path d="M26 62 L44 31 L66 39 L86 24 L107 42 L93 59 L71 64 L52 88 L29 78 Z"
+        fill="url(#gunmetal)" stroke="url(#chromeH)" stroke-width="4.6"/>
+      <path d="M44 109 L57 102 L65 112 L55 126 L42 121 Z"
+        fill="#17131b" stroke="#756d7d" stroke-width="2.4"/>
+
+      <!-- inward-facing attention accents confined to corner slice -->
+      <path d="M93 93 L116 84" stroke="#d895ff" stroke-width="2.4" stroke-linecap="round" opacity=".72" filter="url(#glow)"/>
+      <path d="M86 103 L112 103" stroke="#a35be1" stroke-width="1.8" stroke-linecap="round" opacity=".54"/>
+      <circle cx="101" cy="93" r="2.4" fill="#efbbff" opacity=".72" filter="url(#glow)"/>
+    </g>
+  </defs>
+
+  <!-- Top rail: stretch-safe only -->
+  <g>
+    <path d="M128 42 H896" stroke="#0b090e" stroke-width="26" fill="none"/>
+    <path d="M128 42 H896" stroke="url(#chromeH)" stroke-width="8" fill="none"/>
+    <path d="M128 58 H896" stroke="#593377" stroke-width="4.6" fill="none"/>
+    <path d="M128 70 H896" stroke="url(#violetH)" stroke-width="2.4" fill="none" filter="url(#glow)"/>
+    <path d="M128 80 H896" stroke="url(#innerGlowH)" stroke-width="1.3" fill="none" opacity=".55"/>
+  </g>
+
+  <!-- Bottom rail: stretch-safe only -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M128 42 H896" stroke="#0b090e" stroke-width="26" fill="none"/>
+    <path d="M128 42 H896" stroke="url(#chromeH)" stroke-width="8" fill="none"/>
+    <path d="M128 58 H896" stroke="#593377" stroke-width="4.6" fill="none"/>
+    <path d="M128 70 H896" stroke="url(#violetH)" stroke-width="2.4" fill="none" filter="url(#glow)"/>
+    <path d="M128 80 H896" stroke="url(#innerGlowH)" stroke-width="1.3" fill="none" opacity=".55"/>
+  </g>
+
+  <!-- Left rail: stretch-safe only -->
+  <g>
+    <path d="M42 128 V896" stroke="#0b090e" stroke-width="26" fill="none"/>
+    <path d="M42 128 V896" stroke="url(#chromeV)" stroke-width="8" fill="none"/>
+    <path d="M58 128 V896" stroke="#593377" stroke-width="4.6" fill="none"/>
+    <path d="M70 128 V896" stroke="url(#violetV)" stroke-width="2.4" fill="none" filter="url(#glow)"/>
+    <path d="M80 128 V896" stroke="url(#innerGlowV)" stroke-width="1.3" fill="none" opacity=".55"/>
+  </g>
+
+  <!-- Right rail: stretch-safe only -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M42 128 V896" stroke="#0b090e" stroke-width="26" fill="none"/>
+    <path d="M42 128 V896" stroke="url(#chromeV)" stroke-width="8" fill="none"/>
+    <path d="M58 128 V896" stroke="#593377" stroke-width="4.6" fill="none"/>
+    <path d="M70 128 V896" stroke="url(#violetV)" stroke-width="2.4" fill="none" filter="url(#glow)"/>
+    <path d="M80 128 V896" stroke="url(#innerGlowV)" stroke-width="1.3" fill="none" opacity=".55"/>
+  </g>
+
+  <!-- Four corners -->
+  <use href="#corner"/>
+  <use href="#corner" transform="translate(1024 0) scale(-1 1)"/>
+  <use href="#corner" transform="translate(0 1024) scale(1 -1)"/>
+  <use href="#corner" transform="translate(1024 1024) scale(-1 -1)"/>
+
+  <!-- tiny anchor pips, still within fixed corner slices -->
+  <g fill="#e0a4ff" opacity=".60" filter="url(#glow)">
+    <circle cx="102" cy="102" r="2.7"/>
+    <circle cx="922" cy="102" r="2.7"/>
+    <circle cx="102" cy="922" r="2.7"/>
+    <circle cx="922" cy="922" r="2.7"/>
+  </g>
+
+  <!-- Center intentionally transparent -->
+</svg>

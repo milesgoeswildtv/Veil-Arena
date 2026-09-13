@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  width="1024" height="1024" viewBox="0 0 1024 1024"
+  preserveAspectRatio="none"
+  role="img"
+  aria-label="Veil Arena reusable input frame">
+  <defs>
+    <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1b1820"/>
+      <stop offset="16%" stop-color="#4f4a57"/>
+      <stop offset="30%" stop-color="#e7e3ee"/>
+      <stop offset="44%" stop-color="#787182"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="56%" stop-color="#787182"/>
+      <stop offset="70%" stop-color="#e7e3ee"/>
+      <stop offset="84%" stop-color="#4f4a57"/>
+      <stop offset="100%" stop-color="#1b1820"/>
+    </linearGradient>
+
+    <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b1820"/>
+      <stop offset="16%" stop-color="#4f4a57"/>
+      <stop offset="30%" stop-color="#e7e3ee"/>
+      <stop offset="44%" stop-color="#787182"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="56%" stop-color="#787182"/>
+      <stop offset="70%" stop-color="#e7e3ee"/>
+      <stop offset="84%" stop-color="#4f4a57"/>
+      <stop offset="100%" stop-color="#1b1820"/>
+    </linearGradient>
+
+    <linearGradient id="violetH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6532a6" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#7f45ca" stop-opacity=".22"/>
+      <stop offset="50%" stop-color="#cf92ff" stop-opacity=".55"/>
+      <stop offset="78%" stop-color="#7f45ca" stop-opacity=".22"/>
+      <stop offset="100%" stop-color="#6532a6" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="violetV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6532a6" stop-opacity="0"/>
+      <stop offset="22%" stop-color="#7f45ca" stop-opacity=".22"/>
+      <stop offset="50%" stop-color="#cf92ff" stop-opacity=".55"/>
+      <stop offset="78%" stop-color="#7f45ca" stop-opacity=".22"/>
+      <stop offset="100%" stop-color="#6532a6" stop-opacity="0"/>
+    </linearGradient>
+
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="1.7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- fixed-corner primitive only -->
+    <g id="corner">
+      <path d="M80 34 H58 Q34 34 34 58 V80"
+        stroke="#09080c" stroke-width="18" fill="none"
+        stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M80 34 H58 Q34 34 34 58 V80"
+        stroke="url(#chromeH)" stroke-width="5.8" fill="none"
+        stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M80 46 H63 Q46 46 46 63 V80"
+        stroke="#50306c" stroke-width="3" fill="none"
+        stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M80 55 H70 Q55 55 55 70 V80"
+        stroke="#d29cff" stroke-width="1.35" opacity=".46" fill="none"
+        stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+
+      <!-- minimal restrained corner accent -->
+      <path d="M25 47 L33 32 L44 35 L54 29 L64 38 L57 47 L47 50 L38 62 L27 58 Z"
+        fill="#17141b" stroke="#8e8796" stroke-width="2"/>
+    </g>
+  </defs>
+
+  <!-- top rail -->
+  <g>
+    <path d="M80 34 H944" stroke="#09080c" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M80 34 H944" stroke="url(#chromeH)" stroke-width="5.8" fill="none" stroke-linecap="round"/>
+    <path d="M80 46 H944" stroke="#50306c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M80 55 H944" stroke="url(#violetH)" stroke-width="1.35" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- bottom rail -->
+  <g transform="translate(0 1024) scale(1 -1)">
+    <path d="M80 34 H944" stroke="#09080c" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M80 34 H944" stroke="url(#chromeH)" stroke-width="5.8" fill="none" stroke-linecap="round"/>
+    <path d="M80 46 H944" stroke="#50306c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M80 55 H944" stroke="url(#violetH)" stroke-width="1.35" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- left rail -->
+  <g>
+    <path d="M34 80 V944" stroke="#09080c" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M34 80 V944" stroke="url(#chromeV)" stroke-width="5.8" fill="none" stroke-linecap="round"/>
+    <path d="M46 80 V944" stroke="#50306c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M55 80 V944" stroke="url(#violetV)" stroke-width="1.35" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- right rail -->
+  <g transform="translate(1024 0) scale(-1 1)">
+    <path d="M34 80 V944" stroke="#09080c" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M34 80 V944" stroke="url(#chromeV)" stroke-width="5.8" fill="none" stroke-linecap="round"/>
+    <path d="M46 80 V944" stroke="#50306c" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M55 80 V944" stroke="url(#violetV)" stroke-width="1.35" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- four corners -->
+  <use href="#corner"/>
+  <use href="#corner" transform="translate(1024 0) scale(-1 1)"/>
+  <use href="#corner" transform="translate(0 1024) scale(1 -1)"/>
+  <use href="#corner" transform="translate(1024 1024) scale(-1 -1)"/>
+
+  <!-- tiny alignment pips inside fixed slices only -->
+  <g fill="#d7a4ff" opacity=".40" filter="url(#glow)">
+    <circle cx="64" cy="64" r="1.9"/>
+    <circle cx="960" cy="64" r="1.9"/>
+    <circle cx="64" cy="960" r="1.9"/>
+    <circle cx="960" cy="960" r="1.9"/>
+  </g>
+</svg>
