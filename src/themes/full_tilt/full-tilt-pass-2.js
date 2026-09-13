@@ -248,7 +248,7 @@ const NORMAL_ENDINGS = [
   "No elimination. The rail boos anyway.",
   "The dealer calls it a wash and keeps the hand moving.",
   "Both stacks survive, against all reasonable bankroll management.",
-  "The pit refuses to grade that as a kill.",
+  "The pit refuses to grade that as an elimination.",
   "Still active. Still tilted. Still making bad decisions.",
   "No cash-out yet.",
   "The table stays open for both players.",
@@ -281,7 +281,7 @@ const RARE_ACTIONS = [
 const RARE_ENDINGS = [
   "Nobody is eliminated. Full Tilt logs it as 'weird shit.'",
   "Both survive. The floor refuses to explain it.",
-  "No kill. Just premium-grade casino nonsense.",
+  "No elimination. Just premium-grade casino nonsense.",
   "Action resumes after an uncomfortable amount of silence.",
   "The table camera cuts away and pretends that never happened.",
   "Both players stay active. The rail immediately invents six conspiracy theories.",
@@ -293,15 +293,16 @@ const RARE_ENDINGS = [
 
 function combine4(a,b,c,d){const out=[];for(const w of a)for(const x of b)for(const y of c)for(const z of d)out.push(`${w}, ${x} ${y}. ${z}`);return out}
 function combine3(a,b,c){const out=[];for(const x of a)for(const y of b)for(const z of c)out.push(`${x}, ${y}. ${z}`);return out}
+function combineLinked3(a,b,c){const out=[];for(const x of a)for(const y of b)for(const z of c)out.push(`${x} ${y}. ${z}`);return out}
 
 export const FULL_TILT_PASS_2 = {
-  playerKills: combine4(KILL_ZONES,KILL_OPENERS,KILL_MOVES,KILL_ENDINGS),       // 5,000
+  playerKills: combine4(KILL_ZONES,KILL_OPENERS,KILL_MOVES,KILL_ENDINGS),          // 5,000
   selfKills: combine4(SELF_CONTEXTS,SELF_MISHAPS,SELF_CONSEQUENCES,SELF_ENDINGS), // 2,400
-  pinDuels: combine3(DUEL_SETUPS,DUEL_ACTIONS,DUEL_ENDINGS),                    // 1,500
-  multiPins: combine3(MULTI_SETUPS,MULTI_ACTIONS,MULTI_ENDINGS),                // 1,200
-  revivalDuels: combine3(REVIVE_SETUPS,REVIVE_ACTIONS,REVIVE_ENDINGS),          // 1,200
-  normalEvents: combine3(NORMAL_SETUPS,NORMAL_ACTIONS,NORMAL_ENDINGS),          // 1,000
-  rareEvents: combine3(RARE_SETUPS,RARE_ACTIONS,RARE_ENDINGS)                   // 700
+  pinDuels: combineLinked3(DUEL_SETUPS,DUEL_ACTIONS,DUEL_ENDINGS),                // 1,500
+  multiPins: combineLinked3(MULTI_SETUPS,MULTI_ACTIONS,MULTI_ENDINGS),            // 1,200
+  revivalDuels: combineLinked3(REVIVE_SETUPS,REVIVE_ACTIONS,REVIVE_ENDINGS),      // 1,200
+  normalEvents: combine3(NORMAL_SETUPS,NORMAL_ACTIONS,NORMAL_ENDINGS),            // 1,000
+  rareEvents: combineLinked3(RARE_SETUPS,RARE_ACTIONS,RARE_ENDINGS)               // 700
 };
 
 export const FULL_TILT_PASS_2_COUNT = Object.values(FULL_TILT_PASS_2).reduce((n,pool)=>n+pool.length,0); // 13,000
