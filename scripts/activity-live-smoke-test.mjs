@@ -47,7 +47,13 @@ assert(bootstrapEntry.includes('CONNECTING TO DISCORD'));
 assert(bootstrapEntry.includes('discordBearer("/users/@me/guilds"'));
 assert(!bootstrapEntry.includes('discordBot(`/channels/${channelId}`'));
 
+const sdkRouteEntry = readFileSync(new URL("../src/activity-sdk-route-fix-entry.js", import.meta.url), "utf8");
+assert(sdkRouteEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
+assert(sdkRouteEntry.includes('content-type": "application/javascript'));
+assert(sdkRouteEntry.includes('/activity/sdk-dep/'));
+assert(sdkRouteEntry.includes('20260913-5'));
+
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
-assert(wrangler.includes('main = "src/activity-bootstrap-fix-entry.js"'));
+assert(wrangler.includes('main = "src/activity-sdk-route-fix-entry.js"'));
 
 console.log("Live Discord Activity smoke tests passed.");
