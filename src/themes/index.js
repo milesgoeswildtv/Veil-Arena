@@ -17,7 +17,7 @@ import { PLAYER_KILLS_SEGMENT_3, SELF_KILLS_SEGMENT_3, PIN_DUELS_SEGMENT_3, MULT
 import { PLAYER_KILLS_SEGMENT_4, SELF_KILLS_SEGMENT_4, PIN_DUELS_SEGMENT_4, MULTI_PIN_SEGMENT_4, REVIVAL_DUELS_SEGMENT_4 } from "../content/base/deaths-segment-4.js";
 import { PLAYER_KILLS_SEGMENT_5, SELF_KILLS_SEGMENT_5, PIN_DUELS_SEGMENT_5, MULTI_PIN_SEGMENT_5, REVIVAL_DUELS_SEGMENT_5 } from "../content/base/deaths-segment-5.js";
 
-export const DEFAULT_THEME_ID = "vibe_queen_slots";
+export const DEFAULT_THEME_ID = "base";
 
 const BASE_THEME = {
   id: "base",
