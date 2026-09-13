@@ -10,8 +10,27 @@ let auth;
 let sessionToken = "";
 let currentState = null;
 let polling = false;
+let lastFxSignature = "";
+let fxTimer = null;
 
 const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+
+function markdownToHtml(value) {
+  let html = esc(value ?? "");
+  html = html.replace(/~~\*\*\*([^\n]+?)\*\*\*~~/g, "<s><strong><em>$1</em></strong></s>");
+  html = html.replace(/~~\*\*([^\n]+?)\*\*~~/g, "<s><strong>$1</strong></s>");
+  html = html.replace(/\*\*\*([^\n]+?)\*\*\*/g, "<strong><em>$1</em></strong>");
+  html = html.replace(/\*\*([^\n]+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/__([^_\n]+?)__/g, "<u>$1</u>");
+  html = html.replace(/~~([^~\n]+?)~~/g, "<s>$1</s>");
+  html = html.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  html = html.replace(/\|\|([^|\n]+?)\|\|/g, '<span class="spoiler" tabindex="0">$1</span>');
+  html = html.replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, "<em>$1</em>");
+  html = html.replace(/^##\s+(.+)$/gm, '<span class="md-heading md-heading-2">$1</span>');
+  html = html.replace(/^#\s+(.+)$/gm, '<span class="md-heading">$1</span>');
+  html = html.replace(/\\\./g, ".");
+  return html.replace(/\n/g, "<br>");
+}
 
 function status(text) {
   statusEl.textContent = text;
@@ -42,6 +61,98 @@ async function activityApi(path, init = {}) {
   });
 }
 
+function ensureFxLayer() {
+  let layer = document.querySelector("#fx-layer");
+  if (layer) return layer;
+  layer = document.createElement("div");
+  layer.id = "fx-layer";
+  layer.setAttribute("aria-hidden", "true");
+  document.body.appendChild(layer);
+  return layer;
+}
+
+function fxParticles(layer, variant, count = 22) {
+  const glyphs = variant === "revival" ? ["✦", "✧", "+"] : variant === "winner" ? ["◆", "✦", "★"] : variant === "brawl" ? ["✕", "◆", "⚡"] : ["✦", "●", "◆"];
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement("i");
+    particle.className = "fx-particle";
+    particle.textContent = glyphs[i % glyphs.length];
+    particle.style.setProperty("--x", `${8 + Math.random() * 84}vw`);
+    particle.style.setProperty("--y", `${12 + Math.random() * 72}vh`);
+    particle.style.setProperty("--dx", `${-70 + Math.random() * 140}px`);
+    particle.style.setProperty("--dy", `${-90 - Math.random() * 150}px`);
+    particle.style.setProperty("--r", `${-180 + Math.random() * 360}deg`);
+    particle.style.setProperty("--delay", `${Math.random() * 0.22}s`);
+    layer.appendChild(particle);
+  }
+}
+
+function showFx(title, subtitle, variant = "impact") {
+  const layer = ensureFxLayer();
+  clearTimeout(fxTimer);
+  document.body.classList.remove("fx-impact", "fx-brawl", "fx-revival", "fx-showdown", "fx-final", "fx-winner");
+  void document.body.offsetWidth;
+  document.body.classList.add(`fx-${variant}`);
+  layer.innerHTML = `
+    <div class="fx-vignette"></div>
+    <div class="fx-flash"></div>
+    <div class="fx-title-wrap">
+      <div class="fx-kicker">VEIL // ARENA EVENT</div>
+      <div class="fx-title">${esc(title)}</div>
+      ${subtitle ? `<div class="fx-subtitle">${esc(subtitle)}</div>` : ""}
+    </div>`;
+  fxParticles(layer, variant, variant === "winner" ? 34 : 22);
+  layer.classList.remove("active");
+  void layer.offsetWidth;
+  layer.classList.add("active");
+  fxTimer = setTimeout(() => {
+    layer.classList.remove("active");
+    document.body.classList.remove(`fx-${variant}`);
+  }, variant === "winner" ? 3000 : 2100);
+}
+
+function eventSignature(state) {
+  const game = state?.game;
+  if (!game) return "none";
+  const event = game.lastEvent || {};
+  return [game.id, game.status, game.round, game.aliveCount, game.winnerId || "", event.type || "", event.at || "", event.text || ""].join("|");
+}
+
+function triggerFx(previous, next) {
+  const game = next?.game;
+  if (!game) return;
+  const signature = eventSignature(next);
+  if (signature === lastFxSignature) return;
+
+  const previousGame = previous?.game;
+  const previousAlive = Number(previousGame?.aliveCount ?? game.aliveCount);
+  const alive = Number(game.aliveCount || 0);
+  const event = game.lastEvent || {};
+  const eventChanged = !previousGame || String(previousGame?.lastEvent?.at || "") !== String(event.at || "") || previousGame?.lastEvent?.type !== event.type;
+
+  if (game.winnerId && String(previousGame?.winnerId || "") !== String(game.winnerId)) {
+    const winner = game.players.find(player => String(player.id) === String(game.winnerId));
+    showFx("ARENA CHAMPION", winner ? `${winner.displayName} takes it.` : "One player remains.", "winner");
+  } else if (previousAlive > 5 && alive <= 5 && game.status === "running") {
+    showFx("FINAL FIVE", "Special events are over. Every hit matters now.", "final");
+  } else if (eventChanged && event.type === "mass_brawl") {
+    showFx("MASS BRAWL", "The whole Arena just went feral.", "brawl");
+  } else if (eventChanged && event.type === "revival") {
+    showFx("SECOND CHANCE", "Somebody is coming back.", "revival");
+  } else if (eventChanged && event.type === "crowd_vote_open") {
+    showFx("COMMUNITY SHOWDOWN", "Spectators decide who goes in.", "showdown");
+  } else if (eventChanged && event.type === "crowd_result") {
+    showFx("SHOWDOWN RESOLVED", "One survives the vote.", "showdown");
+  } else if (previousGame?.status === "registration" && game.status === "running") {
+    showFx("ARENA LIVE", `${alive} players entered.`, "impact");
+  } else if (eventChanged && previousAlive > alive) {
+    const lost = previousAlive - alive;
+    showFx(lost > 1 ? `${lost} ELIMINATED` : "ELIMINATION", `${alive} player${alive === 1 ? "" : "s"} remain.`, "impact");
+  }
+
+  lastFxSignature = signature;
+}
+
 function controls(state) {
   const out = [];
   if (!state.game) {
@@ -66,6 +177,7 @@ function controls(state) {
 }
 
 function render(state) {
+  const previousState = currentState;
   currentState = state;
   contentEl.classList.remove("hidden");
   errorEl.classList.add("hidden");
@@ -79,25 +191,28 @@ function render(state) {
         <div class="controls">${controls(state)}</div>
       </div>`;
     bindControls();
+    lastFxSignature = "none";
     return;
   }
 
   const roster = game.players.map(player => `
-    <div class="player ${player.alive ? "" : "dead"}">
+    <div class="player ${player.alive ? "" : "dead"}" data-player-id="${esc(player.id)}">
       <span>${esc(player.displayName)} ${player.simulated ? '<span class="tag">BOT</span>' : ""}</span>
       <span class="small">${player.alive ? `${player.eliminations} KO` : "ELIMINATED"}</span>
     </div>`).join("");
 
   const latest = [...(game.displayLog || [])].reverse()[0]?.text || game.lastEvent?.text || "Registration is open.";
+  const previousLatest = previousState?.game ? ([...(previousState.game.displayLog || [])].reverse()[0]?.text || previousState.game.lastEvent?.text || "") : "";
+  const feedClass = latest !== previousLatest ? "event event-new" : "event";
   const winner = game.winnerId ? game.players.find(p => String(p.id) === String(game.winnerId)) : null;
   const vote = game.crowdVote && state.viewer.canVote ? `
-    <div class="panel">
+    <div class="panel showdown-panel">
       <div class="small">COMMUNITY SHOWDOWN // VOTE</div>
       <div class="vote-grid">${game.crowdVote.eligibleIds.map(id => {
         const player = game.players.find(p => String(p.id) === String(id));
         if (!player) return "";
         const selected = String(game.crowdVote.selectedId || "") === String(id);
-        return `<button data-vote="${esc(id)}">${selected ? "✓ " : ""}${esc(player.displayName)}</button>`;
+        return `<button data-vote="${esc(id)}" class="${selected ? "selected" : ""}">${selected ? "✓ " : ""}${esc(player.displayName)}</button>`;
       }).join("")}</div>
     </div>` : "";
 
@@ -107,14 +222,14 @@ function render(state) {
       <div class="stat"><span class="small">ROUND</span><b>${game.round}</b></div>
       <div class="stat"><span class="small">ALIVE</span><b>${game.aliveCount}/${game.playerCount}</b></div>
     </div>
-    <div class="panel">
+    <div class="panel arena-header">
       <div class="small">${esc(state.channelName || "Discord Activity")}</div>
       ${winner ? `<div class="winner">🏆 ${esc(winner.displayName)} WINS</div>` : ""}
       <div class="controls">${controls(state)}</div>
     </div>
-    <div class="panel">
+    <div class="panel feed-panel">
       <div class="small">LIVE FEED</div>
-      <div class="event">${esc(latest)}</div>
+      <div class="${feedClass}">${markdownToHtml(latest)}</div>
     </div>
     ${vote}
     <div class="panel">
@@ -122,6 +237,18 @@ function render(state) {
       <div class="roster">${roster || "Nobody has entered yet."}</div>
     </div>`;
   bindControls();
+  bindSpoilers();
+  triggerFx(previousState, state);
+}
+
+function bindSpoilers() {
+  document.querySelectorAll(".spoiler").forEach(spoiler => {
+    const reveal = () => spoiler.classList.toggle("revealed");
+    spoiler.addEventListener("click", reveal);
+    spoiler.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") reveal();
+    });
+  });
 }
 
 function bindControls() {
