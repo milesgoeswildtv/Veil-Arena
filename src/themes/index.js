@@ -9,6 +9,7 @@ import { VQS_NORMAL_RARE } from "./vibe_queen_slots/horror-normal-rare.js";
 import { FULL_TILT_GAMBA } from "./full_tilt/gamba.js";
 import { FULL_TILT_EXPANSION } from "./full_tilt/gamba-expansion.js";
 import { FULL_TILT_MEGA } from "./full_tilt/gamba-mega.js";
+import { FULL_TILT_PASS_2 } from "./full_tilt/full-tilt-pass-2.js";
 import { DWALLET_THEME } from "./dwallet-hq.js";
 import { PLAYER_KILLS, SELF_KILLS, PIN_DUELS, MULTI_PIN, REVIVAL_DUELS } from "../content/base/deaths.js";
 import { PLAYER_KILLS_SEGMENT_2, SELF_KILLS_SEGMENT_2, PIN_DUELS_SEGMENT_2, MULTI_PIN_SEGMENT_2, REVIVAL_DUELS_SEGMENT_2 } from "../content/base/deaths-segment-2.js";
@@ -43,13 +44,13 @@ const VQS_THEME = {
 
 const FULL_TILT_THEME = {
   ...FULL_TILT_GAMBA,
-  playerKills: [...FULL_TILT_EXPANSION.playerKills, ...FULL_TILT_GAMBA.playerKills],
-  selfKills: [...FULL_TILT_MEGA.selfKills, ...FULL_TILT_GAMBA.selfKills],
-  pinDuels: [...FULL_TILT_MEGA.pinDuels, ...FULL_TILT_GAMBA.pinDuels],
-  multiPins: [...FULL_TILT_MEGA.multiPins, ...FULL_TILT_GAMBA.multiPins],
-  revivalDuels: [...FULL_TILT_MEGA.revivalDuels, ...FULL_TILT_GAMBA.revivalDuels],
-  normalEvents: FULL_TILT_MEGA.normalEvents,
-  rareEvents: FULL_TILT_MEGA.rareEvents
+  playerKills: [...FULL_TILT_PASS_2.playerKills, ...FULL_TILT_EXPANSION.playerKills, ...FULL_TILT_GAMBA.playerKills],
+  selfKills: [...FULL_TILT_PASS_2.selfKills, ...FULL_TILT_MEGA.selfKills, ...FULL_TILT_GAMBA.selfKills],
+  pinDuels: [...FULL_TILT_PASS_2.pinDuels, ...FULL_TILT_MEGA.pinDuels, ...FULL_TILT_GAMBA.pinDuels],
+  multiPins: [...FULL_TILT_PASS_2.multiPins, ...FULL_TILT_MEGA.multiPins, ...FULL_TILT_GAMBA.multiPins],
+  revivalDuels: [...FULL_TILT_PASS_2.revivalDuels, ...FULL_TILT_MEGA.revivalDuels, ...FULL_TILT_GAMBA.revivalDuels],
+  normalEvents: [...FULL_TILT_PASS_2.normalEvents, ...FULL_TILT_MEGA.normalEvents],
+  rareEvents: [...FULL_TILT_PASS_2.rareEvents, ...FULL_TILT_MEGA.rareEvents]
 };
 
 const THEMES = new Map([
