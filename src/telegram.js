@@ -74,12 +74,29 @@ export async function configureTelegram(token, webhookUrl, webhookSecret) {
 }
 
 export async function sendTelegramMessage(scope, token, text, replyMarkup = undefined) {
+  if (text && typeof text === "object") {
+    replyMarkup = text.reply_markup ?? replyMarkup;
+    text = text.text ?? "";
+  }
   return telegramRequest(token, "sendMessage", {
     chat_id: rawTelegramChatId(scope),
     text: String(text || ""),
     link_preview_options: { is_disabled: true },
     ...(replyMarkup ? { reply_markup: replyMarkup } : {})
   });
+}
+
+export async function deleteTelegramMessage(scope, messageId, token) {
+  if (!messageId) return false;
+  try {
+    await telegramRequest(token, "deleteMessage", {
+      chat_id: rawTelegramChatId(scope),
+      message_id: Number(messageId)
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function telegramUserInChat(scope, userId, token) {

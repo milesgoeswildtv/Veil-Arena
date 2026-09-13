@@ -1,6 +1,9 @@
 import { handleTelegramRoute } from "./telegram-worker.js";
+import { handleDiscordRoute, ArenaCoordinator } from "./discord-worker.js";
 
-const BASELINE = "2026-09-13-clean-reset";
+export { ArenaCoordinator };
+
+const BASELINE = "2026-09-13-discord-dwallet-live";
 const TELEGRAM_BUILD = "2026-09-13-telegram-clean-1";
 
 function json(data, status = 200) {
@@ -22,22 +25,27 @@ export default {
       if (response) return response;
     }
 
+    const discordResponse = await handleDiscordRoute(request, env);
+    if (discordResponse) return discordResponse;
+
     if (url.pathname === "/health") {
       return json({
         ok: true,
         service: "veil-arena",
         baseline: BASELINE,
         gameCore: "preserved",
-        discord: "not-configured",
+        discord: env.DISCORD_BOT_TOKEN && env.DISCORD_PUBLIC_KEY && env.DISCORD_APPLICATION_ID ? "configured" : "waiting-for-keys",
+        dwalletPayouts: env.DWALLET_API_KEY ? "configured" : "waiting-for-api-key",
         telegram: env.TELEGRAM_BOT_TOKEN ? "configured" : "waiting-for-keys",
         telegramBuild: TELEGRAM_BUILD,
         telegramTestMode: env.TELEGRAM_TEST_MODE === "true",
-        databaseBound: Boolean(env.DB)
+        databaseBound: Boolean(env.DB),
+        coordinatorBound: Boolean(env.ARENA_COORDINATOR)
       });
     }
 
     return new Response(
-      "Veil Arena core is online. Telegram has been rebuilt cleanly; Discord remains intentionally disconnected.",
+      "Veil Arena is online. Discord Arena and Telegram Arena are both connected.",
       {
         status: 200,
         headers: {
