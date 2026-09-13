@@ -4,7 +4,7 @@ import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-dwallet-live";
-const TELEGRAM_BUILD = "2026-09-13-telegram-veiltip-3";
+const TELEGRAM_BUILD = "2026-09-13-telegram-round-narration-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -16,13 +16,33 @@ function json(data, status = 200) {
   });
 }
 
+async function preserveFinishedRoundNarration(url, response) {
+  if (!response || url.pathname !== "/telegram/api/state" || !response.ok) return response;
+  const data = await response.clone().json().catch(() => null);
+  if (!data || data.status !== "finished" || !Array.isArray(data.displayLog)) return response;
+
+  const roundEntry = [...data.displayLog].reverse().find(entry => /ROUND\s+\d+/i.test(String(entry?.text || "")));
+  if (!roundEntry?.text) return response;
+
+  const finishEntry = [...data.displayLog].reverse().find(entry => /WINS THE ARENA|ended without a winner/i.test(String(entry?.text || "")));
+  const finishText = String(finishEntry?.text || data.lastEvent?.text || "").trim();
+  const roundText = String(roundEntry.text).trim();
+  const combined = finishText && finishText !== roundText ? `${roundText}\n\n${finishText}` : roundText;
+
+  data.lastEvent = {
+    ...(data.lastEvent || {}),
+    text: combined
+  };
+  return json(data, response.status);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith("/telegram/")) {
       const response = await handleTelegramRoute(request, env);
-      if (response) return response;
+      if (response) return preserveFinishedRoundNarration(url, response);
     }
 
     const discordResponse = await handleDiscordRoute(request, env);
