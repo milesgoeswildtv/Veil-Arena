@@ -13,6 +13,7 @@ export async function createChannelTextFile(channelId,token,filename,text,conten
 export async function deleteChannelMessage(channelId,messageId,token){if(!messageId)return;try{await discordRequest(`/channels/${channelId}/messages/${messageId}`,token,{method:"DELETE"});}catch(error){console.warn("Arena cleanup could not delete message",messageId,error?.message||error);}}
 const sponsorAmount=(name,description)=>({name,description,type:10,required:false,min_value:.01,max_value:100000});
 export function arenaCommands(){return[
+  {name:"ping",description:"Check that Veil's Discord interaction endpoint is online.",type:1},
   {name:"arena",description:"Enter the Arena.",type:1,options:[
     {name:"start",description:"Open Arena registration.",type:1},
     {name:"status",description:"Check the active Arena in this channel.",type:1},
