@@ -6,6 +6,7 @@ export const TELEGRAM_COMMANDS = [
   { command: "arenastatus", description: "Show the current Arena status" },
   { command: "arenarules", description: "Show DWallet Arena rules" },
   { command: "arenaforceclose", description: "Force-close a stuck Arena" },
+  { command: "veiltip", description: "Authorized Veil wallet tip (reply to a user)" },
   { command: "arenahelp", description: "Show Arena commands" },
   { command: "ping", description: "Check whether Veil is online" }
 ];
