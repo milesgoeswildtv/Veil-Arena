@@ -32,7 +32,9 @@ jobs:
         run: |
           node --check src/worker.js
           node --check src/discord.js
+          node --check src/discord-setup.js
           node --check src/discord-control.js
+          node --check src/discord-worker.js
           node --check src/telegram.js
           node --check src/telegram-control.js
           node --check src/telegram-app.js
