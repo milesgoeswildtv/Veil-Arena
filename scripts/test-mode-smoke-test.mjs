@@ -50,7 +50,8 @@ const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", i
 assert(wrangler.includes('main = "src/activity-sdk-route-fix-entry.js"'));
 assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
 assert(sdkRouteEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
-assert(sdkRouteEntry.includes('/activity/sdk-dep/'));
+assert(sdkRouteEntry.includes('/activity/sdk-cdn/npm/'));
+assert(sdkRouteEntry.includes('cdn.jsdelivr.net'));
 assert(sdkRouteEntry.includes('application/javascript'));
 assert(bootstrapEntry.includes('from "./activity-doctor-entry.js"'));
 assert(bootstrapEntry.includes('SDK LOAD FAILED'));
