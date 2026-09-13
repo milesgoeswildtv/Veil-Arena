@@ -14,7 +14,7 @@ The DWallet theme contains exactly **26,000** narration templates across kills, 
 
 DWallet uses a Telegram **Main Mini App** so the group chat does not get flooded by Arena narration.
 
-The Telegram group receives the Arena launcher/status card plus major completion/payout messages. Registration, live round text, eliminations, Mass Brawls, revivals, roster state, sponsorship entry and Community Showdown votes happen inside the Mini App window. Discord keeps its existing chat-based Arena behavior.
+The Telegram group receives only the Arena launcher/status card plus major completion/payout messages. Registration, live round text, eliminations, Mass Brawls, revivals, roster state, sponsorship entry and Community Showdown votes happen inside the Mini App window. Discord keeps its existing chat-based Arena behavior.
 
 The Mini App validates Telegram's signed `initData` server-side before trusting the user identity. Interactive actions also verify that the user belongs to the Telegram group, and the Arena binds itself to the verified Telegram chat context after the first interaction.
 
@@ -137,6 +137,40 @@ Convenience aliases also work through `/arena`, including `/arena status`, `/are
 
 A completed **production** Telegram Arena starts a 30-minute cooldown for that Telegram group. The private QA Worker bypasses this when creating QA Arenas so testing can restart immediately.
 
+## Discord setup, sponsorships and Activity preview
+
+Discord Arena remains chat-based. The current Discord `/arena` command includes:
+
+- `/arena start`
+- `/arena sponsor`
+- `/arena rules`
+
+`/arena sponsor` exposes optional dollar fields for Winner, Runner-Up, Most Eliminations, Most Revivals, Most Community Showdowns Survived and Most Mass Brawls Survived. A sponsor only fills the awards they want.
+
+After changing the Discord command schema, re-register the commands for the target server by opening:
+
+```text
+https://<worker-domain>/setup/discord
+```
+
+Enter the numeric Discord Guild ID, choose the theme, enter `ADMIN_SECRET`, and press **REGISTER / REFRESH DISCORD COMMANDS**.
+
+The private Discord Activity visual harness is served at:
+
+```text
+https://<worker-domain>/activity-preview/
+```
+
+Its health endpoint is:
+
+```text
+https://<worker-domain>/activity-preview/health
+```
+
+The Activity shell starts with **CONTROLS LOADING**. Once the external controller script has attached the buttons it changes to **CONTROLS ONLINE // SYSTEM NOMINAL**. If the controller throws a browser error, the Activity shows **CONTROLS FAILED** instead of silently leaving dead buttons.
+
+For Discord Activity URL mappings, map `/` to the Worker target ending in `/activity-preview` (without the `https://` prefix in Discord's target field). The Worker also serves the controller from both `/activity-preview/app.js` and `/app.js` so Discord's proxy path shape cannot strand the controls.
+
 ## Development
 
 ```bash
@@ -146,4 +180,4 @@ npm run dev
 npm run dev:test
 ```
 
-`npm test` runs the core Arena suite, Telegram/DWallet Mini App suite, sponsorship suite, and QA Test Mode suite. CI also syntax-checks production and QA modules before running the tests.
+`npm test` runs the core Arena suite, Telegram/DWallet Mini App suite, sponsorship suite, and QA Test Mode suite. CI also syntax-checks production and QA modules before running the tests, and validates both production and QA Wrangler bundles.
