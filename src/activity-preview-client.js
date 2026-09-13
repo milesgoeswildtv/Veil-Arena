@@ -13,6 +13,21 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
   let sequence = false;
   let sequenceTimer = null;
 
+  const fail = message => {
+    if (sys) sys.textContent = 'CONTROLS FAILED';
+    if (toast) {
+      toast.textContent = 'ACTIVITY ERROR // ' + String(message || 'UNKNOWN');
+      toast.classList.add('show');
+    }
+  };
+  window.addEventListener('error', event => fail(event?.message));
+  window.addEventListener('unhandledrejection', event => fail(event?.reason?.message || event?.reason));
+
+  if (!shell || !stage || !arena || !overlay || !locationEl || !sys || !hapticEl || !toast) {
+    fail('MISSING ACTIVITY DOM');
+    return;
+  }
+
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
   function clearFx(){
     timers.forEach(clearTimeout); timers = [];
@@ -20,7 +35,6 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
     shell.classList.remove('lockdown','glitching','finalfive');
     overlay.classList.remove('show'); overlay.innerHTML = '';
     locationEl.textContent = 'LOCATION // DWALLET HQ';
-    sys.textContent = 'SYSTEM NOMINAL';
     hapticEl.textContent = 'IDLE';
   }
   function stopSequence(){
@@ -35,6 +49,7 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
   }
   function normal(){
     clearFx();
+    sys.textContent='CONTROLS ONLINE // SYSTEM NOMINAL';
     arena.innerHTML = '<div class="normalCard"><div class="round">ROUND 4 // DWALLET HQ</div><div class="headline">THE ARENA IS LIVE</div><div class="copy">Baseline presentation. Feature rounds temporarily take over this screen, then return here.</div>'+roster(names.slice(0,8),['JAX'])+'</div>';
   }
   function panel(kicker,title,sub,body=''){
@@ -113,6 +128,11 @@ export const ACTIVITY_PREVIEW_CLIENT = String.raw`(() => {
     };
     next();
   }
-  document.querySelectorAll('[data-fx]').forEach(btn=>btn.addEventListener('click',()=>btn.dataset.fx==='all'?runAll():fx(btn.dataset.fx)));
+  const controls=[...document.querySelectorAll('[data-fx]')];
+  controls.forEach(btn=>btn.addEventListener('click',()=>btn.dataset.fx==='all'?runAll():fx(btn.dataset.fx)));
+  if (!controls.length) {
+    fail('NO ACTIVITY CONTROLS FOUND');
+    return;
+  }
   normal();
 })();`;
