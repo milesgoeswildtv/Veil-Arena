@@ -1,4 +1,4 @@
-import app, { ArenaCoordinator } from "./activity-sdk-route-fix-entry.js";
+import app, { ArenaCoordinator } from "./activity-direct-entry.js";
 import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction } from "./discord.js";
 import { ensureSchema, loadActiveGameForChannel, saveGame } from "./storage.js";
 import { addFakeContestants } from "./core/simulation.js";
