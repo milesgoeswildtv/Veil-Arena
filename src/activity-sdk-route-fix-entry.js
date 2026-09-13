@@ -2,9 +2,9 @@ import app, { ArenaCoordinator } from "./activity-bootstrap-fix-entry.js";
 
 export { ArenaCoordinator };
 
-const PREVIOUS_BUILD = "20260913-4";
-const ACTIVITY_BUILD = "20260913-5";
-const SDK_ROOT = "https://esm.sh/@discord/embedded-app-sdk@2.5.0?bundle&target=es2020";
+const BASE_BUILD = "20260913-4";
+const ACTIVITY_BUILD = "20260913-6";
+const SDK_ROOT = "https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@2.5.0/+esm";
 
 function javascript(source, headers = {}) {
   return new Response(source, {
@@ -19,35 +19,48 @@ function javascript(source, headers = {}) {
   });
 }
 
-function rewriteEsmImports(source) {
+function rewriteJsdelivrImports(source) {
   return String(source)
-    .replace(/(from\s*["'])\/([^"']+)(["'])/g, `$1/activity/sdk-dep/$2$3`)
-    .replace(/(import\s*["'])\/([^"']+)(["'])/g, `$1/activity/sdk-dep/$2$3`)
-    .replace(/(import\(\s*["'])\/([^"']+)(["']\s*\))/g, `$1/activity/sdk-dep/$2$3`)
-    .replace(/(from\s*["'])https:\/\/esm\.sh\/([^"']+)(["'])/g, `$1/activity/sdk-dep/$2$3`)
-    .replace(/(import\s*["'])https:\/\/esm\.sh\/([^"']+)(["'])/g, `$1/activity/sdk-dep/$2$3`)
-    .replace(/(import\(\s*["'])https:\/\/esm\.sh\/([^"']+)(["']\s*\))/g, `$1/activity/sdk-dep/$2$3`);
+    // jsDelivr +esm dependencies are normally emitted as root-relative /npm/... URLs.
+    .replace(/(["'])\/npm\//g, "$1/activity/sdk-cdn/npm/")
+    // Also catch absolute jsDelivr URLs in static or dynamic imports.
+    .replace(/(["'])https:\/\/cdn\.jsdelivr\.net\/npm\//g, "$1/activity/sdk-cdn/npm/");
+}
+
+async function fetchWithTimeout(target, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(target, {
+      headers: { "user-agent": "Veil-Arena-Activity/1.0" },
+      signal: controller.signal,
+      cf: { cacheTtl: 0, cacheEverything: false }
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function fetchSdkModule(target) {
   try {
-    const upstream = await fetch(target, {
-      headers: { "user-agent": "Veil-Arena-Activity/1.0" },
-      cf: { cacheTtl: 0, cacheEverything: false }
-    });
-
+    const upstream = await fetchWithTimeout(target);
     if (!upstream.ok) {
-      return javascript(`throw new Error(${JSON.stringify(`Veil could not fetch Discord SDK module (${upstream.status}) from ${target}`)});`, {
-        "x-veil-sdk-upstream": String(upstream.status)
-      });
+      return javascript(
+        `throw new Error(${JSON.stringify(`Veil could not fetch Discord SDK module (${upstream.status}) from ${target}`)});`,
+        { "x-veil-sdk-upstream": String(upstream.status) }
+      );
     }
 
-    const source = rewriteEsmImports(await upstream.text());
+    const source = rewriteJsdelivrImports(await upstream.text());
     return javascript(source, {
-      "x-veil-sdk-upstream": String(upstream.status)
+      "x-veil-sdk-upstream": String(upstream.status),
+      "x-veil-sdk-source": "jsdelivr"
     });
   } catch (error) {
-    return javascript(`throw new Error(${JSON.stringify(`Discord SDK server fetch failed: ${String(error?.message || error)}`)});`);
+    const message = error?.name === "AbortError"
+      ? `Discord SDK upstream timed out while loading ${target}`
+      : `Discord SDK server fetch failed: ${String(error?.message || error)}`;
+    return javascript(`throw new Error(${JSON.stringify(message)});`);
   }
 }
 
@@ -58,8 +71,14 @@ async function versionedLiveClient(request, env, ctx) {
   if (!type.includes("javascript")) return original;
 
   let source = await original.text();
-  source = source.split(PREVIOUS_BUILD).join(ACTIVITY_BUILD);
-  source = source.replace('const sdkPath = "/activity/sdk.js?v=' + ACTIVITY_BUILD + '";', 'const sdkPath = "/activity/sdk.js?v=' + ACTIVITY_BUILD + '";');
+  source = source.split(BASE_BUILD).join(ACTIVITY_BUILD);
+
+  // Never allow the SDK import itself to hang forever. If the browser import has not
+  // completed in 12 seconds, surface a useful error in the Activity UI.
+  source = source.replace(
+    "({ DiscordSDK } = await import(sdkPath));",
+    `({ DiscordSDK } = await Promise.race([\n      import(sdkPath),\n      new Promise((_, reject) => setTimeout(() => reject(new Error(\"Discord SDK module import timed out after 12 seconds.\")), 12000))\n    ]));`
+  );
 
   const headers = new Headers(original.headers);
   headers.set("content-type", "application/javascript; charset=utf-8");
@@ -76,7 +95,7 @@ async function versionedActivityHtml(request, env, ctx) {
   if (!type.includes("text/html")) return original;
 
   let source = await original.text();
-  source = source.split(PREVIOUS_BUILD).join(ACTIVITY_BUILD);
+  source = source.split(BASE_BUILD).join(ACTIVITY_BUILD);
 
   const headers = new Headers(original.headers);
   headers.set("cache-control", "no-store");
@@ -92,12 +111,12 @@ export default {
       return fetchSdkModule(SDK_ROOT);
     }
 
-    if (request.method === "GET" && url.pathname.startsWith("/activity/sdk-dep/")) {
-      const tail = url.pathname.slice("/activity/sdk-dep/".length);
+    if (request.method === "GET" && url.pathname.startsWith("/activity/sdk-cdn/npm/")) {
+      const tail = url.pathname.slice("/activity/sdk-cdn/npm/".length);
       if (!tail || tail.includes("..")) {
         return javascript('throw new Error("Invalid Discord SDK dependency path.");');
       }
-      return fetchSdkModule(`https://esm.sh/${tail}${url.search}`);
+      return fetchSdkModule(`https://cdn.jsdelivr.net/npm/${tail}${url.search}`);
     }
 
     if (request.method === "GET" && url.pathname === "/activity/live.js") {
