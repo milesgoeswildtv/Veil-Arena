@@ -118,33 +118,41 @@
 
   async function applyMusic() {
     const target = desiredMusic;
-    if (target === activeMusic) {
-      const current = musicPlayers[target];
-      if (current?.paused) await current.play().catch(() => {});
+    const config = MUSIC[target];
+    const incoming = musicPlayers[target];
+
+    if (target && config && incoming && activeMusic === target && !incoming.paused && Math.abs(incoming.volume - config.volume) < 0.01) {
       return;
     }
 
     const transitionId = ++musicTransition;
-    const outgoingName = activeMusic;
-    const outgoing = musicPlayers[outgoingName];
-    const incoming = musicPlayers[target];
 
-    activeMusic = target;
-
-    if (outgoing) {
-      const from = outgoing.volume;
-      fadeMusic(outgoing, from, 0, 500, transitionId, () => {
-        outgoing.pause();
-        outgoing.currentTime = 0;
+    for (const [name, audio] of Object.entries(musicPlayers)) {
+      if (name === target) continue;
+      if (audio.paused) {
+        audio.volume = 0;
+        audio.currentTime = 0;
+        continue;
+      }
+      fadeMusic(audio, audio.volume, 0, 500, transitionId, () => {
+        if (desiredMusic !== name) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
       });
     }
 
-    if (!incoming || !MUSIC[target]) return;
+    if (!target || !config || !incoming) {
+      activeMusic = "";
+      return;
+    }
 
-    incoming.volume = 0;
-    const started = await incoming.play().then(() => true).catch(() => false);
+    activeMusic = target;
+    const started = incoming.paused ? await incoming.play().then(() => true).catch(() => false) : true;
     if (!started || transitionId !== musicTransition) return;
-    fadeMusic(incoming, 0, MUSIC[target].volume, 900, transitionId);
+
+    const from = incoming.volume;
+    fadeMusic(incoming, from, config.volume, from > 0 ? 350 : 900, transitionId);
   }
 
   function musicForStatus(status) {
