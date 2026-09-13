@@ -30,14 +30,10 @@ jobs:
 
       - name: Check production module syntax
         run: |
-          node --check src/activity-rpc-trace-entry.js
+          node --check src/activity-clean-entry.js
+          node --check src/activity-clean-client.js
+          node --check src/activity-clean-ui.js
           node --check src/discord-bots-entry.js
-          node --check src/activity-direct-entry.js
-          node --check src/activity-single-script-entry.js
-          node --check src/activity-local-sdk-entry.js
-          node --check src/activity-mini-sdk.js
-          node --check src/activity-sdk-route-fix-entry.js
-          node --check src/activity-bootstrap-fix-entry.js
           node --check src/activity-doctor-entry.js
           node --check src/activity-entrypoint-entry.js
           node --check src/activity-reset-entry.js
