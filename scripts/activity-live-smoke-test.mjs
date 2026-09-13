@@ -47,6 +47,8 @@ assert(entryPointEntry.includes('handler: 2'));
 const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
 assert(doctorEntry.includes('EMBEDDED_FLAG'));
 assert(doctorEntry.includes('/applications/@me'));
+assert(doctorEntry.includes('workerApplicationId'));
+assert(doctorEntry.includes('botApplicationId'));
 assert(doctorEntry.includes('VERIFY + FORCE REPAIR ACTIVITY'));
 assert(doctorEntry.includes('/admin/activity/doctor-repair'));
 
@@ -65,7 +67,10 @@ const singleScriptEntry = readFileSync(new URL("../src/activity-single-script-en
 assert(singleScriptEntry.includes('from "./activity-local-sdk-entry.js"'));
 assert(singleScriptEntry.includes('Promise.resolve({ DiscordSDK: InlineDiscordSDK })'));
 assert(singleScriptEntry.includes('replaceAll'));
-assert(singleScriptEntry.includes('20260913-8'));
+assert(singleScriptEntry.includes('20260913-9'));
+assert(singleScriptEntry.includes('Launch guild_id'));
+assert(singleScriptEntry.includes('Launch channel_id'));
+assert(singleScriptEntry.includes('Worker Application ID'));
 assert(singleScriptEntry.includes('x-veil-single-script'));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
