@@ -36,7 +36,7 @@
   let previous = null;
   let deadline = null;
   let deadlineCueKey = "";
-  let desiredMusic = "";
+  let desiredMusic = "lobby";
   let activeMusic = "";
   let musicTransition = 0;
 
@@ -206,7 +206,7 @@
 
   function handleState(payload) {
     if (payload && Object.prototype.hasOwnProperty.call(payload, "game") && !payload.game) {
-      updateMusic("");
+      updateMusic("registration");
       previous = null;
       deadline = null;
       deadlineCueKey = "";
@@ -304,6 +304,10 @@
     }
     if (desiredMusic) applyMusic();
   });
+
+  // Attempt lobby music immediately. Discord/iOS may require the first user gesture;
+  // the pointerdown handler above retries automatically if autoplay is blocked.
+  applyMusic();
 
   setInterval(() => {
     if (!deadline) return;
