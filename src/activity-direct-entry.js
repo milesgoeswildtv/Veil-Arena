@@ -1,12 +1,12 @@
 import app, { ArenaCoordinator } from "./activity-single-script-entry.js";
 import { liveActivityHtml } from "./activity-live.js";
 import { ACTIVITY_LIVE_CLIENT } from "./activity-live-client.js";
-import { MINI_DISCORD_SDK_SOURCE } from "./activity-mini-sdk.js";
+import { OFFICIAL_DISCORD_SDK_SOURCE, OFFICIAL_DISCORD_SDK_VERSION } from "./generated/discord-sdk-source.js";
 
 export { ArenaCoordinator };
 
-const ACTIVITY_BUILD = "20260913-12";
-const ACTIVITY_CLIENT_PATH = "/activity/veil-arena-20260913-12.js";
+const ACTIVITY_BUILD = "20260913-13";
+const ACTIVITY_CLIENT_PATH = "/activity/veil-arena-20260913-13.js";
 const TEST_GUILD_ID = "1504257112094539798";
 const DISCORD_API = "https://discord.com/api/v10";
 let cachedApplication = null;
@@ -16,7 +16,7 @@ function noStore(headers = new Headers()) {
   headers.set("pragma", "no-cache");
   headers.set("expires", "0");
   headers.set("x-veil-activity-build", ACTIVITY_BUILD);
-  headers.set("x-veil-direct-client", "1");
+  headers.set("x-veil-sdk", `official-${OFFICIAL_DISCORD_SDK_VERSION}`);
   return headers;
 }
 
@@ -30,9 +30,7 @@ function javascript(source) {
 async function resolveDiscordApplication(env) {
   const envId = String(env.DISCORD_APPLICATION_ID || "");
   const now = Date.now();
-  if (cachedApplication?.expiresAt > now) {
-    return { ...cachedApplication, envId };
-  }
+  if (cachedApplication?.expiresAt > now) return { ...cachedApplication, envId };
 
   if (!env.DISCORD_BOT_TOKEN) {
     const fallback = { id: envId, source: "worker-env-fallback", expiresAt: now + 30000 };
@@ -79,24 +77,25 @@ function directClientSource() {
     return `document.body.innerHTML = '<pre style="white-space:pre-wrap;color:#fff;background:#120b18;padding:20px">VEIL CLIENT BUILD ERROR // ${ACTIVITY_BUILD}\\nDirect client patch target was not found.</pre>';`;
   }
 
-  const inlineSdk = MINI_DISCORD_SDK_SOURCE
-    .replace("export class DiscordSDK", "class InlineDiscordSDK")
-    .replace(/^export\s+/gm, "");
+  const client = ACTIVITY_LIVE_CLIENT
+    .replace(
+      target,
+      `  const DiscordSDK = globalThis.__VEIL_OFFICIAL_DISCORD_SDK__;\n  if (!DiscordSDK) throw new Error("Official Discord Embedded App SDK bundle did not initialize.");`
+    )
+    .replace(
+      "discordSdk = new DiscordSDK(clientId);",
+      "discordSdk = new DiscordSDK(clientId, { disableConsoleLogOverride: true });"
+    );
 
-  const client = ACTIVITY_LIVE_CLIENT.replace(
-    target,
-    `  const DiscordSDK = InlineDiscordSDK;`
-  );
+  const diagnostic = `\n(function veilLaunchDiagnostics(){\n  try {\n    const p = new URLSearchParams(window.location.search);\n    const guild = p.get("guild_id") || "MISSING";\n    const body = document.body?.dataset || {};\n    const lines = [\n      "Discord SDK: OFFICIAL @discord/embedded-app-sdk ${OFFICIAL_DISCORD_SDK_VERSION}",\n      "Handshake Application ID: " + (body.discordClientId || "MISSING"),\n      "Original Worker env ID: " + (body.workerEnvAppId || "MISSING"),\n      "Application ID source: " + (body.appIdSource || "MISSING"),\n      "ID auto-corrected: " + (body.appIdCorrected || "NO"),\n      "Expected test guild_id: ${TEST_GUILD_ID}",\n      "Launch guild_id: " + guild,\n      "Test guild match: " + (guild === "${TEST_GUILD_ID}" ? "YES" : "NO"),\n      "Launch channel_id: " + (p.get("channel_id") || "MISSING"),\n      "Launch instance_id: " + (p.get("instance_id") || "MISSING"),\n      "Launch frame_id: " + (p.get("frame_id") || "MISSING"),\n      "Launch platform: " + (p.get("platform") || "MISSING"),\n      "mobile_app_version: " + (p.get("mobile_app_version") || "MISSING"),\n      "referrer origin: " + (document.referrer ? new URL(document.referrer).origin : "MISSING"),\n      "client path: ${ACTIVITY_CLIENT_PATH}",\n      "client mode: OFFICIAL SDK / BUNDLED LOCAL"\n    ];\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = lines.join("\\n");\n  } catch (error) {\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = "launch diagnostic failed: " + (error?.message || String(error));\n  }\n})();\n`;
 
-  const diagnostic = `\n(function veilLaunchDiagnostics(){\n  try {\n    const p = new URLSearchParams(window.location.search);\n    const guild = p.get("guild_id") || "MISSING";\n    const body = document.body?.dataset || {};\n    const lines = [\n      "Handshake Application ID: " + (body.discordClientId || "MISSING"),\n      "Original Worker env ID: " + (body.workerEnvAppId || "MISSING"),\n      "Application ID source: " + (body.appIdSource || "MISSING"),\n      "ID auto-corrected: " + (body.appIdCorrected || "NO"),\n      "Expected test guild_id: ${TEST_GUILD_ID}",\n      "Launch guild_id: " + guild,\n      "Test guild match: " + (guild === "${TEST_GUILD_ID}" ? "YES" : "NO"),\n      "Launch channel_id: " + (p.get("channel_id") || "MISSING"),\n      "Launch instance_id: " + (p.get("instance_id") || "MISSING"),\n      "Launch frame_id: " + (p.get("frame_id") || "MISSING"),\n      "Launch platform: " + (p.get("platform") || "MISSING"),\n      "mobile_app_version: " + (p.get("mobile_app_version") || "MISSING"),\n      "referrer origin: " + (document.referrer ? new URL(document.referrer).origin : "MISSING"),\n      "client path: ${ACTIVITY_CLIENT_PATH}",\n      "client mode: DIRECT / NO DYNAMIC IMPORT"\n    ];\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = lines.join("\\n");\n  } catch (error) {\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = "launch diagnostic failed: " + (error?.message || String(error));\n  }\n})();\n`;
+  const bootMarker = `\n(function veilDirectBootMarker(){\n  const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n  put("connection", "OFFICIAL SDK ONLINE");\n  put("round", "OFFICIAL SDK ONLINE");\n  put("headline", "STARTING DISCORD HANDSHAKE…");\n  put("event", "Veil ${ACTIVITY_BUILD} loaded with Discord's official Embedded App SDK ${OFFICIAL_DISCORD_SDK_VERSION}, bundled locally into Veil.");\n  put("notice", "Official Discord SDK online // starting READY handshake");\n})();\n`;
 
-  const bootMarker = `\n(function veilDirectBootMarker(){\n  const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n  put("connection", "DIRECT CLIENT ONLINE");\n  put("round", "DIRECT CLIENT ONLINE");\n  put("headline", "STARTING DISCORD HANDSHAKE…");\n  put("event", "Veil ${ACTIVITY_BUILD} loaded. Discord Application ID is being sourced from the bot token, not the Worker typo.");\n  put("notice", "Direct client online // starting Discord READY handshake");\n})();\n`;
-
-  return `${inlineSdk}\n${diagnostic}\n${bootMarker}\n${client}`;
+  return `${OFFICIAL_DISCORD_SDK_SOURCE}\n${diagnostic}\n${bootMarker}\n${client}`;
 }
 
 function launchDiagnosticBox() {
-  return `<div id="veilLaunchDebug" style="position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:rgba(5,4,9,.94);border:1px solid #614580;border-radius:10px;padding:8px 10px;color:#d8c9e6;font:10px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;max-height:34vh;overflow:auto"><b style="color:#fff">VEIL LAUNCH CONTEXT // ${ACTIVITY_BUILD}</b><div id="veilLaunchDebugText">external client has not populated launch IDs yet…</div></div>`;
+  return `<div id="veilLaunchDebug" style="position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:rgba(5,4,9,.94);border:1px solid #614580;border-radius:10px;padding:8px 10px;color:#d8c9e6;font:10px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;max-height:34vh;overflow:auto"><b style="color:#fff">VEIL LAUNCH CONTEXT // ${ACTIVITY_BUILD}</b><div id="veilLaunchDebugText">official SDK client has not populated launch IDs yet…</div></div>`;
 }
 
 function directHtml(application, envApplicationId) {
@@ -106,11 +105,11 @@ function directHtml(application, envApplicationId) {
     `<body data-discord-client-id="${applicationId}">`,
     `<body data-discord-client-id="${applicationId}" data-worker-env-app-id="${String(envApplicationId || "").replace(/[^0-9]/g, "")}" data-app-id-source="${application.source}" data-app-id-corrected="${applicationId && applicationId !== String(envApplicationId || "") ? "YES" : "NO"}">`
   );
-  source = source.replace("ARENA OFFLINE", "DIRECT CLIENT LOADING");
-  source = source.replace("The Activity is connecting to the Arena engine.", `Loading direct Activity client ${ACTIVITY_BUILD}…`);
+  source = source.replace("ARENA OFFLINE", "OFFICIAL SDK LOADING");
+  source = source.replace("The Activity is connecting to the Arena engine.", `Loading official Discord SDK Activity client ${ACTIVITY_BUILD}…`);
   source = source.replace(
     '<div class="event" id="event"><div class="spinner"></div></div>',
-    `<div class="event" id="event">Loading Veil direct client ${ACTIVITY_BUILD}…<div class="spinner"></div></div>`
+    `<div class="event" id="event">Loading Veil official SDK client ${ACTIVITY_BUILD}…<div class="spinner"></div></div>`
   );
   source = source.replace('src="/activity/live.js"', `src="${ACTIVITY_CLIENT_PATH}"`);
   const debug = launchDiagnosticBox();
