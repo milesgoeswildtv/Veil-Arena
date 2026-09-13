@@ -28,9 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Check core module syntax
+      - name: Check core and Telegram module syntax
         run: |
           node --check src/worker.js
+          node --check src/telegram.js
+          node --check src/telegram-app.js
+          node --check src/telegram-worker.js
           node --check src/core/engine.js
           node --check src/core/simulation.js
           node --check src/core/orchestrator.js
@@ -45,5 +48,5 @@ jobs:
       - name: Run Arena core tests
         run: npm test
 
-      - name: Validate clean Cloudflare baseline
+      - name: Validate Cloudflare Worker bundle
         run: npx wrangler deploy --dry-run
