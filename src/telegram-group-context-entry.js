@@ -54,33 +54,68 @@ async function requestedGameId(request, auth) {
   return gameIdFromStartParam(auth.startParam);
 }
 
+function testMode(env) {
+  return ["1", "true", "yes", "on"].includes(String(env?.ARENA_TEST_MODE || "").trim().toLowerCase());
+}
+
 async function withOriginatingGroupContext(request, env) {
   if (!env.TELEGRAM_BOT_TOKEN || !env.DB) return request;
   const initData = request.headers.get("x-telegram-init-data") || "";
   if (!initData) return request;
 
   const auth = await validateTelegramInitData(initData, env.TELEGRAM_BOT_TOKEN);
-  if (["group", "supergroup"].includes(auth.chatType) && auth.chatInstance) return request;
-
   const gameId = await requestedGameId(request, auth);
   if (!gameId) return request;
 
   const game = await loadGame(env.DB, gameId);
   if (!game || game.platform !== "telegram" || game.themeId !== "dwallet") return request;
 
-  const member = await telegramUserInChat(game.channelId, auth.user.id, env.TELEGRAM_BOT_TOKEN);
-  if (!member) return request;
+  // In production, verify that the person opening the launch link is still a member of
+  // the Telegram group that created this Arena. The private QA worker already performs
+  // membership/host checks in its action handlers, so avoid an extra Bot API round-trip
+  // on every poll there.
+  if (!testMode(env)) {
+    const member = await telegramUserInChat(game.channelId, auth.user.id, env.TELEGRAM_BOT_TOKEN);
+    if (!member) return request;
+  }
 
-  // Telegram may omit group context from Main Mini App launches on some clients.
-  // The Arena itself is already scoped to the Telegram group that created it, so
-  // verify membership in that originating group and provide a stable signed context.
-  // This works for any Telegram group that has Veil installed; there is no hardcoded
-  // DWallet group ID here.
-  const chatInstance = `veil:${String(game.channelId).replace(/^tg:/, "")}`;
+  // Telegram Main Mini App launches are inconsistent about supplying chat_type and
+  // chat_instance. The game itself already stores its originating Telegram group.
+  // Reuse the Arena's already-bound chat instance when it exists; otherwise derive one
+  // stable value from that group. This works for ANY group that starts an Arena and does
+  // not rely on a hardcoded DWallet group ID.
+  const chatInstance = game.telegramChatInstance || `veil:${String(game.channelId).replace(/^tg:/, "")}`;
+
+  // If Telegram already supplied the exact context this Arena expects, leave it alone.
+  if (["group", "supergroup"].includes(auth.chatType) && auth.chatInstance === chatInstance) {
+    return request;
+  }
+
   const resigned = await resignInitData(initData, env.TELEGRAM_BOT_TOKEN, chatInstance);
   const headers = new Headers(request.headers);
   headers.set("x-telegram-init-data", resigned);
   return new Request(request, { headers });
+}
+
+function patchMiniAppHtml(html) {
+  let out = String(html);
+
+  // Never allow a Telegram client quirk in ready()/expand() to kill the Arena script
+  // before polling begins.
+  out = out.replace(
+    "if(tg){tg.ready();tg.expand();try{tg.requestFullscreen?.()}catch{};try{tg.setHeaderColor?.('#09070f');tg.setBackgroundColor?.('#09070f')}catch{}}",
+    "if(tg){try{tg.ready?.()}catch{};try{tg.expand?.()}catch{};try{tg.requestFullscreen?.()}catch{};try{tg.setHeaderColor?.('#09070f');tg.setBackgroundColor?.('#09070f')}catch{}}"
+  );
+
+  // The old client could sit on \"Opening DWallet Arena…\" forever if its first state
+  // request stalled. Give each API request a timeout so refresh() can recover and poll
+  // again instead of permanently wedging the Mini App.
+  out = out.replace(
+    "const api=async(path,opts={})=>{const r=await fetch(path,{...opts,headers:{'content-type':'application/json','x-telegram-init-data':initData,...(opts.headers||{})}});const j=await r.json().catch(()=>({ok:false,error:'Bad server response'}));if(!j.ok)throw new Error(j.error||'Arena request failed');return j};",
+    "const api=async(path,opts={})=>{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),8000);try{const r=await fetch(path,{...opts,signal:controller.signal,headers:{'content-type':'application/json','x-telegram-init-data':initData,...(opts.headers||{})}});const j=await r.json().catch(()=>({ok:false,error:'Bad server response'}));if(!j.ok)throw new Error(j.error||'Arena request failed');return j}catch(e){if(e?.name==='AbortError')throw new Error('Arena sync timed out. Retrying…');throw e}finally{clearTimeout(timer)}};"
+  );
+
+  return out;
 }
 
 export default {
@@ -99,6 +134,20 @@ export default {
       }
     }
 
-    return app.fetch(request, env, ctx);
+    const response = await app.fetch(request, env, ctx);
+
+    if (request.method === "GET" && (url.pathname === "/tg" || url.pathname === "/telegram/arena")) {
+      const type = response.headers.get("content-type") || "";
+      if (type.includes("text/html")) {
+        const headers = new Headers(response.headers);
+        headers.set("cache-control", "no-store");
+        return new Response(patchMiniAppHtml(await response.text()), {
+          status: response.status,
+          headers
+        });
+      }
+    }
+
+    return response;
   }
 };
