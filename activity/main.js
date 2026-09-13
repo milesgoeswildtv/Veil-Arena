@@ -1,5 +1,13 @@
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 import "./style.css";
+import "./discord-assets.css";
+
+// Vite packages only Discord artwork, with same-origin URLs for the Activity proxy.
+const discordAssets = import.meta.glob("../assets/discord/*.svg", { eager: true, query: "?url", import: "default" });
+function artwork(name, className = "ui-icon") {
+  const url = discordAssets[`../assets/discord/${name}.svg`];
+  return url ? `<img class="${className}" src="${esc(url)}" alt="" aria-hidden="true">` : "";
+}
 
 const statusEl = document.querySelector("#status");
 const contentEl = document.querySelector("#app-content");
@@ -184,7 +192,8 @@ function render(state) {
   const game = state.game;
   if (!game) {
     contentEl.innerHTML = `
-      <div class="panel">
+      <div class="panel lobby-panel">
+        ${artwork("lobby_crest", "lobby-crest")}
         <div class="small">${esc(state.channelName || "Discord channel")}</div>
         <h2>No Arena is open.</h2>
         <p>Open registration for this Activity instance.</p>
@@ -197,7 +206,9 @@ function render(state) {
 
   const roster = game.players.map(player => `
     <div class="player ${player.alive ? "" : "dead"}" data-player-id="${esc(player.id)}">
-      <span>${esc(player.displayName)} ${player.simulated ? '<span class="tag">BOT</span>' : ""}</span>
+      ${artwork(String(game.winnerId || "") === String(player.id) ? "veil_ui_player_state_winner" : player.alive ? "veil_ui_player_state_alive" : "veil_ui_player_state_dead", "player-state")}
+      <span class="player-portrait">${artwork(String(game.winnerId || "") === String(player.id) ? "veil_ui_icon_crown" : player.alive ? "veil_ui_icon_arena" : "veil_ui_icon_skull")}</span>
+      <span class="player-name">${esc(player.displayName)} ${player.simulated ? '<span class="tag">BOT</span>' : ""}</span>
       <span class="small">${player.alive ? `${player.eliminations} KO` : "ELIMINATED"}</span>
     </div>`).join("");
 
@@ -207,7 +218,7 @@ function render(state) {
   const winner = game.winnerId ? game.players.find(p => String(p.id) === String(game.winnerId)) : null;
   const vote = game.crowdVote && state.viewer.canVote ? `
     <div class="panel showdown-panel">
-      <div class="small">COMMUNITY SHOWDOWN // VOTE</div>
+      <div class="small section-label">${artwork("veil_ui_icon_vote")} COMMUNITY SHOWDOWN // VOTE</div>
       <div class="vote-grid">${game.crowdVote.eligibleIds.map(id => {
         const player = game.players.find(p => String(p.id) === String(id));
         if (!player) return "";
@@ -218,22 +229,22 @@ function render(state) {
 
   contentEl.innerHTML = `
     <div class="stats">
-      <div class="stat"><span class="small">STATUS</span><b>${esc(game.status.toUpperCase())}</b></div>
-      <div class="stat"><span class="small">ROUND</span><b>${game.round}</b></div>
-      <div class="stat"><span class="small">ALIVE</span><b>${game.aliveCount}/${game.playerCount}</b></div>
+      <div class="stat"><span class="small section-label">${artwork("veil_ui_icon_arena")} STATUS</span><b>${esc(game.status.toUpperCase())}</b></div>
+      <div class="stat"><span class="small section-label">${artwork("veil_ui_icon_timer")} ROUND</span><b>${game.round}</b></div>
+      <div class="stat"><span class="small section-label">${artwork("veil_ui_icon_stats")} ALIVE</span><b>${game.aliveCount}/${game.playerCount}</b></div>
     </div>
-    <div class="panel arena-header">
+    <div class="panel arena-header ${winner ? "results-panel" : game.status === "registration" ? "lobby-panel" : "match-panel"}">
       <div class="small">${esc(state.channelName || "Discord Activity")}</div>
-      ${winner ? `<div class="winner">🏆 ${esc(winner.displayName)} WINS</div>` : ""}
+      ${winner ? `<div class="winner">${artwork("veil_ui_icon_crown")} ${esc(winner.displayName)} WINS</div>` : ""}
       <div class="controls">${controls(state)}</div>
     </div>
     <div class="panel feed-panel">
-      <div class="small">LIVE FEED</div>
+      <div class="small section-label">${artwork("veil_ui_icon_arena")} LIVE FEED</div>
       <div class="${feedClass}">${markdownToHtml(latest)}</div>
     </div>
     ${vote}
-    <div class="panel">
-      <div class="small">ROSTER</div>
+    <div class="panel roster-panel">
+      <div class="small section-label">${artwork("veil_ui_icon_stats")} ROSTER</div>
       <div class="roster">${roster || "Nobody has entered yet."}</div>
     </div>`;
   bindControls();
