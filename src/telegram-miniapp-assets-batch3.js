@@ -40,7 +40,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   min-height:148px;
   padding:24px 26px;
   overflow:hidden;
-  background:url("/telegram/feed_frame.svg") center/100% 100% no-repeat;
+  background:none!important;
   border-radius:10px;
 }
 .event>*{position:relative;z-index:1}
