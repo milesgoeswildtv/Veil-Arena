@@ -1,7 +1,6 @@
 import { addPlayer, eliminate, forceNextMassBrawl } from "./core/engine.js";
-import { ensureSchema, loadGame, saveGame } from "./storage.js";
-import { validateTelegramInitData } from "./miniapp.js";
-import { telegramUserInChat } from "./telegram.js";
+import { saveGame } from "./storage.js";
+import { authenticateTelegramArenaRequest } from "./telegram-official-miniapp.js";
 
 const TEST_BOT_BASE = 8800000000000000n;
 const TEST_BOT_NAMES = [
@@ -38,11 +37,6 @@ function json(data, status = 200) {
   });
 }
 
-function gameIdFromStartParam(value) {
-  const raw = String(value || "");
-  return raw.startsWith("arena_") ? raw.slice(6) : null;
-}
-
 function isTestBot(player) {
   return Boolean(player?.testBot || player?.simulated === "qa_bot");
 }
@@ -63,11 +57,7 @@ function markTestGame(game) {
 
 function appendDisplay(game, text) {
   if (!Array.isArray(game.displayLog)) game.displayLog = [];
-  game.displayLog.push({
-    round: Number(game.round) || 0,
-    text: String(text),
-    at: new Date().toISOString()
-  });
+  game.displayLog.push({ round: Number(game.round) || 0, text: String(text), at: new Date().toISOString() });
 }
 
 async function registrationIds(db, game) {
@@ -113,17 +103,9 @@ function nextRound(current, predicate) {
   return round;
 }
 
-function nextNormalFeatureEligibleRound(current) {
-  return nextRound(current, r => r % 5 !== 0 && r % 7 !== 0);
-}
-
-function nextCommunityRound(current) {
-  return nextRound(current, r => r % 5 === 0 && r % 7 !== 0);
-}
-
-function nextRevivalRound(current) {
-  return nextRound(current, r => r % 7 === 0);
-}
+const nextNormalFeatureEligibleRound = current => nextRound(current, r => r % 5 !== 0 && r % 7 !== 0);
+const nextCommunityRound = current => nextRound(current, r => r % 5 === 0 && r % 7 !== 0);
+const nextRevivalRound = current => nextRound(current, r => r % 7 === 0);
 
 function requireRunning(game) {
   if (game.status !== "running") throw new Error("Start the QA Arena first.");
@@ -138,11 +120,7 @@ function aliveTestBots(game) {
 }
 
 function triggerSharedPreview(game, type, text) {
-  game.testPreview = {
-    type,
-    nonce: crypto.randomUUID(),
-    at: Date.now()
-  };
+  game.testPreview = { type, nonce: crypto.randomUUID(), at: Date.now() };
   if (text) appendDisplay(game, text);
 }
 
@@ -159,21 +137,8 @@ async function wakeCoordinator(env, game) {
 
 async function authenticate(request, env) {
   if (!arenaTestModeEnabled(env)) throw new Error("Arena Test Mode is disabled on this Worker.");
-  if (!env.DB || !env.TELEGRAM_BOT_TOKEN) throw new Error("Telegram Test Mode is not configured.");
-  const initData = request.headers.get("x-telegram-init-data") || "";
-  const auth = await validateTelegramInitData(initData, env.TELEGRAM_BOT_TOKEN);
-  if (!auth.chatType || !["group", "supergroup"].includes(auth.chatType)) throw new Error("Open the QA Arena from the test Telegram group.");
-  const url = new URL(request.url);
-  const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
-  const gameId = String(body.gameId || url.searchParams.get("game") || gameIdFromStartParam(auth.startParam) || "");
-  if (!gameId) throw new Error("Missing QA Arena ID.");
-  const launched = gameIdFromStartParam(auth.startParam);
-  if (launched && launched !== gameId) throw new Error("That QA control does not match this Arena launch.");
-  await ensureSchema(env.DB);
-  const game = await loadGame(env.DB, gameId);
-  if (!game || game.platform !== "telegram" || game.themeId !== "dwallet") throw new Error("That QA Arena no longer exists.");
-  if (game.telegramChatInstance && auth.chatInstance !== game.telegramChatInstance) throw new Error("Open this Arena from its original test-group message.");
-  if (!await telegramUserInChat(game.channelId, auth.user.id, env.TELEGRAM_BOT_TOKEN)) throw new Error("Only members of the test Telegram can use QA controls.");
+  const body = request.method === "POST" ? await request.clone().json().catch(() => ({})) : {};
+  const { auth, game } = await authenticateTelegramArenaRequest(request, env, body);
   return { auth, game, body };
 }
 
@@ -196,14 +161,11 @@ export async function handleTelegramTestMode(request, env) {
   try {
     const { auth, game, body } = await authenticate(request, env);
     const isHost = String(auth.user.id) === String(game.hostId);
-    let playerCount = null;
-    if (game.status === "registration") playerCount = (await registrationIds(env.DB, game)).size;
+    let playerCount = game.status === "registration" ? (await registrationIds(env.DB, game)).size : null;
 
-    if (request.method === "GET") {
-      return json({ ok: true, test: stateSummary(game, isHost, playerCount) });
-    }
-
+    if (request.method === "GET") return json({ ok: true, test: stateSummary(game, isHost, playerCount) });
     if (!isHost) throw new Error("Only the Arena host gets the QA controls.");
+
     const action = String(body.action || "");
     if (!action) throw new Error("Missing QA action.");
     markTestGame(game);
@@ -222,29 +184,20 @@ export async function handleTelegramTestMode(request, env) {
       const removed = removeQaBots(game);
       message = `Removed ${removed} QA bot${removed === 1 ? "" : "s"}.`;
     } else if (action === "next_round") {
-      requireRunning(game);
-      shouldWake = true;
-      message = "Next round forced now.";
+      requireRunning(game); shouldWake = true; message = "Next round forced now.";
     } else if (action === "mass_brawl") {
-      requireRunning(game);
-      requireFeaturePlayers(game);
+      requireRunning(game); requireFeaturePlayers(game);
       if ((game.aliveIds || []).length < 6) throw new Error("Mass Brawl needs at least 6 alive players.");
       const round = nextNormalFeatureEligibleRound(game.round);
-      game.round = round - 1;
-      forceNextMassBrawl(game);
-      shouldWake = true;
+      game.round = round - 1; forceNextMassBrawl(game); shouldWake = true;
       message = `Mass Brawl forced for round ${round}.`;
     } else if (action === "community_showdown") {
-      requireRunning(game);
-      requireFeaturePlayers(game);
+      requireRunning(game); requireFeaturePlayers(game);
       const round = nextCommunityRound(game.round);
-      game.round = round - 1;
-      game.testMode.simulatedCrowd = true;
-      shouldWake = true;
+      game.round = round - 1; game.testMode.simulatedCrowd = true; shouldWake = true;
       message = `Community Showdown forced for round ${round}. Synthetic spectators will fill the vote.`;
     } else if (action === "revival") {
-      requireRunning(game);
-      requireFeaturePlayers(game);
+      requireRunning(game); requireFeaturePlayers(game);
       while ((game.eliminatedIds || []).length < 2 && (game.aliveIds || []).length > 6) {
         const botId = aliveTestBots(game)[0];
         if (!botId) break;
@@ -252,9 +205,7 @@ export async function handleTelegramTestMode(request, env) {
       }
       if ((game.eliminatedIds || []).length < 2) throw new Error("Second Chance needs 2 eliminated players. Run a few rounds first or start with more QA bots.");
       const round = nextRevivalRound(game.round);
-      game.round = round - 1;
-      shouldWake = true;
-      message = `Second Chance forced for round ${round}.`;
+      game.round = round - 1; shouldWake = true; message = `Second Chance forced for round ${round}.`;
     } else if (action === "final_five") {
       requireRunning(game);
       while ((game.aliveIds || []).length > 5) {
