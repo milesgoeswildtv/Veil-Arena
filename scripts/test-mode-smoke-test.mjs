@@ -26,6 +26,7 @@ assert(OFFICIAL_DISCORD_SDK_SOURCE.includes("__VEIL_OFFICIAL_DISCORD_SDK__"));
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
 const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
+const telegramGroupEntry = readFileSync(new URL("../src/telegram-group-context-entry.js", import.meta.url), "utf8");
 const cleanEntry = readFileSync(new URL("../src/activity-clean-entry.js", import.meta.url), "utf8");
 const cleanClient = readFileSync(new URL("../src/activity-clean-client.js", import.meta.url), "utf8");
 const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
@@ -37,7 +38,10 @@ const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
 assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
-assert(wrangler.includes('main = "src/telegram-start-entry.js"'));
+assert(wrangler.includes('main = "src/telegram-group-context-entry.js"'));
+assert(telegramGroupEntry.includes('from "./telegram-start-entry.js"'));
+assert(telegramGroupEntry.includes("telegramUserInChat"));
+assert(telegramGroupEntry.includes('params.set("chat_type", "group")'));
 assert(botsEntry.includes('from "./activity-clean-entry.js"'));
 assert(botsEntry.includes("addFakeContestants"));
 assert(cleanEntry.includes('BUILD = "20260913-17"'));
