@@ -43,18 +43,19 @@ assert(html.includes("CLEAN CLIENT STARTING"));
 
 const cleanEntry = readFileSync(new URL("../src/activity-clean-entry.js", import.meta.url), "utf8");
 assert(cleanEntry.includes('from "./activity-bootstrap-fix-entry.js"'));
-assert(cleanEntry.includes('BUILD = "20260913-17"'));
+assert(cleanEntry.includes('BUILD = "20260913-18"'));
 assert(cleanEntry.includes('/activity/veil-clean-${BUILD}.js'));
-assert(cleanEntry.includes('discordsays.com'));
-assert(cleanEntry.includes('APP ID MISMATCH'));
-assert(cleanEntry.includes('DISCORD ACTIVITY PROXY MISSING'));
-assert(cleanEntry.includes('DISCORD PARENT RPC MISSING'));
 assert(cleanEntry.includes('url.pathname === "/api/token"'));
 assert(cleanEntry.includes('"/activity/oauth/token"'));
 assert(cleanEntry.includes('url.pathname === "/activity/clean-health"'));
 assert(cleanEntry.includes("OFFICIAL_DISCORD_SDK_SOURCE"));
 assert(cleanEntry.includes("activityCleanClientSource"));
 assert(cleanEntry.includes("cleanActivityHtml"));
+assert(cleanEntry.includes("VEIL CONNECTION FACTS"));
+assert(cleanEntry.includes("FORCED window.parent + * AND RESENT"));
+assert(cleanEntry.includes('this.source = window.parent'));
+assert(cleanEntry.includes('this.sourceOrigin = "*"'));
+assert(cleanEntry.includes('typeof this.handshake === "function"'));
 
 const bootstrapEntry = readFileSync(new URL("../src/activity-bootstrap-fix-entry.js", import.meta.url), "utf8");
 assert(bootstrapEntry.includes('url.pathname === "/activity/oauth/token"'));
