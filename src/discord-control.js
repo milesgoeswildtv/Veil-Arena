@@ -1,6 +1,7 @@
 import { handleDiscordRoute as baseHandleDiscordRoute } from "./discord-worker.js";
 import { InteractionType, verifyDiscordRequest, interactionMessage, userFromInteraction } from "./discord.js";
 import { ensureSchema, loadActiveGameForChannel, saveGame } from "./storage.js";
+import { isVeilTipAdmin, veilTipAdminEntry, sendDirectDwalletTip } from "./dwallet-direct-tip.js";
 
 function canManageGuild(interaction) {
   try {
@@ -50,16 +51,70 @@ async function handleForceClose(interaction, env) {
   return interactionMessage(`🛑 **Arena force-closed.** The stuck active state is cleared. A new Arena can be started in this channel immediately.${prizeWarning}`);
 }
 
+function optionValue(interaction, name) {
+  return interaction?.data?.options?.find(option => option.name === name)?.value;
+}
+
+async function handleVeilTip(interaction, env) {
+  if (!interaction.guild_id) return interactionMessage("Use `/veiltip` inside a Discord server.", [], true);
+  const user = userFromInteraction(interaction);
+  if (!user) return interactionMessage("I couldn't identify who requested this tip.", [], true);
+
+  const allowPlatformAdmin = env.VEIL_TIP_ALLOW_PLATFORM_ADMINS === "true" && canManageGuild(interaction);
+  if (!isVeilTipAdmin(env, "discord", user.id) && !allowPlatformAdmin) {
+    const entry = veilTipAdminEntry("discord", user.id);
+    return interactionMessage(
+      `You are not authorized to spend Veil's DWallet balance.\n\nYour allowlist entry is \`${entry}\`. Add it to the Cloudflare secret/variable \`VEIL_TIP_ADMIN_IDS\` (comma-separated if there are multiple approved spenders).`,
+      [],
+      true
+    );
+  }
+
+  if (!env.DWALLET_API_KEY) return interactionMessage("Veil's DWallet API key is not configured on this Worker.", [], true);
+
+  const recipientId = String(optionValue(interaction, "user") || "");
+  const amount = optionValue(interaction, "amount");
+  const currency = optionValue(interaction, "currency");
+  const suppliedNote = String(optionValue(interaction, "note") || "").trim();
+  if (!recipientId) return interactionMessage("Choose a Discord member to receive the tip.", [], true);
+
+  const resolvedUser = interaction?.data?.resolved?.users?.[recipientId];
+  const resolvedMember = interaction?.data?.resolved?.members?.[recipientId];
+  const recipientName = resolvedMember?.nick || resolvedUser?.global_name || resolvedUser?.username || `Discord ${recipientId}`;
+  const note = suppliedNote || `Veil direct tip authorized by ${user.displayName}`;
+
+  try {
+    const sent = await sendDirectDwalletTip(env, {
+      toUserId: recipientId,
+      amount,
+      currency,
+      note,
+      guildId: interaction.guild_id,
+      channelId: interaction.channel_id
+    });
+    return interactionMessage(
+      `💜 **Veil tipped ${recipientName} ${sent.amount} ${sent.currency}.**${sent.tipId ? `\nDWallet tip #${sent.tipId}` : ""}\nAuthorized by **${user.displayName}**.`
+    );
+  } catch (error) {
+    return interactionMessage(
+      `⚠️ Veil tip failed: ${String(error?.message || error)}\n\nNo automatic retry was attempted. Check Veil's DWallet history before trying again so an ambiguous timeout cannot cause a duplicate payment.`,
+      [],
+      true
+    );
+  }
+}
+
 export async function handleDiscordRoute(request, env) {
   if (request.method === "POST" && request.headers.get("x-signature-ed25519")) {
     const raw = await request.clone().text().catch(() => "");
     let interaction = null;
     try { interaction = JSON.parse(raw); } catch {}
-    const sub = interaction?.type === InteractionType.APPLICATION_COMMAND && interaction?.data?.name === "arena"
-      ? interaction?.data?.options?.[0]?.name
-      : "";
-    if (sub === "status" || sub === "forceclose") {
+    const isCommand = interaction?.type === InteractionType.APPLICATION_COMMAND;
+    const commandName = isCommand ? interaction?.data?.name : "";
+    const sub = commandName === "arena" ? interaction?.data?.options?.[0]?.name : "";
+    if (sub === "status" || sub === "forceclose" || commandName === "veiltip") {
       if (!await verifyDiscordRequest(request, env.DISCORD_PUBLIC_KEY, raw)) return new Response("Bad signature", { status: 401 });
+      if (commandName === "veiltip") return handleVeilTip(interaction, env);
       if (!interaction.guild_id) return interactionMessage("Arena controls can only be used inside a Discord server.", [], true);
       if (sub === "status") return handleStatus(interaction, env);
       return handleForceClose(interaction, env);
