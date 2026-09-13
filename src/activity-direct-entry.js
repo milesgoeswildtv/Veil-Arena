@@ -5,8 +5,8 @@ import { OFFICIAL_DISCORD_SDK_SOURCE, OFFICIAL_DISCORD_SDK_VERSION } from "./gen
 
 export { ArenaCoordinator };
 
-const ACTIVITY_BUILD = "20260913-13";
-const ACTIVITY_CLIENT_PATH = "/activity/veil-arena-20260913-13.js";
+const ACTIVITY_BUILD = "20260913-15";
+const ACTIVITY_CLIENT_PATH = "/activity/veil-arena-20260913-15.js";
 const TEST_GUILD_ID = "1504257112094539798";
 const DISCORD_API = "https://discord.com/api/v10";
 let cachedApplication = null;
@@ -77,25 +77,28 @@ function directClientSource() {
     return `document.body.innerHTML = '<pre style="white-space:pre-wrap;color:#fff;background:#120b18;padding:20px">VEIL CLIENT BUILD ERROR // ${ACTIVITY_BUILD}\\nDirect client patch target was not found.</pre>';`;
   }
 
-  const client = ACTIVITY_LIVE_CLIENT
-    .replace(
-      target,
-      `  const DiscordSDK = globalThis.__VEIL_OFFICIAL_DISCORD_SDK__;\n  if (!DiscordSDK) throw new Error("Official Discord Embedded App SDK bundle did not initialize.");`
-    )
-    .replace(
-      "discordSdk = new DiscordSDK(clientId);",
-      "discordSdk = new DiscordSDK(clientId, { disableConsoleLogOverride: true });"
-    );
+  let client = ACTIVITY_LIVE_CLIENT.replace(
+    target,
+    `  const DiscordSDK = globalThis.__VEIL_OFFICIAL_DISCORD_SDK__;\n  if (!DiscordSDK) throw new Error("Official Discord Embedded App SDK bundle did not initialize.");`
+  );
 
-  const diagnostic = `\n(function veilLaunchDiagnostics(){\n  try {\n    const p = new URLSearchParams(window.location.search);\n    const guild = p.get("guild_id") || "MISSING";\n    const body = document.body?.dataset || {};\n    const lines = [\n      "Discord SDK: OFFICIAL @discord/embedded-app-sdk ${OFFICIAL_DISCORD_SDK_VERSION}",\n      "Handshake Application ID: " + (body.discordClientId || "MISSING"),\n      "Original Worker env ID: " + (body.workerEnvAppId || "MISSING"),\n      "Application ID source: " + (body.appIdSource || "MISSING"),\n      "ID auto-corrected: " + (body.appIdCorrected || "NO"),\n      "Expected test guild_id: ${TEST_GUILD_ID}",\n      "Launch guild_id: " + guild,\n      "Test guild match: " + (guild === "${TEST_GUILD_ID}" ? "YES" : "NO"),\n      "Launch channel_id: " + (p.get("channel_id") || "MISSING"),\n      "Launch instance_id: " + (p.get("instance_id") || "MISSING"),\n      "Launch frame_id: " + (p.get("frame_id") || "MISSING"),\n      "Launch platform: " + (p.get("platform") || "MISSING"),\n      "mobile_app_version: " + (p.get("mobile_app_version") || "MISSING"),\n      "referrer origin: " + (document.referrer ? new URL(document.referrer).origin : "MISSING"),\n      "client path: ${ACTIVITY_CLIENT_PATH}",\n      "client mode: OFFICIAL SDK / BUNDLED LOCAL"\n    ];\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = lines.join("\\n");\n  } catch (error) {\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = "launch diagnostic failed: " + (error?.message || String(error));\n  }\n})();\n`;
+  const setupTarget = '    discordSdk = new DiscordSDK(clientId);\n    await withTimeout(discordSdk.ready(), 12000, "Discord SDK READY");';
+  const setupReplacement = `    const expectedProxyHost = \`${'${clientId}'}.discordsays.com\`;\n    const actualHost = window.location.hostname;\n    const ancestorOrigin = (() => { try { return window.location.ancestorOrigins?.[0] || \"\"; } catch { return \"\"; } })();\n    const parentIsSelf = window.parent === window;\n    globalThis.__VEIL_RPC_INFO__ = { expectedProxyHost, actualHost, ancestorOrigin, parentIsSelf, referrer: document.referrer || \"\" };\n    globalThis.__VEIL_RENDER_DIAGNOSTICS__?.();\n    if (actualHost !== expectedProxyHost) {\n      throw new Error(\`Discord Activity proxy mismatch. Veil is running on ${'${actualHost}'} but must run on ${'${expectedProxyHost}'}. In Discord Developer Portal disable Application URL Override and keep the Activity URL Mapping on /.\`);\n    }\n    discordSdk = new DiscordSDK(clientId, { disableConsoleLogOverride: true });\n    globalThis.__VEIL_RPC_INFO__.sourceOrigin = discordSdk.sourceOrigin || \"\";\n    globalThis.__VEIL_RPC_INFO__.sourceIsParent = discordSdk.source === window.parent;\n    globalThis.__VEIL_RENDER_DIAGNOSTICS__?.();\n    let readyResolved = false;\n    const readyPromise = discordSdk.ready().then(() => { readyResolved = true; globalThis.__VEIL_RPC_INFO__.ready = true; globalThis.__VEIL_RENDER_DIAGNOSTICS__?.(); });\n    if ((!document.referrer || discordSdk.sourceOrigin === \"*\") && typeof discordSdk.handshake === \"function\") {\n      setTimeout(() => {\n        if (readyResolved) return;\n        const trustedOrigin = /^https:\\/\\/(?:ptb\\.|canary\\.)?discord(?:app)?\\.com$/i.test(ancestorOrigin) ? ancestorOrigin : \"https://discord.com\";\n        try {\n          discordSdk.sourceOrigin = trustedOrigin;\n          discordSdk.handshake();\n          globalThis.__VEIL_RPC_INFO__.fallback = \`RESENT TO ${'${trustedOrigin}'}\`;\n        } catch (error) {\n          globalThis.__VEIL_RPC_INFO__.fallback = \`FAILED: ${'${error?.message || String(error)}'}\`;\n        }\n        globalThis.__VEIL_RENDER_DIAGNOSTICS__?.();\n      }, 2500);\n    }\n    await withTimeout(readyPromise, 12000, \"Discord SDK READY\");`;
 
-  const bootMarker = `\n(function veilDirectBootMarker(){\n  const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n  put("connection", "OFFICIAL SDK ONLINE");\n  put("round", "OFFICIAL SDK ONLINE");\n  put("headline", "STARTING DISCORD HANDSHAKE…");\n  put("event", "Veil ${ACTIVITY_BUILD} loaded with Discord's official Embedded App SDK ${OFFICIAL_DISCORD_SDK_VERSION}, bundled locally into Veil.");\n  put("notice", "Official Discord SDK online // starting READY handshake");\n})();\n`;
+  if (!client.includes(setupTarget)) {
+    return `document.body.innerHTML = '<pre style="white-space:pre-wrap;color:#fff;background:#120b18;padding:20px">VEIL CLIENT BUILD ERROR // ${ACTIVITY_BUILD}\\nOfficial SDK setup patch target was not found.</pre>';`;
+  }
+  client = client.replace(setupTarget, setupReplacement);
+
+  const diagnostic = `\n(function veilLaunchDiagnostics(){\n  try {\n    if (\"scrollRestoration\" in history) history.scrollRestoration = \"manual\";\n    window.scrollTo(0, 0);\n    const render = () => {\n      const p = new URLSearchParams(window.location.search);\n      const guild = p.get("guild_id") || "MISSING";\n      const body = document.body?.dataset || {};\n      const rpc = globalThis.__VEIL_RPC_INFO__ || {};\n      const lines = [\n        "Discord SDK: OFFICIAL @discord/embedded-app-sdk ${OFFICIAL_DISCORD_SDK_VERSION}",\n        "Handshake Application ID: " + (body.discordClientId || "MISSING"),\n        "Application ID source: " + (body.appIdSource || "MISSING"),\n        "Launch guild_id: " + guild,\n        "Test guild match: " + (guild === "${TEST_GUILD_ID}" ? "YES" : "NO"),\n        "Launch channel_id: " + (p.get("channel_id") || "MISSING"),\n        "Launch frame_id: " + (p.get("frame_id") || "MISSING"),\n        "Launch platform: " + (p.get("platform") || "MISSING"),\n        "location host: " + window.location.hostname,\n        "expected proxy: " + (rpc.expectedProxyHost || ((body.discordClientId || "MISSING") + ".discordsays.com")),\n        "proxy match: " + (rpc.expectedProxyHost ? (rpc.actualHost === rpc.expectedProxyHost ? "YES" : "NO") : "WAITING"),\n        "document.referrer: " + (document.referrer || "MISSING"),\n        "ancestor origin: " + (rpc.ancestorOrigin || "MISSING"),\n        "parent === self: " + (rpc.parentIsSelf == null ? "WAITING" : rpc.parentIsSelf ? "YES" : "NO"),\n        "SDK sourceOrigin: " + (rpc.sourceOrigin || "WAITING"),\n        "SDK source === parent: " + (rpc.sourceIsParent == null ? "WAITING" : rpc.sourceIsParent ? "YES" : "NO"),\n        "fallback READY: " + (rpc.fallback || "NONE"),\n        "READY received: " + (rpc.ready ? "YES" : "NO"),\n        "client path: ${ACTIVITY_CLIENT_PATH}"\n      ];\n      const el = document.getElementById("veilLaunchDebugText");\n      if (el) el.textContent = lines.join("\\n");\n    };\n    globalThis.__VEIL_RENDER_DIAGNOSTICS__ = render;\n    render();\n    setTimeout(() => { window.scrollTo(0, 0); render(); }, 150);\n  } catch (error) {\n    const el = document.getElementById("veilLaunchDebugText");\n    if (el) el.textContent = "launch diagnostic failed: " + (error?.message || String(error));\n  }\n})();\n`;
+
+  const bootMarker = `\n(function veilDirectBootMarker(){\n  const put = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };\n  put("connection", "OFFICIAL SDK ONLINE");\n  put("round", "OFFICIAL SDK ONLINE");\n  put("headline", "STARTING DISCORD HANDSHAKE…");\n  put("event", "Veil ${ACTIVITY_BUILD} is using Discord's official Embedded App SDK ${OFFICIAL_DISCORD_SDK_VERSION}. No response-rewriting tracer is active.");\n  put("notice", "Official Discord SDK online // checking Activity proxy and READY handshake");\n})();\n`;
 
   return `${OFFICIAL_DISCORD_SDK_SOURCE}\n${diagnostic}\n${bootMarker}\n${client}`;
 }
 
 function launchDiagnosticBox() {
-  return `<div id="veilLaunchDebug" style="position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:rgba(5,4,9,.94);border:1px solid #614580;border-radius:10px;padding:8px 10px;color:#d8c9e6;font:10px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;max-height:34vh;overflow:auto"><b style="color:#fff">VEIL LAUNCH CONTEXT // ${ACTIVITY_BUILD}</b><div id="veilLaunchDebugText">official SDK client has not populated launch IDs yet…</div></div>`;
+  return `<div id="veilLaunchDebug" style="position:fixed;left:8px;right:8px;top:190px;z-index:99999;background:rgba(5,4,9,.96);border:1px solid #614580;border-radius:10px;padding:8px 10px;color:#d8c9e6;font:10px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;max-height:31vh;overflow:auto;pointer-events:none"><b style="color:#fff">VEIL CONNECTION CHECK // ${ACTIVITY_BUILD}</b><div id="veilLaunchDebugText">official SDK client is starting…</div></div>`;
 }
 
 function directHtml(application, envApplicationId) {
