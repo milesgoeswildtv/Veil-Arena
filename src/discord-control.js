@@ -16,9 +16,19 @@ function canManageGuild(interaction) {
 async function activeDiscordGame(interaction, env) {
   if (!env.DB) return null;
   await ensureSchema(env.DB);
-  const game = await loadActiveGameForChannel(env.DB, interaction.channel_id);
-  if (!game || String(game.guildId) !== String(interaction.guild_id) || game.platform !== "discord") return null;
-  return game;
+
+  const normalGame = await loadActiveGameForChannel(env.DB, interaction.channel_id);
+  if (normalGame && String(normalGame.guildId) === String(interaction.guild_id) && normalGame.platform === "discord") {
+    return normalGame;
+  }
+
+  const activityScope = `activity:${interaction.guild_id}:${interaction.channel_id}`;
+  const activityGame = await loadActiveGameForChannel(env.DB, activityScope);
+  if (activityGame && String(activityGame.guildId) === String(interaction.guild_id) && activityGame.platform === "activity") {
+    return activityGame;
+  }
+
+  return null;
 }
 
 async function handleStatus(interaction, env) {
