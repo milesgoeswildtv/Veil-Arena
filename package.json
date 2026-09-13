@@ -4,12 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:activity-client": "node -e \"console.log('Veil Arena clean baseline: no Activity client to build yet.')\"",
+    "build:activity-client": "vite build --config activity/vite.config.js",
     "build": "npm run build:activity-client",
     "test": "node scripts/smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/dwallet-payout-smoke-test.mjs",
-    "deploy": "wrangler deploy"
+    "deploy": "npm run build:activity-client && wrangler deploy"
+  },
+  "dependencies": {
+    "@discord/embedded-app-sdk": "^2.5.0"
   },
   "devDependencies": {
+    "vite": "^7.1.0",
     "wrangler": "^4.0.0"
   }
 }
