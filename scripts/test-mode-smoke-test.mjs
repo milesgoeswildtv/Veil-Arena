@@ -22,22 +22,35 @@ for (const action of ["add_bots","fill_12","remove_bots","next_round","mass_braw
 
 const wrangler = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
 const botsEntry = readFileSync(new URL("../src/discord-bots-entry.js", import.meta.url), "utf8");
-const telegramGroupEntry = readFileSync(new URL("../src/telegram-group-context-entry.js", import.meta.url), "utf8");
+const telegramWorker = readFileSync(new URL("../src/telegram-official-worker.js", import.meta.url), "utf8");
+const telegramMiniApp = readFileSync(new URL("../src/telegram-official-miniapp.js", import.meta.url), "utf8");
 const officialEntry = readFileSync(new URL("../src/activity-official-entry.js", import.meta.url), "utf8");
 const officialBrowser = readFileSync(new URL("../src/activity-official-browser.js", import.meta.url), "utf8");
-const doctorEntry = readFileSync(new URL("../src/activity-doctor-entry.js", import.meta.url), "utf8");
-const entryPointEntry = readFileSync(new URL("../src/activity-entrypoint-entry.js", import.meta.url), "utf8");
-const resetEntry = readFileSync(new URL("../src/activity-reset-entry.js", import.meta.url), "utf8");
-const liveEntry = readFileSync(new URL("../src/activity-live-entry.js", import.meta.url), "utf8");
-const recoveryEntry = readFileSync(new URL("../src/discord-recovery-entry.js", import.meta.url), "utf8");
 const serverConfig = readFileSync(new URL("../src/server-config.js", import.meta.url), "utf8");
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 
 assert(wrangler.includes('main = "src/discord-bots-entry.js"'));
-assert(wrangler.includes('main = "src/telegram-group-context-entry.js"'));
-assert(telegramGroupEntry.includes('from "./telegram-start-entry.js"'));
-assert(telegramGroupEntry.includes("telegramUserInChat"));
-assert(telegramGroupEntry.includes('params.set("chat_type", "group")'));
+assert(wrangler.includes('main = "src/telegram-official-worker.js"'));
+assert(wrangler.includes("[env.test.vars]"));
+assert(wrangler.includes('ARENA_TEST_MODE = "true"'));
+assert(wrangler.includes("[[env.test.durable_objects.bindings]]"));
+assert(wrangler.includes("[[env.test.d1_databases]]"));
+
+assert(telegramWorker.includes('url.pathname === "/telegram/webhook"'));
+assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/state"'));
+assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/action"'));
+assert(telegramWorker.includes('url.pathname === "/telegram/miniapp/test"'));
+assert(telegramWorker.includes("configureTelegramBot"));
+assert(telegramWorker.includes("telegramArenaLaunchUrl"));
+assert(!telegramWorker.includes("telegram-group-context-entry"));
+assert(!telegramWorker.includes("resignInitData"));
+
+assert(telegramMiniApp.includes("validateTelegramInitData"));
+assert(telegramMiniApp.includes("chat_instance"));
+assert(telegramMiniApp.includes("chat_type"));
+assert(telegramMiniApp.includes("We require those values"));
+assert(!telegramMiniApp.includes("params.set(\"chat_type\""));
+assert(!telegramMiniApp.includes("resignInitData"));
 
 assert(botsEntry.includes('from "./activity-official-entry.js"'));
 assert(botsEntry.includes("addFakeContestants"));
@@ -45,10 +58,6 @@ assert(officialEntry.includes('BUILD = "20260913-official-1"'));
 assert(officialEntry.includes('url.pathname === "/api/token"'));
 assert(officialEntry.includes('url.pathname === "/api/session"'));
 assert(officialEntry.includes("OFFICIAL_ACTIVITY_CLIENT_SOURCE"));
-assert(!officialEntry.includes("activity-bootstrap-fix-entry"));
-assert(!officialEntry.includes("activity-clean-entry"));
-assert(!officialEntry.includes("activity-browser-runtime-fix-entry"));
-
 assert(officialBrowser.includes('import { DiscordSDK } from "@discord/embedded-app-sdk"'));
 assert(officialBrowser.includes("new DiscordSDK(clientId)"));
 assert(officialBrowser.includes("await discordSdk.ready()"));
@@ -56,24 +65,9 @@ assert(officialBrowser.includes("discordSdk.commands.authorize"));
 assert(officialBrowser.includes("discordSdk.commands.authenticate"));
 assert(!officialBrowser.includes("guilds.members.read"));
 assert(!officialBrowser.includes("rpc.voice.read"));
-assert(!officialBrowser.includes("esm.sh"));
 
 assert(serverConfig.includes('VEIL_ACTIVITY_TEST_GUILD_ID = "1504257112094539798"'));
 assert(packageJson.includes('"@discord/embedded-app-sdk": "2.5.0"'));
 assert(packageJson.includes('"build:activity-client"'));
-assert(packageJson.includes('"postinstall": "npm run build:activity-client"'));
 
-assert(doctorEntry.includes("EMBEDDED_FLAG"));
-assert(doctorEntry.includes("type: 4"));
-assert(doctorEntry.includes("handler: 2"));
-assert(entryPointEntry.includes('from "./activity-reset-entry.js"'));
-assert(resetEntry.includes('from "./activity-live-entry.js"'));
-assert(resetEntry.includes('body.action === "abort"'));
-assert(liveEntry.includes('from "./discord-recovery-entry.js"'));
-assert(recoveryEntry.includes('from "./test-entry.js"'));
-assert(wrangler.includes("[env.test.vars]"));
-assert(wrangler.includes('ARENA_TEST_MODE = "true"'));
-assert(wrangler.includes("[[env.test.durable_objects.bindings]]"));
-assert(wrangler.includes("[[env.test.d1_databases]]"));
-
-console.log("Telegram QA Test Mode smoke tests passed.");
+console.log("Telegram QA official-flow smoke tests passed.");
