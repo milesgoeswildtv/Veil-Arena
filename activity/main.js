@@ -18,10 +18,22 @@ let auth;
 let sessionToken = "";
 let currentState = null;
 let polling = false;
+let refreshTimer = null;
+let setupInFlight = false;
+let lastRenderSignature = "";
 let lastFxSignature = "";
 let fxTimer = null;
 
 const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 function markdownToHtml(value) {
   let html = esc(value ?? "");
@@ -273,6 +285,28 @@ function render(state) {
   triggerFx(previousState, state);
 }
 
+function renderState(state, force = false) {
+  const signature = JSON.stringify(state);
+  if (!force && signature === lastRenderSignature) return false;
+  lastRenderSignature = signature;
+  render(state);
+  return true;
+}
+
+function pollDelay(state = currentState) {
+  if (document.hidden) return 6000;
+  const gameStatus = state?.game?.status;
+  return ["registration", "starting", "running"].includes(gameStatus) ? 2000 : 4000;
+}
+
+function scheduleRefresh(delay = pollDelay()) {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => {
+    await refresh();
+    if (sessionToken) scheduleRefresh();
+  }, delay);
+}
+
 function bindSpoilers() {
   document.querySelectorAll(".spoiler").forEach(spoiler => {
     const reveal = () => spoiler.classList.toggle("revealed");
@@ -292,7 +326,8 @@ function bindControls() {
           method: "POST",
           body: JSON.stringify({ action: button.dataset.action })
         });
-        render(state);
+        renderState(state, true);
+        scheduleRefresh();
       } catch (error) {
         showError(error);
       } finally {
@@ -307,7 +342,8 @@ function bindControls() {
           method: "POST",
           body: JSON.stringify({ action: "vote", targetId: button.dataset.vote })
         });
-        render(state);
+        renderState(state, true);
+        scheduleRefresh();
       } catch (error) {
         showError(error);
       }
@@ -319,7 +355,7 @@ async function refresh() {
   if (!sessionToken || polling) return;
   polling = true;
   try {
-    render(await activityApi("/api/activity/state"));
+    renderState(await activityApi("/api/activity/state"));
   } catch (error) {
     showError(error);
   } finally {
@@ -329,28 +365,44 @@ async function refresh() {
 
 async function setupDiscordSdk() {
   status("1 / 5 — LOADING CONFIG");
-  const config = await jsonFetch("/api/activity/config");
+  const config = await withTimeout(
+    jsonFetch("/api/activity/config"),
+    10000,
+    "Veil could not load Activity configuration."
+  );
 
   status("2 / 5 — DISCORD READY");
   discordSdk = new DiscordSDK(config.clientId);
-  await discordSdk.ready();
+  await withTimeout(discordSdk.ready(), 10000, "Discord Activity did not become ready.");
 
   status("3 / 5 — AUTHORIZE");
-  const { code } = await discordSdk.commands.authorize({
-    client_id: config.clientId,
-    response_type: "code",
-    state: "",
-    prompt: "none",
-    scope: ["identify", "guilds", "applications.commands"]
-  });
+  const { code } = await withTimeout(
+    discordSdk.commands.authorize({
+      client_id: config.clientId,
+      response_type: "code",
+      state: "",
+      prompt: "none",
+      scope: ["identify", "guilds", "applications.commands"]
+    }),
+    10000,
+    "Discord authorization timed out."
+  );
 
   status("4 / 5 — AUTHENTICATE");
-  const token = await jsonFetch("/api/token", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ code })
-  });
-  auth = await discordSdk.commands.authenticate({ access_token: token.access_token });
+  const token = await withTimeout(
+    jsonFetch("/api/token", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ code })
+    }),
+    10000,
+    "Veil token exchange timed out."
+  );
+  auth = await withTimeout(
+    discordSdk.commands.authenticate({ access_token: token.access_token }),
+    10000,
+    "Discord authentication timed out."
+  );
   if (!auth) throw new Error("Discord authenticate command failed.");
 
   let channelName = "Discord Activity";
@@ -360,23 +412,53 @@ async function setupDiscordSdk() {
   }
 
   status("5 / 5 — ARENA SESSION");
-  const session = await jsonFetch("/api/activity/session", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${token.access_token}`
-    },
-    body: JSON.stringify({
-      guildId: discordSdk.guildId,
-      channelId: discordSdk.channelId,
-      instanceId: discordSdk.instanceId || null,
-      channelName
-    })
-  });
+  const session = await withTimeout(
+    jsonFetch("/api/activity/session", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${token.access_token}`
+      },
+      body: JSON.stringify({
+        guildId: discordSdk.guildId,
+        channelId: discordSdk.channelId,
+        instanceId: discordSdk.instanceId || null,
+        channelName
+      })
+    }),
+    10000,
+    "Veil Arena session creation timed out."
+  );
   sessionToken = session.session;
   status(`ONLINE // ${channelName}`);
   await refresh();
-  setInterval(refresh, 1000);
+  scheduleRefresh();
 }
 
-setupDiscordSdk().catch(showError);
+async function bootActivity() {
+  if (setupInFlight) return;
+  setupInFlight = true;
+  clearTimeout(refreshTimer);
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    sessionToken = "";
+    try {
+      if (attempt > 1) status(`RECONNECTING // ATTEMPT ${attempt} OF 3`);
+      await setupDiscordSdk();
+      setupInFlight = false;
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        errorEl.classList.add("hidden");
+        await sleep(750 * attempt);
+      }
+    }
+  }
+
+  setupInFlight = false;
+  showError(lastError);
+}
+
+bootActivity();
