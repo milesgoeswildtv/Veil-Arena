@@ -1,7 +1,7 @@
 /* Discord Activity presentation only. Never reference the Telegram asset tree. */
 body {
   background: linear-gradient(#09070ddd, #09070df5),
-    url("../assets/discord/Veil Arena Universal Master Splash Art.PNG") center top / cover fixed,
+    url("../assets/discord/Veil Arena Universal Master Splash Art.PNG") center top / cover no-repeat scroll,
     #09070d;
 }
 .shell { width: min(1180px, 100%); padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
