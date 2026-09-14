@@ -1,7 +1,6 @@
 import { createGame, addPlayer, startGame, castCrowdVote } from "./core/engine.js";
 import { addFakeContestants, setSimulatedCrowd } from "./core/simulation.js";
-import { advanceArenaGame } from "./core/orchestrator.js";
-import { ensureSchema, loadGame, loadActiveGameForChannel, saveGame, recordFinishedGame, getGuildConfig, setGuildTheme } from "./storage.js";
+import { ensureSchema, loadActiveGameForChannel, saveGame, getGuildConfig, setGuildTheme } from "./storage.js";
 import { themeForGuild } from "./server-config.js";
 
 const DISCORD_API = "https://discord.com/api/v10";
@@ -167,36 +166,16 @@ async function currentGame(env, session, includeFinished = true) {
   return hydrateRegistrations(env.DB, game);
 }
 
-async function acquireTickLease(db, gameId, now) {
-  const result = await db.prepare(`
-    INSERT INTO activity_tick_leases (game_id, lease_until) VALUES (?, ?)
-    ON CONFLICT(game_id) DO UPDATE SET lease_until = excluded.lease_until
-    WHERE activity_tick_leases.lease_until < ?
-  `).bind(gameId, now + 4000, now).run();
-  return Boolean(result?.meta?.changes);
-}
-
-async function releaseTickLease(db, gameId) {
-  await db.prepare("UPDATE activity_tick_leases SET lease_until = 0 WHERE game_id = ?").bind(gameId).run();
-}
-
-async function maybeAdvance(env, game) {
-  if (!game || game.status !== "running") return game;
-  const now = Date.now();
-  if (Number(game.nextAdvanceAt || 0) > now) return game;
-  if (!await acquireTickLease(env.DB, game.id, now)) return loadGame(env.DB, game.id);
-  try {
-    const fresh = await loadGame(env.DB, game.id);
-    if (!fresh || fresh.status !== "running" || Number(fresh.nextAdvanceAt || 0) > Date.now()) return fresh || game;
-    const event = advanceArenaGame(fresh);
-    fresh.lastEvent = { type: event.type, round: event.round, text: event.text || null, at: new Date().toISOString() };
-    fresh.nextAdvanceAt = event.finished ? null : Date.now() + Math.max(750, Number(event.waitMs) || 1500);
-    await saveGame(env.DB, fresh);
-    if (fresh.status === "finished") await recordFinishedGame(env.DB, fresh);
-    return fresh;
-  } finally {
-    await releaseTickLease(env.DB, game.id);
-  }
+async function kickActivityCoordinator(env, channelId) {
+  if (!env.ARENA_COORDINATOR) throw new Error("Arena coordinator binding is missing.");
+  const id = env.ARENA_COORDINATOR.idFromName(channelId);
+  const stub = env.ARENA_COORDINATOR.get(id);
+  const response = await stub.fetch("https://arena.internal/", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action: "kick", channelId, platform: "activity" })
+  });
+  if (!response.ok) throw new Error(`Arena coordinator could not start (${response.status}).`);
 }
 
 function publicState(game, session, env) {
@@ -294,9 +273,10 @@ async function actionStart(env, game, user) {
   if (Object.keys(hydrated.players).length < 2) throw new Error("Arena needs at least 2 players.");
   if (Object.values(hydrated.players).some(player => player.simulated)) setSimulatedCrowd(hydrated, true);
   startGame(hydrated);
-  hydrated.nextAdvanceAt = Date.now() + 1000;
+  hydrated.nextAdvanceAt = null;
   hydrated.displayLog = hydrated.displayLog || [];
   await saveGame(env.DB, hydrated);
+  await kickActivityCoordinator(env, hydrated.channelId);
   await env.DB.prepare("DELETE FROM arena_registrations WHERE game_id = ?").bind(game.id).run();
   return hydrated;
 }
@@ -326,7 +306,7 @@ export async function handleDiscordActivityRoute(request, env) {
   try {
     if (url.pathname === "/api/activity/config" && request.method === "GET") {
       if (!env.DISCORD_APPLICATION_ID) return json({ error: "DISCORD_APPLICATION_ID is missing." }, 503);
-      return json({ clientId: String(env.DISCORD_APPLICATION_ID), build: "2026-09-13-official-activity-1" });
+      return json({ clientId: String(env.DISCORD_APPLICATION_ID), build: "2026-09-14-activity-stability-1" });
     }
 
     if (url.pathname === "/api/token" && request.method === "POST") {
@@ -341,9 +321,7 @@ export async function handleDiscordActivityRoute(request, env) {
 
     if (url.pathname === "/api/activity/state" && request.method === "GET") {
       const session = await requireSession(request, env);
-      let game = await currentGame(env, session, true);
-      game = await maybeAdvance(env, game);
-      if (game) game = await hydrateRegistrations(env.DB, game);
+      const game = await currentGame(env, session, true);
       return json(publicState(game, session, env));
     }
 
