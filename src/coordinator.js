@@ -74,6 +74,16 @@ function rememberDisplayed(g, text) {
   g.displayLog.push({ round: g.round, text, at: new Date().toISOString() });
 }
 
+function rememberActivityEvent(g, type, text) {
+  if (platformOf(g) !== "activity") return;
+  g.lastEvent = {
+    type,
+    round: g.round,
+    text: text || null,
+    at: new Date().toISOString()
+  };
+}
+
 function normalText(g, t, r) {
   const ids = r.actorIds || [];
   const killer = ids[0] ? name(g, ids[0]) : "Someone";
@@ -333,6 +343,7 @@ export class ArenaCoordinator {
       const result = resolveCrowdVote(g);
       const msg = crowdText(g, t, result, sim);
       rememberDisplayed(g, msg);
+      rememberActivityEvent(g, "crowd_result", msg);
       await saveGame(this.env.DB, g);
       await appendRoundMessage(this.ctx, this.env, platform, channelId, g.round, msg);
       if (await finish(this.env, g)) return;
@@ -348,6 +359,7 @@ export class ArenaCoordinator {
       const result = resolveRevivalPit(g);
       const msg = revivalRoundText(g, t, result);
       rememberDisplayed(g, msg);
+      rememberActivityEvent(g, "revival", msg);
       await postRound(this.ctx, this.env, platform, channelId, g.round, msg);
       if (await finish(this.env, g)) return;
       await saveGame(this.env.DB, g);
@@ -361,6 +373,7 @@ export class ArenaCoordinator {
       if (vote) {
         const msg = crowdOpenText(g, t);
         rememberDisplayed(g, msg);
+        rememberActivityEvent(g, "crowd_vote_open", msg);
         await saveGame(this.env.DB, g);
         const controls = platform === "discord" ? {
           discord: [{
@@ -384,6 +397,7 @@ export class ArenaCoordinator {
     const isBrawl = normal.type === "mass_brawl";
     const msg = roundText(g, t, normal);
     rememberDisplayed(g, msg);
+    rememberActivityEvent(g, isBrawl ? "mass_brawl" : "normal", msg);
     await postRound(this.ctx, this.env, platform, channelId, g.round, msg);
     if (await finish(this.env, g)) return;
     await saveGame(this.env.DB, g);
