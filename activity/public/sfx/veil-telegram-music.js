@@ -8,6 +8,8 @@
   let activeMusic = "";
   let musicTransition = 0;
   let unlocked = false;
+  let musicEnabled = localStorage.getItem("veil.music.enabled") !== "0";
+  let masterVolume = Math.max(0, Math.min(1, Number(localStorage.getItem("veil.audio.volume") || "1")));
 
   const players = Object.fromEntries(Object.entries(MUSIC).map(([name, config]) => {
     const audio = new Audio(config.src);
@@ -16,6 +18,10 @@
     audio.volume = 0;
     return [name, audio];
   }));
+
+  function targetVolume(name) {
+    return Math.max(0, Math.min(1, Number(MUSIC[name]?.volume || 0) * masterVolume));
+  }
 
   function fade(audio, from, to, duration, transitionId, onDone) {
     const startedAt = performance.now();
@@ -31,6 +37,12 @@
   }
 
   async function applyMusic() {
+    if (!musicEnabled) {
+      musicTransition++;
+      Object.values(players).forEach(audio => { audio.pause(); audio.volume = 0; });
+      activeMusic = "";
+      return;
+    }
     if (!unlocked || document.hidden) return;
     const target = desiredMusic;
     const config = MUSIC[target];
@@ -57,14 +69,15 @@
       return;
     }
 
-    if (activeMusic === target && !incoming.paused && Math.abs(incoming.volume - config.volume) < 0.01) return;
+    const targetLevel = targetVolume(target);
+    if (activeMusic === target && !incoming.paused && Math.abs(incoming.volume - targetLevel) < 0.01) return;
 
     activeMusic = target;
     const started = incoming.paused
       ? await incoming.play().then(() => true).catch(() => false)
       : true;
     if (!started || transitionId !== musicTransition) return;
-    fade(incoming, incoming.volume, config.volume, incoming.volume > 0 ? 300 : 800, transitionId);
+    fade(incoming, incoming.volume, targetLevel, incoming.volume > 0 ? 300 : 800, transitionId);
   }
 
   function updateMusicForStatus(status) {
@@ -104,6 +117,13 @@
     unlocked = true;
     applyMusic();
   }
+
+  window.addEventListener("veil-audio-settings", event => {
+    const detail = event?.detail || {};
+    if (typeof detail.music === "boolean") musicEnabled = detail.music;
+    if (Number.isFinite(Number(detail.volume))) masterVolume = Math.max(0, Math.min(1, Number(detail.volume)));
+    applyMusic();
+  });
 
   document.addEventListener("pointerdown", unlockMusic, { capture: true });
   document.addEventListener("touchstart", unlockMusic, { capture: true, passive: true });
