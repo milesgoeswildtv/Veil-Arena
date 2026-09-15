@@ -4,6 +4,7 @@ import { applyTelegramMiniAppAssetBatch2 } from "./telegram-miniapp-assets-batch
 import { applyTelegramMiniAppAssetBatch3 } from "./telegram-miniapp-assets-batch3.js";
 import { applyTelegramPerformancePass } from "./telegram-performance.js";
 import { applyTelegramFeaturePack } from "./telegram-feature-pack.js";
+import { applyTelegramPrizePack } from "./telegram-prize-pack.js";
 import { handleDiscordRoute } from "./discord-control.js";
 import { ArenaCoordinator } from "./coordinator-features.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
@@ -12,7 +13,7 @@ import { injectVeilSfx } from "./sfx-integration.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-15-telegram-feature-pack-1";
+const TELEGRAM_BUILD = "2026-09-15-telegram-dwallet-prize-pool-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -59,7 +60,8 @@ export default {
       const performanceHtml = applyTelegramPerformancePass(telegramFxMiniAppHtml());
       const telegramHtml = applyTelegramMiniAppAssetBatch2(performanceHtml);
       const assetHtml = applyTelegramMiniAppAssetBatch3(telegramHtml);
-      return html(injectVeilSfx(applyTelegramFeaturePack(assetHtml)));
+      const featureHtml = applyTelegramFeaturePack(assetHtml);
+      return html(injectVeilSfx(applyTelegramPrizePack(featureHtml)));
     }
 
     if (url.pathname.startsWith("/telegram/")) {
@@ -85,6 +87,8 @@ export default {
         discordActivity: env.DISCORD_APPLICATION_ID && env.DISCORD_CLIENT_SECRET ? "ready-for-portal" : "waiting-for-oauth-keys",
         discordActivityTestMode: env.DISCORD_ACTIVITY_TEST_MODE === "true",
         dwalletPayouts: env.DWALLET_API_KEY ? "configured" : "waiting-for-api-key",
+        telegramDwalletPot: env.DWALLET_TELEGRAM_POT_USERNAME ? "configured" : "waiting-for-pot-username",
+        telegramDwalletPayouts: env.DWALLET_TELEGRAM_PAYOUTS_ENABLED === "true" ? "enabled" : "safety-locked",
         veilTipAdminsConfigured: Boolean(String(env.VEIL_TIP_ADMIN_IDS || "").trim()),
         veilTipPlatformAdminsEnabled: env.VEIL_TIP_ALLOW_PLATFORM_ADMINS === "true",
         telegram: env.TELEGRAM_BOT_TOKEN ? "configured" : "waiting-for-keys",
