@@ -36,6 +36,43 @@ export function applyTelegramPerformancePass(html) {
   );
 
   out = out.replace(
+`  let controls='';
+  if(state.status==='registration'){
+    if(!state.viewer.joined)controls+=button('JOIN ARENA','join','primary','arena');
+    else if(!state.viewer.isHost)controls+=button('LEAVE','leave','','spectate');
+    if(state.viewer.isHost){
+      controls+=button('START ARENA','start','primary','success');
+      if(state.testMode){
+        controls+=button('ADD 4 TEST BOTS','add4','','stats');
+        controls+=button('FILL TO 12','fill','','leaderboard');
+        controls+=button('RESET','reset','danger','warning');
+      }
+    }
+  }else if(state.testMode&&state.viewer.isHost&&state.status==='running'){
+    controls+=button('ABORT / RESET','reset','danger','warning');
+  }
+  $('controls').innerHTML=controls;`,
+`  let controls='';
+  if(state.status==='registration'){
+    if(!state.viewer.joined)controls+=button('JOIN ARENA','join','primary','arena');
+    else if(!state.viewer.isHost)controls+=button('LEAVE','leave','','spectate');
+    if(state.viewer.isHost){
+      controls+=button('START ARENA','start','primary','success');
+      controls+=button('FORCE CLOSE','forceclose','danger','warning');
+      if(state.testMode){
+        controls+=button('ADD 4 TEST BOTS','add4','','stats');
+        controls+=button('FILL TO 12','fill','','leaderboard');
+      }
+    }
+  }else if(state.viewer.isHost&&state.status==='running'){
+    controls+=button('FORCE CLOSE','forceclose','danger','warning');
+  }else if(state.viewer.isHost&&(state.status==='finished'||state.status==='cancelled')){
+    controls+=button('START NEW GAME','newgame','primary','arena');
+  }
+  $('controls').innerHTML=controls;`
+  );
+
+  out = out.replace(
 `async function refresh(){
   if(!initData){
     err('Open this Arena from Telegram.');
