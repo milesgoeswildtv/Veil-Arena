@@ -1,7 +1,8 @@
-import { handleTelegramRoute } from "./telegram-control.js";
+import { handleTelegramRoute } from "./telegram-control-fast.js";
 import { telegramFxMiniAppHtml } from "./telegram-fx-app.js";
 import { applyTelegramMiniAppAssetBatch2 } from "./telegram-miniapp-assets-batch2.js";
 import { applyTelegramMiniAppAssetBatch3 } from "./telegram-miniapp-assets-batch3.js";
+import { applyTelegramPerformancePass } from "./telegram-performance.js";
 import { handleDiscordRoute, ArenaCoordinator } from "./discord-control.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
 import { injectVeilSfx } from "./sfx-integration.js";
@@ -9,7 +10,7 @@ import { injectVeilSfx } from "./sfx-integration.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-13-telegram-assets-batch-3";
+const TELEGRAM_BUILD = "2026-09-15-telegram-stability-performance-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -53,7 +54,8 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === "GET" && url.pathname === "/telegram/app") {
-      const telegramHtml = applyTelegramMiniAppAssetBatch2(telegramFxMiniAppHtml());
+      const performanceHtml = applyTelegramPerformancePass(telegramFxMiniAppHtml());
+      const telegramHtml = applyTelegramMiniAppAssetBatch2(performanceHtml);
       return html(injectVeilSfx(applyTelegramMiniAppAssetBatch3(telegramHtml)));
     }
 
