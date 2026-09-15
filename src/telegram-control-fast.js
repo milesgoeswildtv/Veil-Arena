@@ -1,5 +1,5 @@
 import { handleTelegramRoute as baseHandleTelegramRoute } from "./telegram-control.js";
-import { telegramState, telegramAction } from "./telegram-live-api.js";
+import { telegramState, telegramAction } from "./telegram-live-api-host-controls.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
