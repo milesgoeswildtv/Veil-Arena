@@ -26,6 +26,8 @@
   let previous = null;
   let deadline = null;
   let deadlineCueKey = "";
+  let sfxEnabled = localStorage.getItem("veil.sfx.enabled") !== "0";
+  let masterVolume = Math.max(0, Math.min(1, Number(localStorage.getItem("veil.audio.volume") || "1")));
 
   function audioContext() {
     if (!ctx) {
@@ -58,6 +60,7 @@
   }
 
   async function play(name, delay = 0) {
+    if (!sfxEnabled || masterVolume <= 0) return;
     if (delay > 0) {
       setTimeout(() => play(name), delay);
       return;
@@ -73,7 +76,7 @@
       const source = c.createBufferSource();
       const gain = c.createGain();
       source.buffer = decoded;
-      gain.gain.value = VOLUME;
+      gain.gain.value = VOLUME * masterVolume;
       source.connect(gain);
       gain.connect(c.destination);
       source.start(0, cue[0], cue[1]);
@@ -171,8 +174,14 @@
   function handleActionSuccess(action) {
     if (!action) return;
     if (action === "join") play("join");
-    else if (action !== "start") play("confirm");
+    else if (action !== "start" && action !== "reaction") play("confirm");
   }
+
+  window.addEventListener("veil-audio-settings", event => {
+    const detail = event?.detail || {};
+    if (typeof detail.sfx === "boolean") sfxEnabled = detail.sfx;
+    if (Number.isFinite(Number(detail.volume))) masterVolume = Math.max(0, Math.min(1, Number(detail.volume)));
+  });
 
   const originalFetch = window.fetch.bind(window);
   window.fetch = async function veilSfxFetch(input, init) {
@@ -194,7 +203,7 @@
   };
 
   document.addEventListener("pointerdown", event => {
-    const target = event.target?.closest?.("button,[data-action],[data-vote]");
+    const target = event.target?.closest?.("button,[data-action],[data-vote],[data-feature-action],[data-reaction]");
     if (!target) return;
     play("click");
   }, true);
