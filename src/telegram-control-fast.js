@@ -1,5 +1,5 @@
 import { handleTelegramRoute as baseHandleTelegramRoute } from "./telegram-control.js";
-import { telegramState, telegramAction } from "./telegram-live-api-host-controls.js";
+import { telegramState, telegramAction, telegramHall, telegramShare } from "./telegram-feature-api.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -22,6 +22,22 @@ export async function handleTelegramRoute(request, env) {
   if (request.method === "POST" && url.pathname === "/telegram/api/action") {
     try {
       return json(await telegramAction(request, env));
+    } catch (error) {
+      return json({ error: String(error?.message || error) }, 400);
+    }
+  }
+
+  if (request.method === "GET" && url.pathname === "/telegram/api/hall") {
+    try {
+      return json(await telegramHall(request, env));
+    } catch (error) {
+      return json({ error: String(error?.message || error) }, 400);
+    }
+  }
+
+  if (request.method === "GET" && url.pathname === "/telegram/api/share") {
+    try {
+      return json(await telegramShare(request, env));
     } catch (error) {
       return json({ error: String(error?.message || error) }, 400);
     }
