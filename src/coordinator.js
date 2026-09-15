@@ -74,14 +74,20 @@ function rememberDisplayed(g, text) {
   g.displayLog.push({ round: g.round, text, at: new Date().toISOString() });
 }
 
-function rememberActivityEvent(g, type, text) {
-  if (platformOf(g) !== "activity") return;
+function rememberClientEvent(g, type, text) {
+  const platform = platformOf(g);
+  if (platform !== "activity" && platform !== "telegram") return;
   g.lastEvent = {
     type,
     round: g.round,
     text: text || null,
     at: new Date().toISOString()
   };
+}
+
+function setTelegramNextAdvance(g, delayMs) {
+  if (platformOf(g) !== "telegram") return;
+  g.nextAdvanceAt = Date.now() + Math.max(250, Number(delayMs) || 0);
 }
 
 function normalText(g, t, r) {
@@ -267,19 +273,20 @@ async function finish(env, g) {
   const automaticPayout = payoutStatusText(g);
   const msg = platform === "telegram" ? `${base}\n\n⏳ **Next DWallet Arena: 30 minutes.**` : base;
   g.payoutReport = payout || null;
+  g.nextAdvanceAt = null;
   rememberDisplayed(g, base);
   if (payout) rememberDisplayed(g, payout);
   if (automaticPayout) rememberDisplayed(g, automaticPayout);
   await saveGame(env.DB, g);
   await recordFinishedGame(env.DB, g);
-  if (platform !== "activity") {
+  if (platform === "discord") {
     await sendTransport(env, platform, g.channelId, msg);
     if (payout) {
       for (const chunk of messageChunks(payout)) await sendTransport(env, platform, g.channelId, chunk);
     }
     if (automaticPayout) await sendTransport(env, platform, g.channelId, automaticPayout);
   }
-  if (platform === "telegram") {
+  if (platform === "telegram" && env.TELEGRAM_TEST_MODE !== "true") {
     await startArenaCooldown(env.DB, g.channelId, TELEGRAM_ARENA_COOLDOWN_MS);
   }
   return true;
@@ -343,11 +350,14 @@ export class ArenaCoordinator {
       const result = resolveCrowdVote(g);
       const msg = crowdText(g, t, result, sim);
       rememberDisplayed(g, msg);
-      rememberActivityEvent(g, "crowd_result", msg);
+      rememberClientEvent(g, "crowd_result", msg);
       await saveGame(this.env.DB, g);
       await appendRoundMessage(this.ctx, this.env, platform, channelId, g.round, msg);
       if (await finish(this.env, g)) return;
-      await this.ctx.storage.setAlarm(Date.now() + delayFor(false));
+      const waitMs = delayFor(false);
+      setTelegramNextAdvance(g, waitMs);
+      if (platform === "telegram") await saveGame(this.env.DB, g);
+      await this.ctx.storage.setAlarm(Date.now() + waitMs);
       return;
     }
 
@@ -359,11 +369,13 @@ export class ArenaCoordinator {
       const result = resolveRevivalPit(g);
       const msg = revivalRoundText(g, t, result);
       rememberDisplayed(g, msg);
-      rememberActivityEvent(g, "revival", msg);
+      rememberClientEvent(g, "revival", msg);
       await postRound(this.ctx, this.env, platform, channelId, g.round, msg);
       if (await finish(this.env, g)) return;
+      const waitMs = delayFor(false);
+      setTelegramNextAdvance(g, waitMs);
       await saveGame(this.env.DB, g);
-      await this.ctx.storage.setAlarm(Date.now() + delayFor(false));
+      await this.ctx.storage.setAlarm(Date.now() + waitMs);
       return;
     }
 
@@ -373,7 +385,8 @@ export class ArenaCoordinator {
       if (vote) {
         const msg = crowdOpenText(g, t);
         rememberDisplayed(g, msg);
-        rememberActivityEvent(g, "crowd_vote_open", msg);
+        rememberClientEvent(g, "crowd_vote_open", msg);
+        setTelegramNextAdvance(g, CROWD_VOTE_MS);
         await saveGame(this.env.DB, g);
         const controls = platform === "discord" ? {
           discord: [{
@@ -397,10 +410,12 @@ export class ArenaCoordinator {
     const isBrawl = normal.type === "mass_brawl";
     const msg = roundText(g, t, normal);
     rememberDisplayed(g, msg);
-    rememberActivityEvent(g, isBrawl ? "mass_brawl" : "normal", msg);
+    rememberClientEvent(g, isBrawl ? "mass_brawl" : "normal", msg);
     await postRound(this.ctx, this.env, platform, channelId, g.round, msg);
     if (await finish(this.env, g)) return;
+    const waitMs = delayFor(isBrawl);
+    setTelegramNextAdvance(g, waitMs);
     await saveGame(this.env.DB, g);
-    await this.ctx.storage.setAlarm(Date.now() + delayFor(isBrawl));
+    await this.ctx.storage.setAlarm(Date.now() + waitMs);
   }
 }
