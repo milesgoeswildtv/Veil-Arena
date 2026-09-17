@@ -183,11 +183,16 @@ export function applyTelegramFeaturePack(html) {
     const timer=document.getElementById('timer'); const timerRow=document.getElementById('timerRow'); if(state.paused&&timer&&timerRow){timer.textContent='PAUSED';timerRow.style.display='flex'}
   }
 
+  function renderPausedTimer(){
+    if(!state?.paused)return;
+    const timer=document.getElementById('timer');
+    const row=document.getElementById('timerRow');
+    if(timer&&row){timer.textContent='PAUSED';row.style.display='flex'}
+  }
+
   installFeatureDom();
-  const originalRender=render;
-  render=function featureRender(){originalRender();renderFeaturePack()};
-  const originalUpdateTimer=typeof updateTimerOnly==='function'?updateTimerOnly:null;
-  if(originalUpdateTimer){updateTimerOnly=function featureTimer(){originalUpdateTimer();if(state?.paused){const timer=document.getElementById('timer'),row=document.getElementById('timerRow');if(timer&&row){timer.textContent='PAUSED';row.style.display='flex'}}}};
+  registerRenderHook(renderFeaturePack);
+  registerTimerHook(renderPausedTimer);
 
   document.addEventListener('click',async event=>{
     const feature=event.target.closest('[data-feature-action]');

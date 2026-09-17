@@ -23,10 +23,16 @@ export function telegramFxMiniAppHtml() {
   --gold:#f2c968;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+html,body{
+  margin:0;
+  min-height:var(--tg-viewport-stable-height,100vh);
+  background:var(--bg);
+  color:var(--text);
+}
 body{
-  min-height:100vh;
+  min-height:var(--tg-viewport-stable-height,100vh);
   overflow-x:hidden;
+  overscroll-behavior-y:none;
   background:
     radial-gradient(circle at 50% -10%,#3b175b55 0,transparent 36rem),
     radial-gradient(circle at 15% 85%,#38104b2f 0,transparent 30rem),
@@ -54,8 +60,7 @@ img{display:block;max-width:100%}
 .state-shell{
   position:relative;
   isolation:isolate;
-  min-height:calc(100vh - 28px);
-  min-height:calc(100svh - 28px);
+  min-height:calc(var(--tg-viewport-stable-height,100vh) - 28px);
   border-radius:32px;
   background:linear-gradient(165deg,#100b16f2,#07050af7 48%,#0b0710f2);
   box-shadow:0 26px 80px #000b,inset 0 0 0 1px #ffffff08;
@@ -705,11 +710,29 @@ const frames={
 let state=null,busy=false,lastFxKey='',finalFiveSeen=false,lastStateSignature='',refreshTimer=null,refreshing=false;
 const changeUntil=new Map();
 const playerRows=new Map();
+const renderHooks=[];
+const timerHooks=[];
+
+function registerRenderHook(fn){
+  if(typeof fn!=='function'||renderHooks.includes(fn))return;
+  renderHooks.push(fn);
+}
+function registerTimerHook(fn){
+  if(typeof fn!=='function'||timerHooks.includes(fn))return;
+  timerHooks.push(fn);
+}
+function runRenderHooks(){
+  for(const hook of renderHooks){try{hook()}catch(error){console.error('Arena render hook failed',error)}}
+}
+function runTimerHooks(){
+  for(const hook of timerHooks){try{hook()}catch(error){console.error('Arena timer hook failed',error)}}
+}
 
 if(tg){
   try{
     tg.ready();
     tg.expand();
+    if(typeof tg.disableVerticalSwipes==='function')tg.disableVerticalSwipes();
     tg.setHeaderColor('#08060d');
     tg.setBackgroundColor('#08060d');
   }catch{}
@@ -963,6 +986,7 @@ function updateTimerOnly(){
   if(expiredRosterFx)renderRoster();
   const cooldown=document.querySelector('.cooldown-note');
   if(cooldown&&state.cooldownRemainingMs>0&&state.cooldownText)cooldown.textContent='Next Arena in '+state.cooldownText;
+  runTimerHooks();
 }
 
 function playerVisualMode(player){
@@ -1157,6 +1181,8 @@ function render(){
     vc.classList.remove('live');
     vg.innerHTML='';
   }
+
+  runRenderHooks();
 }
 
 document.addEventListener('click',e=>{
