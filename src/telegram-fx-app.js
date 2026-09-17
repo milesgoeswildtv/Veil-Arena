@@ -76,6 +76,7 @@ img{display:block;max-width:100%}
   z-index:1;
   min-height:inherit;
   padding:clamp(30px,5vw,64px);
+  overflow-anchor:none;
 }
 .topline{
   display:flex;
@@ -550,8 +551,6 @@ img{display:block;max-width:100%}
   .controls{grid-template-columns:1fr}
   .vote-grid{grid-template-columns:1fr}
   .event{min-height:90px}
-  .player{align-items:flex-start}
-  .player-meta{flex-direction:column;align-items:flex-end;gap:4px}
 }
 @media(min-width:1000px){
   .roster{grid-template-columns:repeat(3,minmax(0,1fr))}
