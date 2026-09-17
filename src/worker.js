@@ -15,7 +15,7 @@ import { injectVeilSfx } from "./sfx-integration.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-17-telegram-product-pass-1";
+const TELEGRAM_BUILD = "2026-09-17-telegram-ios-bounce-fix-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
