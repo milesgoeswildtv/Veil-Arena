@@ -95,7 +95,6 @@ async function augmentState(request, env, suppliedState = null) {
   state.viewer.ready = state.viewer.isHost ? true : Boolean(readyMap.get(String(state.viewer.id)));
   state.viewer.rematchEligible = Array.isArray(game.rematchRosterIds) && game.rematchRosterIds.includes(String(state.viewer.id));
   state.arenaCode = String(game.id).replace(/-/g, "").slice(-8).toUpperCase();
-  state.serverTime = Date.now();
   state.diagnostics = state.viewer.isHost ? {
     gameId: game.id,
     channelId: game.channelId,
