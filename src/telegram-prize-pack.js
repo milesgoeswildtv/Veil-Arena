@@ -158,8 +158,7 @@ body[data-arena-view="arena"] #featureGrid{display:none!important}body[data-aren
     if(local){local.textContent=message||'';local.classList.toggle('show',Boolean(message)&&currentView==='sponsor')}
   };
 
-  const priorRender=render;
-  render=function prizeRender(){priorRender();renderSponsor()};
+  registerRenderHook(renderSponsor);
 
   document.addEventListener('click',async event=>{
     const nav=event.target.closest('[data-arena-view]');if(nav){setView(nav.dataset.arenaView);return}
