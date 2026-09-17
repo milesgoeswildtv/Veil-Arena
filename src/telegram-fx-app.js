@@ -178,6 +178,70 @@ img{display:block;max-width:100%}
   font-weight:750;
 }
 .status-line img{width:20px;height:20px;opacity:.9}
+.registration-inline{
+  display:none;
+  grid-template-columns:auto minmax(72px,1fr) auto;
+  align-items:center;
+  gap:8px;
+  margin:2px 0 10px;
+  min-width:0;
+}
+.registration-inline.show{display:grid}
+.registration-ready{
+  color:#d9cbe3;
+  font:950 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.11em;
+  white-space:nowrap;
+}
+.registration-track{
+  height:6px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#211329;
+  box-shadow:inset 0 0 0 1px #6c428033;
+}
+.registration-track span{
+  display:block;
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#8e4fe7,#cc66ff);
+  box-shadow:0 0 10px #b45cff55;
+  transition:width .2s ease;
+}
+.registration-lock{
+  padding:4px 7px;
+  border:1px solid #684579;
+  border-radius:999px;
+  color:#d8c6e2;
+  font:900 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.1em;
+  white-space:nowrap;
+}
+.registration-lock.locked{border-color:#82642f;color:#ebca72}
+.hero-panel.registration-mode .status-line{margin:6px 0 8px;min-height:22px}
+.hero-panel.registration-mode .stats{gap:6px}
+.hero-panel.registration-mode .stat{padding:9px 9px}
+.hero-panel.registration-mode .stat b{margin-top:5px;font-size:clamp(20px,3.5vw,28px)}
+.hero-panel.registration-mode .readout{min-height:40px;margin-top:8px;padding:7px 14px!important;font-size:10px}
+.hero-panel.registration-mode .readout img{width:18px;height:18px}
+.hero-panel.registration-mode .controls{
+  grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+  gap:6px;
+  margin-top:8px;
+}
+.hero-panel.registration-mode .veil-button{
+  min-height:42px;
+  padding:8px 8px;
+  font-size:10px;
+  line-height:1.1;
+}
+.hero-panel.registration-mode .veil-button img{
+  width:16px!important;
+  height:16px!important;
+  margin-right:4px!important;
+  vertical-align:-4px!important;
+}
 .stats{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -548,12 +612,21 @@ img{display:block;max-width:100%}
   .rules summary{justify-content:flex-start}
 }
 @media(max-width:440px){
-  .state-content{padding:26px 16px 38px}
-  .crest{width:145px}
-  .stats{gap:6px}
-  .stat{padding:11px 9px}
-  .stat-head{font-size:8px;letter-spacing:.08em}
+  .state-content{padding:18px 12px 30px}
+  .crest{width:138px}
+  .topline{margin-bottom:10px}
+  .arena-title{gap:8px}
+  .arena-title img{width:34px;height:34px}
+  .arena-title h1{font-size:36px}
+  .stats{gap:5px}
+  .stat{padding:8px 7px}
+  .stat-head{font-size:7px;letter-spacing:.06em}
   .controls{grid-template-columns:1fr}
+  .hero-panel.registration-mode .controls{grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
+  .hero-panel.registration-mode .veil-button{min-height:40px;font-size:9px;padding:7px 5px}
+  .registration-inline{grid-template-columns:auto minmax(58px,1fr) auto;gap:6px;margin-bottom:7px}
+  .registration-ready{font-size:8px;letter-spacing:.08em}
+  .registration-lock{font-size:6px;padding:4px 6px}
   .vote-grid{grid-template-columns:1fr}
   .event{min-height:90px}
 }
@@ -605,6 +678,12 @@ img{display:block;max-width:100%}
           <div class="status-line" id="statusLine">
             <img id="statusIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
             <span id="status">Connecting to Telegram…</span>
+          </div>
+
+          <div class="registration-inline" id="registrationInline" aria-live="polite">
+            <span class="registration-ready" id="registrationReady">0 / 0 READY</span>
+            <span class="registration-track"><span id="registrationProgress"></span></span>
+            <span class="registration-lock" id="registrationLock">OPEN</span>
           </div>
 
           <div class="stats">
@@ -1057,7 +1136,27 @@ function renderAssetPanels(){
     else hero.classList.add('asset-panel-stats');
   }
   const eventCard=$('eventCard');
+  if(hero)hero.classList.toggle('registration-mode',state.status==='registration');
   if(eventCard)eventCard.classList.toggle('asset-panel-live',state.status==='running');
+}
+
+function renderRegistrationInline(){
+  const box=$('registrationInline');
+  if(!box)return;
+  if(state.status!=='registration'){
+    box.classList.remove('show');
+    return;
+  }
+  const total=Math.max(1,Number(state.playerCount||0));
+  const ready=Math.min(total,Number(state.readyCount||0));
+  const pct=Math.max(0,Math.min(100,Math.round(ready*100/total)));
+  $('registrationReady').textContent=ready+' / '+total+' READY';
+  $('registrationProgress').style.width=pct+'%';
+  const lock=$('registrationLock');
+  const locked=Boolean(state.registrationLocked);
+  lock.textContent=locked?'LOCKED':'OPEN';
+  lock.classList.toggle('locked',locked);
+  box.classList.add('show');
 }
 
 function renderViewerStateCard(){
@@ -1086,6 +1185,7 @@ function renderViewerStateCard(){
 function render(){
   if(!state)return;
   renderAssetPanels();
+  renderRegistrationInline();
   const present=statusPresentation();
   const badge=$('stateBadge');
   badge.className='status-badge '+present.cls;
@@ -1137,7 +1237,7 @@ function render(){
       controls+=button('START ARENA','start','primary','success');
       controls+=button('FORCE CLOSE','forceclose','danger','warning');
       if(state.testMode){
-        controls+=button('ADD 4 TEST BOTS','add4','','stats');
+        controls+=button('ADD 4 BOTS','add4','','stats');
         controls+=button('FILL TO 12','fill','','leaderboard');
       }
     }

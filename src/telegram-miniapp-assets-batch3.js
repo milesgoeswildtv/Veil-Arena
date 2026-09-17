@@ -65,23 +65,25 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 }
 
 @media(max-width:760px){
-  #hero.asset-panel-lobby,
+  #hero.asset-panel-lobby{padding:24px 20px}
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
   #voteCard{padding:30px 24px}
   .event{min-height:132px;padding:22px}
+  #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px!important}
   .readout{min-height:50px;padding:10px 20px!important}
   .sponsorship-card{min-height:126px!important;padding:30px 42px!important}
 }
 
 @media(max-width:440px){
-  #hero.asset-panel-lobby,
+  #hero.asset-panel-lobby{padding:18px 14px}
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
   #voteCard{padding:26px 19px}
   .event{min-height:118px;padding:19px 18px}
+  #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px!important}
   .readout{padding:9px 16px!important}
   .sponsorship-card{min-height:110px!important;padding:26px 32px!important}
   .sponsorship-card img{width:28px;height:28px}

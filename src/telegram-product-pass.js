@@ -6,7 +6,6 @@ export function applyTelegramProductPass(html) {
 .results-stage{overflow-anchor:none}
 .product-loading{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 12px;padding:10px 13px;border:1px solid #4a3458;border-radius:12px;background:#0b0711;color:#bcaec7;font:900 9px/1.2 ui-monospace,monospace;letter-spacing:.14em}.product-loading.ready{display:none}.product-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--veil-purple);box-shadow:0 0 12px #c45cffaa;animation:productPulse 1s ease-in-out infinite alternate}
 @keyframes productPulse{to{opacity:.35;transform:scale(.72)}}
-.phase-brief{display:none;margin:0 0 14px;padding:14px 15px;border:1px solid #493257;border-radius:15px;background:linear-gradient(145deg,#120c18e8,#09070ddd);box-shadow:0 12px 28px #0005}.phase-brief.show{display:block}.phase-brief-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.phase-brief-title{font:1000 11px/1.2 ui-monospace,monospace;letter-spacing:.14em;color:#e6d8ef}.phase-pill{padding:5px 8px;border:1px solid #604174;border-radius:999px;color:#cdbada;font:900 8px/1 ui-monospace,monospace;letter-spacing:.1em}.phase-pill.locked{border-color:#775d30;color:#e8c86f}.phase-progress{height:7px;margin-top:11px;border-radius:99px;background:#25172e;overflow:hidden}.phase-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8d57e8,#c45cff);transition:width .22s ease}.phase-brief-copy{margin-top:9px;color:#9f91aa;font-size:11px;line-height:1.45}
 body[data-arena-phase="registration"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr!important}
 body[data-arena-phase="registration"][data-arena-view="arena"] .stack{display:none!important}
 body[data-arena-phase="registration"] #hero .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -15,7 +14,7 @@ body[data-arena-phase="running"] #eventCard{box-shadow:0 0 0 1px #c45cff16,0 18p
 body[data-arena-phase="running"] #timerRow{min-height:46px!important;margin-top:12px!important;padding:9px 13px!important;border:1px solid #4d335c;border-radius:12px;background:#0a0710;color:#dbc6e8!important;font:950 12px/1 ui-monospace,monospace;letter-spacing:.08em}
 body[data-arena-phase="running"] #timerRow img{width:23px!important;height:23px!important}
 body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-head h2:after{content:" // LIVE";color:#b56ee4}
-.results-stage{display:none}.results-stage.show{display:block}\nbody:not([data-arena-view="arena"]) .results-stage,body:not([data-arena-view="arena"]) .phase-brief{display:none!important}\n#controls [data-feature-action="lock"],#controls [data-feature-action="unlock"],#controls [data-feature-action="pause"],#controls [data-feature-action="resume"],#controls [data-action="forceclose"]{display:none!important}
+.results-stage{display:none}.results-stage.show{display:block}\nbody:not([data-arena-view="arena"]) .results-stage{display:none!important}\n#controls [data-feature-action="lock"],#controls [data-feature-action="unlock"],#controls [data-feature-action="pause"],#controls [data-feature-action="resume"],#controls [data-action="forceclose"]{display:none!important}
 body[data-arena-phase="finished"][data-arena-view="arena"] .main-grid,
 body[data-arena-phase="finished"][data-arena-view="arena"] .roster-panel,
 body[data-arena-phase="finished"][data-arena-view="arena"] .viewer-state-card,
@@ -29,8 +28,8 @@ body[data-arena-view="more"] #hostTools,body[data-arena-view="more"] #recapPanel
 #roster .player{cursor:pointer;-webkit-tap-highlight-color:transparent}#roster .player:active{transform:scale(.992)}
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex!important;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
-@media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.phase-brief{padding:12px}.results-hero{padding:22px 16px}}
-@media(max-width:440px){body[data-arena-phase="registration"] #hero .controls{grid-template-columns:1fr}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
+@media(max-width:440px){.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
@@ -44,7 +43,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     if(q('productLoading'))return;
     const nav=q('arenaNav');
     if(nav){
-      nav.insertAdjacentHTML('afterend','<div class="product-loading" id="productLoading"><span class="product-loading-dot"></span><span id="productLoadingText">SYNCING ARENA</span></div><div class="phase-brief" id="phaseBrief"></div><section class="results-stage" id="resultsStage"></section><section class="more-intro" id="moreIntro"><h2>MORE</h2><p>Arena history, Hall of Degens, audio, rules, sharing and utility controls.</p></section>');
+      nav.insertAdjacentHTML('afterend','<div class="product-loading" id="productLoading"><span class="product-loading-dot"></span><span id="productLoadingText">SYNCING ARENA</span></div><section class="results-stage" id="resultsStage"></section><section class="more-intro" id="moreIntro"><h2>MORE</h2><p>Arena history, Hall of Degens, audio, rules, sharing and utility controls.</p></section>');
     }
     document.body.insertAdjacentHTML('beforeend','<div class="host-drawer" id="hostDrawer"><div class="host-drawer-sheet"><div class="drawer-head"><div class="drawer-title">HOST CONTROL</div><button type="button" class="feature-mini" data-product-close-host>CLOSE</button></div><div id="hostDrawerBody"></div></div></div><div class="player-sheet" id="playerSheet"><div class="player-sheet-card"><div class="drawer-head"><div><div class="player-sheet-name" id="playerSheetName">PLAYER</div><div class="player-sheet-state" id="playerSheetState"></div></div><button type="button" class="feature-mini" data-product-close-player>CLOSE</button></div><div class="player-sheet-grid" id="playerSheetGrid"></div></div></div>');
     const controls=q('controls');
@@ -72,16 +71,6 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     if(state&&!offline){el.classList.add('ready');return}
     el.classList.remove('ready');
     q('productLoadingText').textContent=offline?'CONNECTION LOST // RETRYING':'SYNCING ARENA';
-  }
-
-  function renderPhaseBrief(){
-    const box=q('phaseBrief');if(!box||!state)return;
-    if(state.status!=='registration'){box.classList.remove('show');box.innerHTML='';return}
-    const total=Math.max(1,Number(state.playerCount||0));
-    const ready=Math.min(total,Number(state.readyCount||0));
-    const pct=Math.round(ready*100/total);
-    box.classList.add('show');
-    box.innerHTML='<div class="phase-brief-top"><div class="phase-brief-title">REGISTRATION // READY CHECK</div><span class="phase-pill '+(state.registrationLocked?'locked':'')+'">'+(state.registrationLocked?'LOCKED':'OPEN')+'</span></div><div class="phase-progress"><span style="width:'+pct+'%"></span></div><div class="phase-brief-copy">'+ready+' / '+total+' ready. '+(state.viewer?.isHost?'Start when the room is set. Host tools are separated below.':state.viewer?.joined?(state.viewer.ready?'You are ready.':'Mark ready when you are set.'):'Join before registration closes.')+'</div>';
   }
 
   function resultPrizeRows(){
@@ -161,7 +150,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
   function renderProductPass(){
     installProductDom();if(!state){renderLoading();return}
     document.body.dataset.arenaPhase=phase();
-    renderLoading();renderPhaseBrief();renderResults();renderHostDrawer();renderPlayerRows();renderHistoryKinds();
+    renderLoading();renderResults();renderHostDrawer();renderPlayerRows();renderHistoryKinds();
   }
 
   installProductDom();

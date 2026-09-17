@@ -96,6 +96,10 @@ assert(baseUi.includes("const playerRows=new Map()"));
 assert(baseUi.includes("function renderRoster()"));
 assert(baseUi.includes("veil_ui_player_card.svg"));
 assert(baseUi.includes("veil_ui_player_state_alive.svg"));
+assert(baseUi.includes('id="registrationInline"'));
+assert(baseUi.includes("function renderRegistrationInline"));
+assert(baseUi.includes("repeat(auto-fit,minmax(88px,1fr))"));
+assert(baseUi.includes("ADD 4 BOTS"));
 assert(baseUi.includes("setInterval(updateTimerOnly,500)"));
 assert(!baseUi.includes("setInterval(()=>{if(state)render()},500)"));
 
@@ -128,12 +132,13 @@ assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
 assert(!productPassSource.includes("render=function productRender"));
 
 const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", import.meta.url), "utf8");
+assert(prizePackSource.includes("min-height:38px"));
 assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
 assert(!prizePackSource.includes("render=function prizeRender"));
 
 const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
 assert(productUi.includes("ARENA CHAMPION"));
-assert(productUi.includes("REGISTRATION // READY CHECK"));
+assert(!productUi.includes('id="phaseBrief"'));
 assert(productUi.includes("HOST CONTROL"));
 assert(productUi.includes("SHARE RESULTS"));
 assert(productUi.includes("SHOWDOWN SURVIVORS"));
