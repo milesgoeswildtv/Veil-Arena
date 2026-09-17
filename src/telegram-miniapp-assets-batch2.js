@@ -55,81 +55,6 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   pointer-events:none;
   background:url("/telegram/panel_frame.svg") center/100% 100% no-repeat;
 }
-.roster{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
-.player.asset-player-card{
-  --veil-player-state:url("/telegram/veil_ui_player_state_alive.svg");
-  position:relative;
-  display:block;
-  width:100%;
-  aspect-ratio:2/1;
-  min-height:0;
-  padding:0;
-  border:0!important;
-  border-radius:0;
-  overflow:hidden;
-  opacity:1;
-  background-color:transparent!important;
-  background-image:var(--veil-player-state),url("/telegram/veil_ui_player_card.svg")!important;
-  background-position:center,center;
-  background-repeat:no-repeat,no-repeat;
-  background-size:100% 100%,100% 100%;
-  box-shadow:none;
-  filter:drop-shadow(0 10px 18px #0008);
-}
-.player.asset-alive{--veil-player-state:url("/telegram/veil_ui_player_state_alive.svg")}
-.player.asset-dead{--veil-player-state:url("/telegram/veil_ui_player_state_dead.svg");opacity:.72}
-.player.asset-revived{--veil-player-state:url("/telegram/veil_ui_player_state_revived.svg")}
-.player.asset-winner{--veil-player-state:url("/telegram/veil_ui_player_state_winner.svg");opacity:1;filter:drop-shadow(0 0 20px #a56cff66) drop-shadow(0 10px 18px #0008)}
-.player.asset-player-card .player-name{
-  position:absolute;
-  left:34.5%;
-  right:6.5%;
-  top:24%;
-  z-index:2;
-  font-size:clamp(11px,1.45vw,16px);
-  line-height:1.15;
-  font-weight:950;
-  letter-spacing:.015em;
-  text-shadow:0 2px 8px #000;
-}
-.player.asset-player-card .player-meta{
-  position:absolute;
-  left:34.5%;
-  right:6.5%;
-  bottom:16%;
-  z-index:2;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:space-between;
-  gap:7px;
-}
-.player.asset-player-card .player-kos{font-size:9px;color:#c0b0ca}
-.player.asset-player-card .player-badge{min-width:68px;height:24px;font-size:7px}
-.player-portrait-token{
-  position:absolute;
-  left:7.1%;
-  top:22%;
-  width:21.5%;
-  height:56%;
-  z-index:2;
-  display:grid;
-  grid-template-rows:1fr auto;
-  place-items:center;
-  padding:10% 8%;
-  color:#efe8f5;
-  text-shadow:0 2px 7px #000;
-  pointer-events:none;
-}
-.player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
-.player-portrait-token span{
-  max-width:100%;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  color:#bcaec7;
-  font:900 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
-  letter-spacing:.12em;
-}
 .viewer-state-card{
   --viewer-state:url("/telegram/veil_ui_player_state_spectator.svg");
   position:relative;
@@ -214,14 +139,10 @@ export function applyTelegramMiniAppAssetBatch2(html) {
 .sponsorship-copy strong{display:block;margin-top:5px;font-size:14px;letter-spacing:.08em}
 @media(max-width:760px){
   .arena-splash-bg{opacity:.17;object-position:center top}
-  .roster{grid-template-columns:1fr!important}
   .viewer-state-card{width:100%;margin-top:10px}
   .sponsorship-card{min-height:94px;padding:24px 34px}
 }
 @media(max-width:440px){
-  .player.asset-player-card .player-name{font-size:12px}
-  .player.asset-player-card .player-meta{left:34%;right:6%;bottom:15%}
-  .player.asset-player-card .player-badge{min-width:62px;height:22px}
   .sponsorship-card{min-height:84px;padding:20px 28px;gap:10px}
   .sponsorship-card img{width:25px;height:25px}
   .sponsorship-copy strong{font-size:12px}
@@ -264,65 +185,5 @@ export function applyTelegramMiniAppAssetBatch2(html) {
       <div class="footer-row">`
   );
 
-  const js = `
-function decorateAssetBatch2(){
-  if(!state)return;
-  const rows=Array.from(document.querySelectorAll('#roster .player'));
-  const players=state.players||[];
-  rows.forEach((row,index)=>{
-    const p=players[index];
-    if(!p)return;
-    row.classList.add('asset-player-card');
-    row.classList.remove('asset-alive','asset-dead','asset-revived','asset-winner');
-    let mode=p.alive?'alive':'dead';
-    if(row.classList.contains('revived-now'))mode='revived';
-    if(state.status==='finished'&&state.winnerId&&String(state.winnerId)===String(p.id))mode='winner';
-    row.classList.add('asset-'+mode);
-
-    if(!row.querySelector('.player-portrait-token')){
-      const portrait=document.createElement('div');
-      portrait.className='player-portrait-token';
-      const icon=document.createElement('img');
-      icon.alt='';
-      icon.src=mode==='winner'?icons.crown:(mode==='dead'?icons.skull:icons.arena);
-      const tag=document.createElement('span');
-      tag.textContent=p.simulated?'BOT':String(p.displayName||'PLAYER').slice(0,10).toUpperCase();
-      portrait.appendChild(icon);
-      portrait.appendChild(tag);
-      row.prepend(portrait);
-    }
-  });
-
-  const card=$('viewerStateCard');
-  if(card){
-    let mode='spectator';
-    let label='SPECTATOR';
-    let title='YOU';
-    let icon='spectate';
-    if(state.status==='registration'&&state.viewer.joined){mode='alive';label='REGISTERED';icon='success'}
-    if(state.status==='running'&&state.viewer.alive){mode='alive';label='ALIVE';icon='arena'}
-    if(state.status==='running'&&state.viewer.joined&&!state.viewer.alive){mode='spectator';label='SPECTATING';icon='spectate'}
-    if(state.status==='finished'){
-      const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
-      if(won){mode='winner';label='WINNER';title='ARENA CHAMPION';icon='crown'}
-      else{mode='spectator';label='COMPLETE';icon='success'}
-    }
-    card.className='viewer-state-card asset-'+mode;
-    card.style.display='block';
-    $('viewerStateLabel').textContent=label;
-    $('viewerStateTitle').textContent=title;
-    $('viewerStateDetail').textContent=$('viewerText').textContent||'Arena viewer state.';
-    $('viewerStateIcon').src=icons[icon]||icons.spectate;
-  }
-}
-
-const renderBeforeAssetBatch2=render;
-render=function(){
-  renderBeforeAssetBatch2();
-  decorateAssetBatch2();
-};
-`;
-
-  html = html.replace("\nrefresh();\nsetInterval(refresh,1500);", "\n" + js + "\nrefresh();\nsetInterval(refresh,1500);");
   return html;
 }
