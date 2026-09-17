@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   upsertSponsorship,
   calculatePayouts,
@@ -8,7 +9,8 @@ import {
 } from "../src/sponsorships.js";
 import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
 import { applyTelegramProductPass } from "../src/telegram-product-pass.js";
-import { applyTelegramUiPolish } from "../src/telegram-ui-polish.js";
+import { telegramFxMiniAppHtml } from "../src/telegram-fx-app.js";
+import { applyTelegramMiniAppAssetBatch3 } from "../src/telegram-miniapp-assets-batch3.js";
 
 const game = {
   id: "test-arena",
@@ -82,12 +84,27 @@ assert(sponsorUi.includes("BackButton"));
 assert(sponsorUi.includes("CHECK FUNDING"));
 assert(!sponsorUi.includes("prizePoolCard"));
 
-const polishedUi = applyTelegramUiPolish(sponsorUi);
-assert(polishedUi.includes(".roster-panel:before{display:none!important"));
-assert(polishedUi.includes("directHelpButton"));
-assert(polishedUi.includes("bindDirectTap(directHelpButton,openHelp)"));
-assert(polishedUi.includes("touchend"));
-assert(polishedUi.includes("player-portrait-token{display:none!important}"));
+assert(sponsorUi.includes("bindSponsorHelp"));
+assert(sponsorUi.includes("touchend"));
+assert(sponsorUi.includes("z-index:5000"));
+
+const baseUi = telegramFxMiniAppHtml();
+assert(baseUi.includes("function stateSignature"));
+assert(baseUi.includes("key==='serverTime'?undefined:item"));
+assert(baseUi.includes("const playerRows=new Map()"));
+assert(baseUi.includes("function renderRoster()"));
+assert(baseUi.includes("veil_ui_player_card.svg"));
+assert(baseUi.includes("veil_ui_player_state_alive.svg"));
+assert(baseUi.includes("setInterval(updateTimerOnly,500)"));
+assert(!baseUi.includes("setInterval(()=>{if(state)render()},500)"));
+
+const assetUi = applyTelegramMiniAppAssetBatch3(baseUi);
+assert(assetUi.includes(".roster-panel:before{display:none!important"));
+assert(!assetUi.includes("decorateAssetBatch3"));
+
+const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
+assert(!workerSource.includes("telegram-performance.js"));
+assert(!workerSource.includes("telegram-ui-polish.js"));
 
 const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
 assert(productUi.includes("ARENA CHAMPION"));
@@ -96,8 +113,6 @@ assert(productUi.includes("HOST CONTROL"));
 assert(productUi.includes("SHARE RESULTS"));
 assert(productUi.includes("SHOWDOWN SURVIVORS"));
 assert(productUi.includes("data-product-player-id"));
-assert(productUi.includes(".app{padding-top:14px!important}"));
-assert(productUi.includes("100svh"));
 assert(productUi.includes("lastResultsKey"));
 
 console.log("Arena sponsorship core and Telegram product UI tests passed.");
