@@ -1,7 +1,7 @@
 export function applyTelegramProductPass(html) {
   if (typeof html !== "string" || !html || html.includes("veil-product-pass-js")) return html;
 
-  const css = \`<style id="veil-product-pass-css">
+  const css = `<style id="veil-product-pass-css">
 :root{--veil-card:#100b15f2;--veil-card2:#09070df2;--veil-line:#493257;--veil-purple:#c45cff;--veil-gold:#f2c968;--veil-green:#55e2ae;--veil-red:#ef526f}
 .product-loading{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 12px;padding:10px 13px;border:1px solid #4a3458;border-radius:12px;background:#0b0711;color:#bcaec7;font:900 9px/1.2 ui-monospace,monospace;letter-spacing:.14em}.product-loading.ready{display:none}.product-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--veil-purple);box-shadow:0 0 12px #c45cffaa;animation:productPulse 1s ease-in-out infinite alternate}
 @keyframes productPulse{to{opacity:.35;transform:scale(.72)}}
@@ -31,9 +31,9 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.phase-brief{padding:12px}.results-hero{padding:22px 16px}}
 @media(max-width:440px){body[data-arena-phase="registration"] #hero .controls{grid-template-columns:1fr}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
-</style>\`;
+</style>`;
 
-  const script = \`<script id="veil-product-pass-js">
+  const script = `<script id="veil-product-pass-js">
 (() => {
   const q=id=>document.getElementById(id);
   const pEsc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -191,7 +191,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
 
   if(state)renderProductPass();else renderLoading();
 })();
-</script>\`;
+</script>`;
 
-  return html.replace("</head>", css + "\\n</head>").replace("</body>", script + "\\n</body>");
+  return html.replace("</head>", css + "\n</head>").replace("</body>", script + "\n</body>");
 }
