@@ -7,6 +7,7 @@ import {
   SPONSOR_AWARDS
 } from "../src/sponsorships.js";
 import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
+import { applyTelegramProductPass } from "../src/telegram-product-pass.js";
 import { applyTelegramUiPolish } from "../src/telegram-ui-polish.js";
 
 const game = {
@@ -88,4 +89,12 @@ assert(polishedUi.includes("bindDirectTap(directHelpButton,openHelp)"));
 assert(polishedUi.includes("touchend"));
 assert(polishedUi.includes("player-portrait-token{display:none!important}"));
 
-console.log("Arena sponsorship core and Telegram sponsor UI tests passed.");
+const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
+assert(productUi.includes("ARENA CHAMPION"));
+assert(productUi.includes("REGISTRATION // READY CHECK"));
+assert(productUi.includes("HOST CONTROL"));
+assert(productUi.includes("SHARE RESULTS"));
+assert(productUi.includes("SHOWDOWN SURVIVORS"));
+assert(productUi.includes("data-product-player-id"));
+
+console.log("Arena sponsorship core and Telegram product UI tests passed.");
