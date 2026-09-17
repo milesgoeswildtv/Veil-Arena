@@ -1013,8 +1013,44 @@ function renderRoster(){
   if(!players.length)roster.innerHTML='<div class="empty">No players yet.</div>';
 }
 
+function renderAssetPanels(){
+  const hero=$('hero');
+  if(hero){
+    hero.classList.remove('asset-panel-lobby','asset-panel-stats','asset-panel-results');
+    if(state.status==='registration')hero.classList.add('asset-panel-lobby');
+    else if(state.status==='finished')hero.classList.add('asset-panel-results');
+    else hero.classList.add('asset-panel-stats');
+  }
+  const eventCard=$('eventCard');
+  if(eventCard)eventCard.classList.toggle('asset-panel-live',state.status==='running');
+}
+
+function renderViewerStateCard(){
+  const card=$('viewerStateCard');
+  if(!card)return;
+  let mode='spectator';
+  let label='SPECTATOR';
+  let title='YOU';
+  let icon='spectate';
+  if(state.status==='registration'&&state.viewer.joined){mode='alive';label='REGISTERED';icon='success'}
+  if(state.status==='running'&&state.viewer.alive){mode='alive';label='ALIVE';icon='arena'}
+  if(state.status==='running'&&state.viewer.joined&&!state.viewer.alive){mode='spectator';label='SPECTATING';icon='spectate'}
+  if(state.status==='finished'){
+    const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
+    if(won){mode='winner';label='WINNER';title='ARENA CHAMPION';icon='crown'}
+    else{mode='spectator';label='COMPLETE';icon='success'}
+  }
+  card.className='viewer-state-card asset-'+mode;
+  card.style.display='block';
+  $('viewerStateLabel').textContent=label;
+  $('viewerStateTitle').textContent=title;
+  $('viewerStateDetail').textContent=$('viewerText').textContent||'Arena viewer state.';
+  $('viewerStateIcon').src=icons[icon]||icons.spectate;
+}
+
 function render(){
   if(!state)return;
+  renderAssetPanels();
   const present=statusPresentation();
   const badge=$('stateBadge');
   badge.className='status-badge '+present.cls;
@@ -1089,6 +1125,7 @@ function render(){
 
   updateTimerOnly();
   renderRoster();
+  renderViewerStateCard();
 
   const vc=$('voteCard');
   const vg=$('voteGrid');
