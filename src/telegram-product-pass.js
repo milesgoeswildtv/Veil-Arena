@@ -100,7 +100,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     const resultsKey=JSON.stringify({
       id:state.id,status:state.status,recap:state.recap,
       prizes:(state.prizePool?.prizes||[]).map(p=>[p.id,p.status,p.amount,p.currency,p.fundedAmount,(p.recipients||[]).map(r=>[r.displayName,r.status,r.amount])]),
-      host:Boolean(state.viewer?.isHost),cooldown:Number(state.cooldownRemainingMs||0)
+      host:Boolean(state.viewer?.isHost)
     });
     if(stage.classList.contains('show')&&resultsKey===lastResultsKey)return;
     lastResultsKey=resultsKey;
