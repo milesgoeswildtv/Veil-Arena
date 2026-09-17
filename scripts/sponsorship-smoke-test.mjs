@@ -90,7 +90,8 @@ assert(sponsorUi.includes("z-index:5000"));
 
 const baseUi = telegramFxMiniAppHtml();
 assert(baseUi.includes("function stateSignature"));
-assert(baseUi.includes("key==='serverTime'?undefined:item"));
+assert(baseUi.includes("key==='serverTime'||key==='cooldownText'"));
+assert(baseUi.includes("key==='cooldownRemainingMs'"));
 assert(baseUi.includes("const playerRows=new Map()"));
 assert(baseUi.includes("function renderRoster()"));
 assert(baseUi.includes("veil_ui_player_card.svg"));
@@ -105,6 +106,9 @@ assert(!assetUi.includes("decorateAssetBatch3"));
 const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
 assert(!workerSource.includes("telegram-performance.js"));
 assert(!workerSource.includes("telegram-ui-polish.js"));
+
+const featureApiSource = readFileSync(new URL("../src/telegram-feature-api.js", import.meta.url), "utf8");
+assert(!featureApiSource.includes("state.serverTime = Date.now()"));
 
 const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
 assert(productUi.includes("ARENA CHAMPION"));
