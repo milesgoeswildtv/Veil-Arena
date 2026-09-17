@@ -99,6 +99,11 @@ assert(baseUi.includes("veil_ui_player_state_alive.svg"));
 assert(baseUi.includes("setInterval(updateTimerOnly,500)"));
 assert(!baseUi.includes("setInterval(()=>{if(state)render()},500)"));
 
+assert(baseUi.includes("--tg-viewport-stable-height"));
+assert(baseUi.includes("disableVerticalSwipes"));
+assert(baseUi.includes("function registerRenderHook"));
+assert(baseUi.includes("function registerTimerHook"));
+
 const assetUi = applyTelegramMiniAppAssetBatch3(baseUi);
 assert(assetUi.includes(".roster-panel:before{display:none!important"));
 assert(!assetUi.includes("decorateAssetBatch3"));
@@ -111,9 +116,20 @@ const featureApiSource = readFileSync(new URL("../src/telegram-feature-api.js", 
 assert(!featureApiSource.includes("state.serverTime = Date.now()"));
 
 const featurePackSource = readFileSync(new URL("../src/telegram-feature-pack.js", import.meta.url), "utf8");
+assert(featurePackSource.includes("registerRenderHook(renderFeaturePack)"));
+assert(featurePackSource.includes("registerTimerHook(renderPausedTimer)"));
+assert(!featurePackSource.includes("render=function featureRender"));
 assert(featurePackSource.includes("width:94px"));
 assert(featurePackSource.includes("text.textContent=mode==='live'?'LIVE':mode==='offline'?'OFFLINE':'SYNCING'"));
 assert(!featurePackSource.includes("setConnection('syncing');\n    try{ const result=await originalApi"));
+
+const productPassSource = readFileSync(new URL("../src/telegram-product-pass.js", import.meta.url), "utf8");
+assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
+assert(!productPassSource.includes("render=function productRender"));
+
+const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", import.meta.url), "utf8");
+assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
+assert(!prizePackSource.includes("render=function prizeRender"));
 
 const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
 assert(productUi.includes("ARENA CHAMPION"));
