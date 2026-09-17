@@ -955,6 +955,14 @@ function updateTimerOnly(){
     timer.textContent='';
     timerRow.style.display='none';
   }
+  const now=Date.now();
+  let expiredRosterFx=false;
+  for(const [id,change] of changeUntil){
+    if(change.until<=now){changeUntil.delete(id);expiredRosterFx=true}
+  }
+  if(expiredRosterFx)renderRoster();
+  const cooldown=document.querySelector('.cooldown-note');
+  if(cooldown&&state.cooldownRemainingMs>0&&state.cooldownText)cooldown.textContent='Next Arena in '+state.cooldownText;
 }
 
 function playerVisualMode(player){
