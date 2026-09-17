@@ -6,6 +6,7 @@ import {
   sponsorshipSummary,
   SPONSOR_AWARDS
 } from "../src/sponsorships.js";
+import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
 
 const game = {
   id: "test-arena",
@@ -69,4 +70,14 @@ assert.equal(labels.most_kills, "Most Eliminations");
 assert.equal(labels.most_showdowns, "Most Community Showdowns Survived");
 assert.equal(labels.most_mass_brawls, "Most Mass Brawls Survived");
 
-console.log("Arena sponsorship core tests passed.");
+const sponsorUi = applyTelegramPrizePack("<!doctype html><html><head></head><body></body></html>");
+assert(sponsorUi.includes('data-arena-view="arena"'));
+assert(sponsorUi.includes('data-arena-view="sponsor"'));
+assert(sponsorUi.includes('data-arena-view="more"'));
+assert(sponsorUi.includes("SPONSOR THE ARENA"));
+assert(sponsorUi.includes("HOW TO USE"));
+assert(sponsorUi.includes("BackButton"));
+assert(sponsorUi.includes("CHECK FUNDING"));
+assert(!sponsorUi.includes("prizePoolCard"));
+
+console.log("Arena sponsorship core and Telegram sponsor UI tests passed.");
