@@ -49,12 +49,13 @@ img{display:block;max-width:100%}
 .app{
   width:min(1180px,100%);
   margin:0 auto;
-  padding:max(14px,env(safe-area-inset-top)) 12px max(74px,env(safe-area-inset-bottom));
+  padding:14px 12px max(74px,env(safe-area-inset-bottom));
 }
 .state-shell{
   position:relative;
   isolation:isolate;
   min-height:calc(100vh - 28px);
+  min-height:calc(100svh - 28px);
   border-radius:32px;
   background:linear-gradient(165deg,#100b16f2,#07050af7 48%,#0b0710f2);
   box-shadow:0 26px 80px #000b,inset 0 0 0 1px #ffffff08;
@@ -335,24 +336,48 @@ img{display:block;max-width:100%}
   gap:8px;
 }
 .player{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
+  --veil-player-state:url("/telegram/veil_ui_player_state_alive.svg");
+  --veil-player-select:none;
+  position:relative;
+  display:block;
+  width:100%;
+  aspect-ratio:2/1;
   min-width:0;
-  padding:10px 11px 10px 13px;
-  border:1px solid #3f2b4c;
-  border-radius:12px;
-  background:linear-gradient(145deg,#100b15,#0b080f);
-  transition:transform .25s,box-shadow .25s,border-color .25s,opacity .25s;
+  min-height:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  overflow:hidden;
+  background-color:transparent;
+  background-image:var(--veil-player-select),var(--veil-player-state),url("/telegram/veil_ui_player_card.svg");
+  background-position:center,center,center;
+  background-repeat:no-repeat,no-repeat,no-repeat;
+  background-size:100% 100%,100% 100%,100% 100%;
+  filter:drop-shadow(0 10px 18px #0008);
+  transition:filter .22s ease,opacity .22s ease,transform .22s ease;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
+.player.asset-alive{--veil-player-state:url("/telegram/veil_ui_player_state_alive.svg")}
+.player.asset-dead{--veil-player-state:url("/telegram/veil_ui_player_state_dead.svg");opacity:.72}
+.player.asset-revived{--veil-player-state:url("/telegram/veil_ui_player_state_revived.svg");opacity:1}
+.player.asset-winner{--veil-player-state:url("/telegram/veil_ui_player_state_winner.svg");opacity:1;filter:drop-shadow(0 0 20px #a56cff66) drop-shadow(0 10px 18px #0008)}
+.player.asset-selected{--veil-player-select:url("/telegram/veil_ui_player_state_selected.svg");opacity:1;filter:drop-shadow(0 0 20px #c689ff88) drop-shadow(0 10px 18px #0008)}
+.player:active{transform:scale(.992)}
 .player-name{
+  position:absolute;
+  left:34.5%;
+  right:6.5%;
+  top:25%;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:13px;
-  font-weight:850;
+  font-size:clamp(14px,2.2vw,20px);
+  line-height:1.15;
+  font-weight:950;
+  letter-spacing:.015em;
+  text-shadow:0 2px 8px #000;
 }
 .bot-tag{
   display:inline-block;
@@ -365,29 +390,43 @@ img{display:block;max-width:100%}
   vertical-align:2px;
 }
 .player-meta{
+  position:absolute;
+  left:34.5%;
+  right:6.5%;
+  bottom:16%;
   display:flex;
   align-items:center;
-  justify-content:flex-end;
-  gap:6px;
-  flex:none;
+  justify-content:space-between;
+  gap:7px;
+  min-width:0;
 }
 .player-kos{
-  color:#9c8ba8;
-  font-size:10px;
+  color:#c0b0ca;
+  font-size:9px;
   font-weight:850;
   white-space:nowrap;
 }
 .player-badge{
-  min-width:76px;
-  height:25px;
+  min-width:72px;
+  height:24px;
   padding:0 12px;
-  font-size:8px;
+  font-size:7px;
 }
 .player-badge.alive{background-image:url("/telegram/veil_ui_badge_alive.svg")}
 .player-badge.dead{background-image:url("/telegram/veil_ui_badge_dead.svg")}
-.player.dead-row{opacity:.56}
-.new-dead{animation:playerOut 1.1s ease both;border-color:#b73755!important;box-shadow:0 0 24px #b7375555}
-.revived-now{animation:playerBack 1.4s ease both;border-color:#39d8a0!important;box-shadow:0 0 28px #39d8a055}
+.player-portrait-token{
+  position:absolute;
+  left:7.1%;
+  top:22%;
+  width:21.5%;
+  height:56%;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+.player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
+.new-dead{animation:playerOut 1.1s ease both}
+.revived-now{animation:playerBack 1.4s ease both}
 .footer-row{
   display:flex;
   align-items:flex-start;
@@ -664,8 +703,9 @@ const frames={
   vote:A+'vote_frame.svg',
   finished:A+'results_frame.svg'
 };
-let state=null,busy=false,lastFxKey='',finalFiveSeen=false;
+let state=null,busy=false,lastFxKey='',finalFiveSeen=false,lastStateSignature='',refreshTimer=null,refreshing=false;
 const changeUntil=new Map();
+const playerRows=new Map();
 
 if(tg){
   try{
@@ -678,6 +718,9 @@ if(tg){
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function stateSignature(value){
+  return JSON.stringify(value,(key,item)=>key==='serverTime'?undefined:item);
+}
 
 function richText(value=''){
   let out=esc(value);
@@ -835,11 +878,19 @@ function triggerEventFx(next,prev){
   haptic('light');
 }
 
-function acceptState(next){
+function acceptState(next,force=false){
+  const signature=stateSignature(next);
+  if(!force&&signature===lastStateSignature){
+    state=next;
+    updateTimerOnly();
+    return false;
+  }
   const prev=state;
   state=next;
+  lastStateSignature=signature;
   triggerEventFx(next,prev);
   render();
+  return true;
 }
 
 async function act(action,extra={}){
@@ -848,7 +899,8 @@ async function act(action,extra={}){
   document.body.classList.add('busy');
   try{
     err();
-    acceptState(await api('/telegram/api/action',{action,...extra}));
+    acceptState(await api('/telegram/api/action',{action,...extra}),true);
+    scheduleRefresh();
   }catch(e){
     err(e.message);
     haptic('light','error');
@@ -886,6 +938,79 @@ function eventIconKey(){
   if(t==='crowd_vote_open'||t==='crowd_result')return 'vote';
   if(t==='mass_brawl')return 'skull';
   return 'timer';
+}
+
+function updateTimerOnly(){
+  if(!state)return;
+  const timer=$('timer');
+  const timerRow=$('timerRow');
+  if(state.status==='running'&&state.nextAdvanceAt){
+    const sec=Math.max(0,Math.ceil((state.nextAdvanceAt-Date.now())/1000));
+    timer.textContent=sec?'Next event in '+sec+'s':'Resolving…';
+    timerRow.style.display='flex';
+  }else{
+    timer.textContent='';
+    timerRow.style.display='none';
+  }
+}
+
+function playerVisualMode(player){
+  const live=changeUntil.get(String(player.id));
+  if(state.status==='finished'&&state.winnerId&&String(state.winnerId)===String(player.id))return 'winner';
+  if(live?.kind==='back')return 'revived';
+  return player.alive?'alive':'dead';
+}
+
+function makePlayerRow(player){
+  const row=document.createElement('div');
+  row.className='player asset-player-card';
+  row.dataset.playerId=String(player.id);
+  row.setAttribute('role','button');
+  row.setAttribute('tabindex','0');
+  row.innerHTML='<div class="player-portrait-token"><img class="player-state-icon" alt=""></div><div class="player-name"></div><div class="player-meta"><span class="player-kos"></span><span class="player-badge"></span></div>';
+  playerRows.set(String(player.id),row);
+  return row;
+}
+
+function renderRoster(){
+  const roster=$('roster');
+  const players=state.players||[];
+  const now=Date.now();
+  const liveIds=new Set(players.map(player=>String(player.id)));
+  for(const [id,row] of playerRows){
+    if(!liveIds.has(id)){row.remove();playerRows.delete(id)}
+  }
+  const empty=roster.querySelector('.empty');
+  if(empty)empty.remove();
+  for(const player of players){
+    const id=String(player.id);
+    const change=changeUntil.get(id);
+    if(change&&change.until<=now)changeUntil.delete(id);
+    const row=playerRows.get(id)||makePlayerRow(player);
+    const mode=playerVisualMode(player);
+    row.className='player asset-player-card asset-'+mode;
+    const activeChange=changeUntil.get(id);
+    if(activeChange?.kind==='out')row.classList.add('new-dead');
+    if(activeChange?.kind==='back')row.classList.add('revived-now');
+    const selectedId=state.crowdVote?.selectedId;
+    if(selectedId!=null&&String(selectedId)===id)row.classList.add('asset-selected');
+    row.setAttribute('aria-label','View '+String(player.displayName||'player')+' stats');
+    const name=row.querySelector('.player-name');
+    name.textContent=player.displayName||'Player';
+    if(player.simulated){
+      const bot=document.createElement('span');bot.className='bot-tag';bot.textContent='BOT';name.appendChild(bot);
+    }
+    const kos=row.querySelector('.player-kos');
+    kos.textContent=player.eliminations?player.eliminations+' KO':'';
+    kos.style.visibility=player.eliminations?'visible':'hidden';
+    const badge=row.querySelector('.player-badge');
+    badge.className='player-badge '+(player.alive?'alive':'dead');
+    badge.textContent=player.alive?'ALIVE':'OUT';
+    const icon=row.querySelector('.player-state-icon');
+    icon.src=mode==='winner'?icons.crown:(mode==='dead'?icons.skull:(mode==='revived'?icons.revive:icons.arena));
+    roster.appendChild(row);
+  }
+  if(!players.length)roster.innerHTML='<div class="empty">No players yet.</div>';
 }
 
 function render(){
@@ -939,14 +1064,16 @@ function render(){
     else if(!state.viewer.isHost)controls+=button('LEAVE','leave','','spectate');
     if(state.viewer.isHost){
       controls+=button('START ARENA','start','primary','success');
+      controls+=button('FORCE CLOSE','forceclose','danger','warning');
       if(state.testMode){
         controls+=button('ADD 4 TEST BOTS','add4','','stats');
         controls+=button('FILL TO 12','fill','','leaderboard');
-        controls+=button('RESET','reset','danger','warning');
       }
     }
-  }else if(state.testMode&&state.viewer.isHost&&state.status==='running'){
-    controls+=button('ABORT / RESET','reset','danger','warning');
+  }else if(state.viewer.isHost&&state.status==='running'){
+    controls+=button('FORCE CLOSE','forceclose','danger','warning');
+  }else if(state.viewer.isHost&&(state.status==='finished'||state.status==='cancelled')){
+    controls+=button('START NEW GAME','newgame','primary','arena');
   }
   $('controls').innerHTML=controls;
 
@@ -960,32 +1087,8 @@ function render(){
   $('event').innerHTML=richText(last);
   $('eventIcon').src=icons[eventIconKey()]||icons.timer;
 
-  const timer=$('timer');
-  const timerRow=$('timerRow');
-  if(state.status==='running'&&state.nextAdvanceAt){
-    const sec=Math.max(0,Math.ceil((state.nextAdvanceAt-Date.now())/1000));
-    timer.textContent=sec?'Next event in '+sec+'s':'Resolving…';
-    timerRow.style.display='flex';
-  }else{
-    timer.textContent='';
-    timerRow.style.display='none';
-  }
-
-  const now=Date.now();
-  $('roster').innerHTML=(state.players||[]).map(p=>{
-    const c=changeUntil.get(String(p.id));
-    if(c&&c.until<=now)changeUntil.delete(String(p.id));
-    const live=changeUntil.get(String(p.id));
-    const fx=live?(live.kind==='out'?' new-dead':' revived-now'):'';
-    const badgeClass=p.alive?'alive':'dead';
-    const badgeText=p.alive?'ALIVE':'OUT';
-    return '<div class="player '+(p.alive?'':'dead-row')+fx+'">'
-      +'<div class="player-name">'+esc(p.displayName)+(p.simulated?'<span class="bot-tag">BOT</span>':'')+'</div>'
-      +'<div class="player-meta">'
-      +(p.eliminations?'<span class="player-kos">'+p.eliminations+' KO</span>':'')
-      +'<span class="player-badge '+badgeClass+'">'+badgeText+'</span>'
-      +'</div></div>';
-  }).join('')||'<div class="empty">No players yet.</div>';
+  updateTimerOnly();
+  renderRoster();
 
   const vc=$('voteCard');
   const vg=$('voteGrid');
@@ -1015,30 +1118,62 @@ document.addEventListener('click',e=>{
   if(v)act('vote',{targetId:v.dataset.vote});
 });
 
-async function refresh(){
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+
+function pollDelay(){
+  if(document.hidden)return 6000;
+  return state&&['registration','running'].includes(state.status)?2000:4000;
+}
+
+function scheduleRefresh(delay=pollDelay()){
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(async()=>{
+    await refresh();
+    scheduleRefresh();
+  },delay);
+}
+
+async function refresh({quiet=false}={}){
   if(!initData){
     err('Open this Arena from Telegram.');
     $('status').textContent='Telegram is required';
     $('stateBadge').className='status-badge pending';
     $('stateBadge').textContent='TELEGRAM';
     $('viewerText').textContent='Launch Veil Arena from the button inside your Telegram group.';
-    return;
+    return false;
   }
+  if(refreshing)return true;
+  refreshing=true;
   try{
     const next=await api('/telegram/api/state');
     err();
     acceptState(next);
+    return true;
   }catch(e){
-    err(e.message);
-    $('status').textContent='Connection error';
-    $('stateBadge').className='status-badge pending';
-    $('stateBadge').textContent='ERROR';
+    if(!quiet){
+      err(e.message);
+      $('status').textContent='Connection error';
+      $('stateBadge').className='status-badge pending';
+      $('stateBadge').textContent='ERROR';
+    }
+    return false;
+  }finally{
+    refreshing=false;
   }
 }
 
-refresh();
-setInterval(refresh,1500);
-setInterval(()=>{if(state)render()},500);
+async function bootTelegram(){
+  for(let attempt=1;attempt<=3;attempt++){
+    const ok=await refresh({quiet:attempt<3});
+    if(ok){scheduleRefresh();return}
+    if(attempt<3)await sleep(650*attempt);
+  }
+  scheduleRefresh();
+}
+
+bootTelegram();
+setInterval(updateTimerOnly,500);
+document.addEventListener('visibilitychange',()=>scheduleRefresh(250));
 </script>
 </body>
 </html>`;
