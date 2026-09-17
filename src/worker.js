@@ -6,6 +6,7 @@ import { applyTelegramPerformancePass } from "./telegram-performance.js";
 import { applyTelegramFeaturePack } from "./telegram-feature-pack.js";
 import { applyTelegramPrizePack } from "./telegram-prize-pack.js";
 import { applyTelegramUiPolish } from "./telegram-ui-polish.js";
+import { applyTelegramProductPass } from "./telegram-product-pass.js";
 import { handleDiscordRoute } from "./discord-control.js";
 import { ArenaCoordinator } from "./coordinator-features.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
@@ -14,7 +15,7 @@ import { injectVeilSfx } from "./sfx-integration.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-17-telegram-roster-help-fix-1";
+const TELEGRAM_BUILD = "2026-09-17-telegram-product-pass-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -63,7 +64,7 @@ export default {
       const assetHtml = applyTelegramMiniAppAssetBatch3(telegramHtml);
       const featureHtml = applyTelegramFeaturePack(assetHtml);
       const sponsorHtml = applyTelegramPrizePack(featureHtml);
-      return html(applyTelegramUiPolish(injectVeilSfx(sponsorHtml)));
+      return html(applyTelegramProductPass(applyTelegramUiPolish(injectVeilSfx(sponsorHtml))));
     }
 
     if (url.pathname.startsWith("/telegram/")) {
