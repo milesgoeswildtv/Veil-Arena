@@ -14,7 +14,7 @@ body[data-arena-phase="running"] #eventCard{box-shadow:0 0 0 1px #c45cff16,0 18p
 body[data-arena-phase="running"] #timerRow{min-height:46px!important;margin-top:12px!important;padding:9px 13px!important;border:1px solid #4d335c;border-radius:12px;background:#0a0710;color:#dbc6e8!important;font:950 12px/1 ui-monospace,monospace;letter-spacing:.08em}
 body[data-arena-phase="running"] #timerRow img{width:23px!important;height:23px!important}
 body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-head h2:after{content:" // LIVE";color:#b56ee4}
-.results-stage{display:none}.results-stage.show{display:block}
+.results-stage{display:none}.results-stage.show{display:block}\nbody:not([data-arena-view="arena"]) .results-stage,body:not([data-arena-view="arena"]) .phase-brief{display:none!important}\n#controls [data-feature-action="lock"],#controls [data-feature-action="unlock"],#controls [data-feature-action="pause"],#controls [data-feature-action="resume"],#controls [data-action="forceclose"]{display:none!important}
 body[data-arena-phase="finished"][data-arena-view="arena"] .main-grid,
 body[data-arena-phase="finished"][data-arena-view="arena"] .roster-panel,
 body[data-arena-phase="finished"][data-arena-view="arena"] .viewer-state-card,
@@ -111,7 +111,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     if(!host)return;
     const body=q('hostDrawerBody');if(!body)return;
     let actions='';
-    if(state.status==='registration')actions='<button class="feature-mini primary" data-action="start">START ARENA</button><button class="feature-mini" data-feature-action="'+(state.registrationLocked?'unlock':'lock')+'">'+(state.registrationLocked?'UNLOCK REGISTRATION':'LOCK REGISTRATION')+'</button>';
+    if(state.status==='registration')actions='<button class="feature-mini" data-feature-action="'+(state.registrationLocked?'unlock':'lock')+'">'+(state.registrationLocked?'UNLOCK REGISTRATION':'LOCK REGISTRATION')+'</button>';
     if(state.status==='running')actions='<button class="feature-mini '+(state.paused?'primary':'')+'" data-feature-action="'+(state.paused?'resume':'pause')+'">'+(state.paused?'RESUME ARENA':'PAUSE ARENA')+'</button><button class="feature-mini danger" data-action="forceclose">FORCE CLOSE</button>';
     const players=state.status==='registration'?(state.players||[]).filter(p=>String(p.id)!==String(state.hostId)):[];
     body.innerHTML='<div class="drawer-actions">'+actions+'</div>'+(players.length?'<div class="drawer-player-list">'+players.map(p=>'<div class="drawer-player"><div class="drawer-player-name">'+pEsc(p.displayName)+(p.ready?' · READY':' · WAITING')+'</div><button class="feature-mini danger" data-feature-action="remove" data-target-id="'+pEsc(p.id)+'">REMOVE</button></div>').join('')+'</div>':'');
