@@ -718,7 +718,11 @@ if(tg){
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function stateSignature(value){
-  return JSON.stringify(value,(key,item)=>key==='serverTime'?undefined:item);
+  return JSON.stringify(value,(key,item)=>{
+    if(key==='serverTime'||key==='cooldownText')return undefined;
+    if(key==='cooldownRemainingMs')return Number(item||0)>0;
+    return item;
+  });
 }
 
 function richText(value=''){
