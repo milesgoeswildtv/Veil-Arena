@@ -110,6 +110,11 @@ assert(!workerSource.includes("telegram-ui-polish.js"));
 const featureApiSource = readFileSync(new URL("../src/telegram-feature-api.js", import.meta.url), "utf8");
 assert(!featureApiSource.includes("state.serverTime = Date.now()"));
 
+const featurePackSource = readFileSync(new URL("../src/telegram-feature-pack.js", import.meta.url), "utf8");
+assert(featurePackSource.includes("width:94px"));
+assert(featurePackSource.includes("text.textContent=mode==='live'?'LIVE':mode==='offline'?'OFFLINE':'SYNCING'"));
+assert(!featurePackSource.includes("setConnection('syncing');\n    try{ const result=await originalApi"));
+
 const productUi = applyTelegramProductPass("<!doctype html><html><head></head><body></body></html>");
 assert(productUi.includes("ARENA CHAMPION"));
 assert(productUi.includes("REGISTRATION // READY CHECK"));
