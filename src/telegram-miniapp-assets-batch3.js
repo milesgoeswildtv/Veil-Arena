@@ -5,8 +5,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 /* Telegram Mini App asset batch 3 */
 #hero:before,
 #eventCard:before,
-#voteCard:before,
-.roster-panel:before{
+#voteCard:before{
   background-size:100% 100%!important;
   background-position:center!important;
   background-repeat:no-repeat!important;
@@ -17,14 +16,12 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 #hero.asset-panel-results:before{background-image:url("/telegram/veil_ui_results_panel.svg")!important}
 #eventCard.asset-panel-live:before{background-image:url("/telegram/veil_ui_live_round_panel.svg")!important}
 #voteCard:before{background-image:url("/telegram/veil_ui_vote_panel.svg")!important}
-.roster-panel:before{background-image:url("/telegram/veil_ui_leaderboard_panel.svg")!important}
 
 #hero.asset-panel-lobby,
 #hero.asset-panel-stats,
 #hero.asset-panel-results,
 #eventCard.asset-panel-live,
-#voteCard,
-.roster-panel{
+#voteCard{
   background:linear-gradient(155deg,#0e0b12e9,#070509ee)!important;
 }
 
@@ -33,7 +30,9 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 #hero.asset-panel-results{padding:clamp(34px,4vw,50px)}
 #eventCard.asset-panel-live{padding:clamp(30px,3.8vw,46px)}
 #voteCard{padding:clamp(30px,3.8vw,46px)}
-.roster-panel{padding:clamp(32px,4vw,48px)}
+.roster-panel{padding:18px 0 0!important;overflow:visible!important;background:transparent!important;filter:none!important}
+.roster-panel:before{display:none!important;background:none!important}
+.roster-panel .section-head{padding:0 8px;margin-bottom:12px}
 
 .event{
   position:relative;
@@ -70,8 +69,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
-  #voteCard,
-  .roster-panel{padding:30px 24px}
+  #voteCard{padding:30px 24px}
   .event{min-height:132px;padding:22px}
   .readout{min-height:50px;padding:10px 20px!important}
   .sponsorship-card{min-height:126px!important;padding:30px 42px!important}
@@ -82,8 +80,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
-  #voteCard,
-  .roster-panel{padding:26px 19px}
+  #voteCard{padding:26px 19px}
   .event{min-height:118px;padding:19px 18px}
   .readout{padding:9px 16px!important}
   .sponsorship-card{min-height:110px!important;padding:26px 32px!important}
