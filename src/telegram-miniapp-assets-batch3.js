@@ -61,17 +61,6 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 .sponsorship-copy small{font-size:9px}
 .sponsorship-copy strong{font-size:15px}
 
-.player.asset-player-card.asset-selected{
-  background-image:url("/telegram/veil_ui_player_state_selected.svg"),var(--veil-player-state),url("/telegram/veil_ui_player_card.svg")!important;
-  background-position:center,center,center!important;
-  background-repeat:no-repeat,no-repeat,no-repeat!important;
-  background-size:100% 100%,100% 100%,100% 100%!important;
-  opacity:1!important;
-  filter:drop-shadow(0 0 20px #c689ff88) drop-shadow(0 10px 18px #0008)!important;
-}
-.player.asset-player-card.asset-selected .player-name{color:#fff}
-.player.asset-player-card.asset-selected .player-badge{filter:brightness(1.14)}
-
 #voteCard.live .veil-button.selected{
   filter:brightness(1.12) drop-shadow(0 0 14px #d3a1ff99)!important;
 }
@@ -105,43 +94,5 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 
   html = html.replace("</style>", css + "\n</style>");
 
-  const js = `
-function decorateAssetBatch3(){
-  if(!state)return;
-
-  const hero=$('hero');
-  if(hero){
-    hero.classList.remove('asset-panel-lobby','asset-panel-stats','asset-panel-results');
-    if(state.status==='registration')hero.classList.add('asset-panel-lobby');
-    else if(state.status==='finished')hero.classList.add('asset-panel-results');
-    else hero.classList.add('asset-panel-stats');
-  }
-
-  const eventCard=$('eventCard');
-  if(eventCard){
-    eventCard.classList.toggle('asset-panel-live',state.status==='running');
-  }
-
-  const selectedId=state.crowdVote&&state.crowdVote.selectedId!=null
-    ?String(state.crowdVote.selectedId)
-    :null;
-  const rows=Array.from(document.querySelectorAll('#roster .player'));
-  const players=state.players||[];
-  rows.forEach((row,index)=>{
-    const p=players[index];
-    row.classList.remove('asset-selected');
-    if(!p||!selectedId)return;
-    if(String(p.id)===selectedId)row.classList.add('asset-selected');
-  });
-}
-
-const renderBeforeAssetBatch3=render;
-render=function(){
-  renderBeforeAssetBatch3();
-  decorateAssetBatch3();
-};
-`;
-
-  html = html.replace("\nrefresh();\nsetInterval(refresh,1500);", "\n" + js + "\nrefresh();\nsetInterval(refresh,1500);");
   return html;
 }
