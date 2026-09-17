@@ -7,6 +7,7 @@ import {
   SPONSOR_AWARDS
 } from "../src/sponsorships.js";
 import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
+import { applyTelegramUiPolish } from "../src/telegram-ui-polish.js";
 
 const game = {
   id: "test-arena",
@@ -79,5 +80,12 @@ assert(sponsorUi.includes("HOW TO USE"));
 assert(sponsorUi.includes("BackButton"));
 assert(sponsorUi.includes("CHECK FUNDING"));
 assert(!sponsorUi.includes("prizePoolCard"));
+
+const polishedUi = applyTelegramUiPolish(sponsorUi);
+assert(polishedUi.includes(".roster-panel:before{display:none!important"));
+assert(polishedUi.includes("directHelpButton"));
+assert(polishedUi.includes("bindDirectTap(directHelpButton,openHelp)"));
+assert(polishedUi.includes("touchend"));
+assert(polishedUi.includes("player-portrait-token{display:none!important}"));
 
 console.log("Arena sponsorship core and Telegram sponsor UI tests passed.");
