@@ -3,6 +3,10 @@ export function applyTelegramProductPass(html) {
 
   const css = `<style id="veil-product-pass-css">
 :root{--veil-card:#100b15f2;--veil-card2:#09070df2;--veil-line:#493257;--veil-purple:#c45cff;--veil-gold:#f2c968;--veil-green:#55e2ae;--veil-red:#ef526f}
+/* Telegram already owns the top safe area. Do not let iOS status/recording UI resize Arena. */
+.app{padding-top:14px!important}
+.state-content,.results-stage{overflow-anchor:none}
+@supports (height:100svh){.state-shell{min-height:calc(100svh - 28px)!important}}
 .product-loading{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 12px;padding:10px 13px;border:1px solid #4a3458;border-radius:12px;background:#0b0711;color:#bcaec7;font:900 9px/1.2 ui-monospace,monospace;letter-spacing:.14em}.product-loading.ready{display:none}.product-loading-dot{width:8px;height:8px;border-radius:50%;background:var(--veil-purple);box-shadow:0 0 12px #c45cffaa;animation:productPulse 1s ease-in-out infinite alternate}
 @keyframes productPulse{to{opacity:.35;transform:scale(.72)}}
 .phase-brief{display:none;margin:0 0 14px;padding:14px 15px;border:1px solid #493257;border-radius:15px;background:linear-gradient(145deg,#120c18e8,#09070ddd);box-shadow:0 12px 28px #0005}.phase-brief.show{display:block}.phase-brief-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.phase-brief-title{font:1000 11px/1.2 ui-monospace,monospace;letter-spacing:.14em;color:#e6d8ef}.phase-pill{padding:5px 8px;border:1px solid #604174;border-radius:999px;color:#cdbada;font:900 8px/1 ui-monospace,monospace;letter-spacing:.1em}.phase-pill.locked{border-color:#775d30;color:#e8c86f}.phase-progress{height:7px;margin-top:11px;border-radius:99px;background:#25172e;overflow:hidden}.phase-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8d57e8,#c45cff);transition:width .22s ease}.phase-brief-copy{margin-top:9px;color:#9f91aa;font-size:11px;line-height:1.45}
@@ -37,6 +41,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
 (() => {
   const q=id=>document.getElementById(id);
   const pEsc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let lastResultsKey='';
 
   function installProductDom(){
     if(q('productLoading'))return;
@@ -94,7 +99,14 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
 
   function renderResults(){
     const stage=q('resultsStage');if(!stage||!state)return;
-    if(state.status!=='finished'||!state.recap){stage.classList.remove('show');stage.innerHTML='';return}
+    if(state.status!=='finished'||!state.recap){lastResultsKey='';stage.classList.remove('show');stage.innerHTML='';return}
+    const resultsKey=JSON.stringify({
+      id:state.id,status:state.status,recap:state.recap,
+      prizes:(state.prizePool?.prizes||[]).map(p=>[p.id,p.status,p.amount,p.currency,p.fundedAmount,(p.recipients||[]).map(r=>[r.displayName,r.status,r.amount])]),
+      host:Boolean(state.viewer?.isHost),cooldown:Number(state.cooldownRemainingMs||0)
+    });
+    if(stage.classList.contains('show')&&resultsKey===lastResultsKey)return;
+    lastResultsKey=resultsKey;
     const r=state.recap;
     const kills=r.killLeaders?.length?pEsc(r.killLeaders.join(', ')):'—';
     const revives=r.reviveLeaders?.length?pEsc(r.reviveLeaders.join(', ')):'—';
