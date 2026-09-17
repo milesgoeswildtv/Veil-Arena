@@ -165,8 +165,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
   }
 
   installProductDom();
-  const beforeProductRender=render;
-  render=function productRender(){beforeProductRender();renderProductPass()};
+  registerRenderHook(renderProductPass);
   window.addEventListener('offline',renderLoading);window.addEventListener('online',renderLoading);
 
   document.addEventListener('click',async event=>{
