@@ -384,13 +384,46 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard #controls:empty{display:none}
 .live-event-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-auto-rows:auto;
-  align-items:stretch;
+  grid-template-columns:1fr;
   gap:0;
-  padding:14px 15px 15px;
-  background:url("/telegram/NewEventBackgroundPlate.PNG") center/100% 100% no-repeat;
+  padding:0;
+  overflow:visible;
+  background:none;
 }
+.live-event-row{
+  position:relative;
+  min-width:0;
+  overflow:hidden;
+}
+.live-event-plate-slice{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.live-event-plate-slice img{
+  position:absolute;
+  left:0;
+  width:100%;
+  max-width:none;
+  height:200%;
+  object-fit:fill;
+}
+.live-event-row-top .live-event-plate-slice img{top:0}
+.live-event-row-bottom .live-event-plate-slice img{bottom:0}
+.live-event-row-content{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:stretch;
+  min-width:0;
+  padding-left:15px;
+  padding-right:15px;
+}
+.live-event-row-top .live-event-row-content{padding-top:14px;padding-bottom:4px}
+.live-event-row-bottom .live-event-row-content{padding-top:4px;padding-bottom:15px}
 .live-event-entry{
   min-width:0;
   min-height:0;
@@ -1067,7 +1100,10 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   .hero-panel.live-dashboard .status-line{font-size:8px}
   .hero-panel.live-dashboard .stat{padding:5px 5px}
   .hero-panel.live-dashboard .stat b{font-size:18px}
-  .live-event-grid{gap:0;padding:10px 10px 11px}
+  .live-event-grid{gap:0;padding:0}
+  .live-event-row-content{padding-left:10px;padding-right:10px}
+  .live-event-row-top .live-event-row-content{padding-top:10px;padding-bottom:3px}
+  .live-event-row-bottom .live-event-row-content{padding-top:3px;padding-bottom:11px}
   .live-event-entry{padding:8px 8px}
   .live-event-copy{font-size:10px;line-height:1.34}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
@@ -1756,11 +1792,15 @@ function renderEventText(){
   if(!target)return;
   if(state.status==='running'){
     const rows=currentRoundEvents();
+    const cells=(rows.length?rows:['Waiting for the next Arena event…']).slice(0,4);
+    while(cells.length<4)cells.push('');
+    const eventCell=text=>'<article class="live-event-entry"><div class="live-event-copy">'+(text?richText(text):'')+'</div></article>';
+    const plateSlice='<div class="live-event-plate-slice" aria-hidden="true"><img src="/telegram/NewEventBackgroundPlate.PNG" alt=""></div>';
     target.classList.add('live-event-grid');
     if(heading)heading.textContent='ROUND '+Number(state.round||0);
-    target.innerHTML=(rows.length?rows:['Waiting for the next Arena event…']).map(text=>
-      '<article class="live-event-entry"><div class="live-event-copy">'+richText(text)+'</div></article>'
-    ).join('');
+    target.innerHTML=
+      '<div class="live-event-row live-event-row-top">'+plateSlice+'<div class="live-event-row-content">'+cells.slice(0,2).map(eventCell).join('')+'</div></div>'
+      +'<div class="live-event-row live-event-row-bottom">'+plateSlice+'<div class="live-event-row-content">'+cells.slice(2,4).map(eventCell).join('')+'</div></div>';
     return;
   }
   target.classList.remove('live-event-grid');
