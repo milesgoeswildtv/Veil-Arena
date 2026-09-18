@@ -62,23 +62,44 @@ img{display:block;max-width:100%}
   isolation:isolate;
   min-height:calc(var(--tg-viewport-stable-height,100vh) - 28px);
   border-radius:32px;
-  background:linear-gradient(165deg,#100b16f2,#07050af7 48%,#0b0710f2);
+  background:linear-gradient(165deg,#0d0912f2,#050407f8 48%,#09060df2);
   box-shadow:0 26px 80px #000b,inset 0 0 0 1px #ffffff08;
   overflow:hidden;
+}
+.arena-splash-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 18%;
+  opacity:.20;
+  filter:saturate(.92) brightness(.58) contrast(1.08);
+  pointer-events:none;
+  user-select:none;
+}
+.state-shell:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,#07050a1c 0,#07050a8a 35%,#07050ae8 84%,#07050af7 100%);
 }
 .state-frame{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  z-index:0;
+  z-index:1;
   pointer-events:none;
   object-fit:fill;
   opacity:.96;
 }
 .state-content{
   position:relative;
-  z-index:1;
+  z-index:2;
   min-height:inherit;
   padding:clamp(30px,5vw,64px);
   overflow-anchor:none;
@@ -144,11 +165,65 @@ img{display:block;max-width:100%}
   position:relative;
   min-width:0;
   padding:clamp(20px,2.6vw,30px);
-  background:linear-gradient(155deg,#130e19e8,#09070deb);
-  border:18px solid transparent;
-  border-image:url("/telegram/veil_ui_panel_frame.svg") 96 fill stretch;
+  border:0;
+  overflow:hidden;
+  background:linear-gradient(155deg,#120e18ed,#08060ced);
   filter:drop-shadow(0 16px 25px #0008);
 }
+.panel:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:url("/telegram/panel_frame.svg") center/100% 100% no-repeat;
+}
+.panel>*{position:relative;z-index:1}
+#hero:before,#eventCard:before,#voteCard:before{
+  background-size:100% 100%;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+#hero.asset-panel-lobby:before{background-image:url("/telegram/veil_ui_lobby_panel.svg")}
+#hero.asset-panel-stats:before{background-image:url("/telegram/veil_ui_stats_panel.svg")}
+#hero.asset-panel-results:before{background-image:url("/telegram/veil_ui_results_panel.svg")}
+#eventCard.asset-panel-live:before{display:none;background:none}
+#voteCard:before{background-image:url("/telegram/veil_ui_vote_panel.svg")}
+#hero.asset-panel-lobby,
+#hero.asset-panel-stats,
+#hero.asset-panel-results,
+#voteCard{background:linear-gradient(155deg,#0e0b12e9,#070509ee)}
+#eventCard.asset-panel-live{
+  background:transparent;
+  filter:none;
+  overflow:visible;
+}
+#hero.asset-panel-lobby{padding:clamp(22px,2.8vw,34px) clamp(24px,3.2vw,38px) clamp(14px,1.8vw,22px)}
+#hero.asset-panel-stats{padding:clamp(14px,2vw,22px) clamp(18px,2.4vw,28px)}
+#hero.asset-panel-results{padding:clamp(34px,4vw,50px)}
+#eventCard.asset-panel-live{padding:14px}
+#voteCard{padding:16px}
+body[data-arena-phase="registration"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr}
+body[data-arena-phase="registration"][data-arena-view="arena"] .stack{display:none}
+body[data-arena-phase="running"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr;gap:8px}
+body[data-arena-phase="running"] #eventCard{box-shadow:0 0 0 1px #c45cff16,0 12px 28px #0007}
+body.crowd-vote-open #eventCard{display:none}
+body.crowd-vote-open #voteCard{display:block}
+body.crowd-vote-open .stack{gap:0}
+body.crowd-vote-open #viewerStateCard.live-compact{margin-bottom:0}
+body[data-arena-phase="running"] #timerRow{
+  min-height:46px;
+  margin-top:12px;
+  padding:9px 13px;
+  border:1px solid #4d335c;
+  border-radius:12px;
+  background:#0a0710;
+  color:#dbc6e8;
+  font:950 12px/1 ui-monospace,monospace;
+  letter-spacing:.08em;
+}
+body[data-arena-phase="running"] #timerRow img{width:23px;height:23px}
+body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-head h2:after{content:" // LIVE";color:#b56ee4}
 .hero-panel{min-height:100%}
 .hero-panel.registration-mode{min-height:0}
 .arena-title{
@@ -225,7 +300,7 @@ img{display:block;max-width:100%}
 .hero-panel.registration-mode .stats{gap:5px}
 .hero-panel.registration-mode .stat{padding:7px 7px}
 .hero-panel.registration-mode .stat b{margin-top:4px;font-size:clamp(18px,3.2vw,25px)}
-.hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px!important;font-size:9px}
+.hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px;font-size:9px}
 .hero-panel.registration-mode .readout img{width:16px;height:16px}
 .hero-panel.host-registration #viewerReadout{display:none}
 .hero-panel.registration-mode .controls{
@@ -241,11 +316,11 @@ img{display:block;max-width:100%}
   font-size:9px;
   line-height:1.05;
 }
-.hero-panel.registration-mode .veil-button img{
-  width:16px!important;
-  height:16px!important;
-  margin-right:4px!important;
-  vertical-align:-4px!important;
+.hero-panel.registration-mode .veil-button-icon{
+  width:16px;
+  height:16px;
+  margin-right:4px;
+  vertical-align:-4px;
 }
 .hero-panel.live-dashboard{
   min-height:0;
@@ -375,10 +450,10 @@ img{display:block;max-width:100%}
   display:flex;
   align-items:center;
   gap:9px;
-  min-height:48px;
+  min-height:54px;
   margin-top:12px;
-  padding:9px 18px;
-  background:url("/telegram/veil_ui_input_field.svg") center/100% 100% no-repeat;
+  padding:11px 24px;
+  background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;
   color:#cbbbd8;
   font:800 11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;
   letter-spacing:.06em;
@@ -405,6 +480,13 @@ img{display:block;max-width:100%}
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   transition:transform .15s ease,filter .15s ease,opacity .15s ease;
+}
+.veil-button-icon{
+  width:20px;
+  height:20px;
+  display:inline-block;
+  vertical-align:-5px;
+  margin-right:7px;
 }
 .veil-button:before{
   content:"";
@@ -449,12 +531,23 @@ img{display:block;max-width:100%}
   text-transform:uppercase;
 }
 .event{
-  min-height:110px;
+  position:relative;
+  min-height:148px;
+  padding:24px 26px;
+  overflow:hidden;
+  background-color:transparent;
+  border-radius:10px;
   white-space:pre-wrap;
   line-height:1.52;
   font-size:15px;
   overflow-wrap:anywhere;
 }
+.event>*{position:relative;z-index:1}
+#eventCard.asset-panel-live .section-head{margin-bottom:8px}
+#eventCard.asset-panel-live .section-head img{width:20px;height:20px}
+#eventCard.asset-panel-live .section-head h2{font-size:9px}
+#eventCard.asset-panel-live .event{min-height:0;padding:0}
+#eventCard.asset-panel-live .timer{margin-top:7px;min-height:24px;font-size:10px}
 .event strong{font-weight:950}
 .event em{font-style:italic}
 .event s{opacity:.52;text-decoration-thickness:2px}
@@ -588,7 +681,15 @@ img{display:block;max-width:100%}
   font-size:9px;
   line-height:1.4;
 }
-.roster-panel{margin-top:14px}
+.roster-panel{
+  margin-top:14px;
+  padding:10px 0 0;
+  overflow:visible;
+  background:transparent;
+  filter:none;
+}
+.roster-panel:before{display:none;background:none}
+.roster-panel .section-head{padding:0 8px;margin-bottom:8px}
 .roster{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -686,6 +787,115 @@ img{display:block;max-width:100%}
 .player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
 .new-dead{animation:playerOut 1.1s ease both}
 .revived-now{animation:playerBack 1.4s ease both}
+.viewer-state-card{
+  --viewer-state:url("/telegram/veil_ui_player_state_spectator.svg");
+  position:relative;
+  display:none;
+  width:min(520px,100%);
+  aspect-ratio:2.72/1;
+  margin:14px 0 0 auto;
+  overflow:hidden;
+  background-image:var(--viewer-state),url("/telegram/veil_ui_player_card.svg");
+  background-position:center,center;
+  background-repeat:no-repeat,no-repeat;
+  background-size:100% 100%,100% 100%;
+  filter:drop-shadow(0 12px 24px #0009);
+}
+.viewer-state-card.asset-alive{--viewer-state:url("/telegram/veil_ui_player_state_alive.svg")}
+.viewer-state-card.asset-dead{--viewer-state:url("/telegram/veil_ui_player_state_dead.svg")}
+.viewer-state-card.asset-revived{--viewer-state:url("/telegram/veil_ui_player_state_revived.svg");filter:drop-shadow(0 0 18px #56e5bb66) drop-shadow(0 10px 20px #0008)}
+.viewer-state-card.asset-spectator{--viewer-state:url("/telegram/veil_ui_player_state_spectator.svg")}
+.viewer-state-card.asset-winner{--viewer-state:url("/telegram/veil_ui_player_state_winner.svg")}
+.viewer-state-card .viewer-portrait{
+  position:absolute;
+  left:6.2%;
+  top:18%;
+  width:18.5%;
+  height:64%;
+  display:grid;
+  place-items:center;
+}
+.viewer-state-card .viewer-portrait img{width:46%;filter:drop-shadow(0 0 10px #a966ff88)}
+.viewer-state-copy{
+  position:absolute;
+  left:29%;
+  right:6%;
+  top:19%;
+  bottom:14%;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-width:0;
+}
+.viewer-state-copy strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:clamp(13px,1.8vw,18px);
+  font-weight:1000;
+  letter-spacing:.02em;
+}
+.viewer-state-copy span{
+  color:#b8a9c3;
+  font-size:clamp(9px,1.15vw,11px);
+  line-height:1.25;
+}
+.viewer-state-label{
+  align-self:flex-start;
+  color:#e5d8ed;
+  font:950 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.viewer-state-card.live-compact{
+  width:100%;
+  min-height:72px;
+  aspect-ratio:auto;
+  margin:7px 0 0;
+  background-position:left center,left center;
+  background-size:38% 100%,38% 100%;
+}
+.viewer-state-card.live-compact .viewer-portrait{left:4.5%;top:13%;width:11.5%;height:74%}
+.viewer-state-card.live-compact .viewer-portrait img{width:42%}
+.viewer-state-card.live-compact .viewer-state-copy{
+  left:41%;
+  right:4%;
+  top:18%;
+  bottom:17%;
+  justify-content:center;
+  gap:5px;
+}
+.viewer-state-card.live-compact .viewer-state-copy > div{display:flex;align-items:center;gap:7px}
+.viewer-state-card.live-compact .viewer-state-label{font-size:7px}
+.viewer-state-card.live-compact .viewer-state-copy strong{font-size:15px}
+.viewer-state-card.live-compact .viewer-state-copy span{font-size:9px;line-height:1.2}
+.viewer-state-card.live-compact.asset-dead .viewer-state-label{color:#ef7a90}
+.viewer-state-card.live-compact.asset-revived .viewer-state-label{color:#7ce7c2}
+.viewer-state-card.live-compact.asset-revived .viewer-state-copy strong{color:#eafff7}
+.viewer-state-card.live-compact.revived-now{animation:playerBack 1.4s ease both}
+.sponsorship-card{
+  position:relative;
+  width:min(720px,100%);
+  min-height:150px;
+  margin:16px auto 0;
+  padding:38px 60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  text-align:center;
+  background:url("/telegram/veil_ui_sponsor_panel.svg") center/100% 100% no-repeat;
+  filter:drop-shadow(0 14px 24px #0008);
+}
+.sponsorship-card img{width:34px;height:34px;filter:drop-shadow(0 0 10px #ba69ff77)}
+.sponsorship-copy small{
+  display:block;
+  color:#a99ab6;
+  font:900 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.sponsorship-copy strong{display:block;margin-top:5px;font-size:15px;letter-spacing:.08em}
 .footer-row{
   display:flex;
   align-items:flex-start;
@@ -742,11 +952,19 @@ img{display:block;max-width:100%}
   width:min(88vw,560px);
   padding:25px 22px 22px;
   text-align:center;
-  border:18px solid transparent;
-  border-image:url("/telegram/veil_ui_panel_frame.svg") 96 fill stretch;
-  background:#08050ce8;
+  border:0;
+  overflow:hidden;
+  background:#08050cee;
   filter:drop-shadow(0 0 28px #8d57e877);
   opacity:0;
+}
+.fx-banner:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:url("/telegram/panel_frame.svg") center/100% 100% no-repeat;
 }
 .fx-icon{
   width:52px;
@@ -789,13 +1007,24 @@ img{display:block;max-width:100%}
 @media(max-width:760px){
   .app{padding-left:6px;padding-right:6px}
   .state-shell{border-radius:22px}
+  .arena-splash-bg{opacity:.17;object-position:center top}
   .state-content{padding:30px 22px 44px}
   .topline{align-items:flex-start;gap:8px}
   .brand-copy{display:none}
   .status-badge{min-width:98px;height:27px;padding:0 12px;font-size:8px}
   .main-grid{grid-template-columns:1fr}
   .stack{gap:10px}
-  .panel{border-width:13px;padding:18px}
+  .panel{padding:18px}
+  #hero.asset-panel-lobby{padding:18px 16px 10px}
+  #hero.asset-panel-stats{padding:12px}
+  #hero.asset-panel-results{padding:30px 24px}
+  #eventCard.asset-panel-live{padding:12px 10px}
+  #voteCard{padding:13px 11px}
+  .event{min-height:132px;padding:22px}
+  #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px}
+  .readout{min-height:50px;padding:10px 20px}
+  .viewer-state-card{width:100%;margin-top:7px}
+  .sponsorship-card{min-height:126px;padding:30px 42px}
   .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
   .roster .player:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - 3.5px);justify-self:center}
   .footer-row{flex-direction:column;align-items:stretch}
@@ -818,6 +1047,20 @@ img{display:block;max-width:100%}
   .registration-inline{grid-template-columns:auto minmax(58px,1fr) auto;gap:6px;margin-bottom:7px}
   .registration-ready{font-size:8px;letter-spacing:.08em}
   .registration-lock{font-size:6px;padding:4px 6px}
+  #hero.asset-panel-lobby{padding:14px 12px 7px}
+  #hero.asset-panel-stats{padding:10px 9px}
+  #hero.asset-panel-results{padding:26px 19px}
+  #eventCard.asset-panel-live{padding:10px 8px}
+  #voteCard{padding:11px 9px}
+  #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
+  .readout{padding:9px 16px}
+  .viewer-state-card.live-compact{min-height:64px}
+  .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
+  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
+  .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
+  .sponsorship-card{min-height:110px;padding:26px 32px}
+  .sponsorship-card img{width:28px;height:28px}
+  .sponsorship-copy strong{font-size:13px}
   .hero-panel.live-dashboard{padding-top:0}
   .hero-panel.live-dashboard .arena-heading{gap:5px}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
@@ -869,6 +1112,7 @@ img{display:block;max-width:100%}
 
 <main class="app" id="app">
   <section class="state-shell" id="stateShell">
+    <img class="arena-splash-bg" src="/telegram/Veil%20Arena%20Universal%20Master%20Splash%20Art.PNG" alt="" aria-hidden="true">
     <img class="state-frame" id="stateFrame" src="/telegram/lobby_frame.svg" alt="" aria-hidden="true">
     <div class="state-content">
       <div class="topline">
@@ -928,6 +1172,19 @@ img{display:block;max-width:100%}
           <div class="controls" id="controls"></div>
         </section>
 
+        <div class="final-five-strip" id="finalFiveStrip">FINAL FIVE // SPECIAL EVENTS LOCKED OUT</div>
+
+        <section class="viewer-state-card asset-spectator" id="viewerStateCard" aria-label="Your Arena state">
+          <div class="viewer-portrait"><img id="viewerStateIcon" src="/telegram/veil_ui_icon_spectate.svg" alt=""></div>
+          <div class="viewer-state-copy">
+            <div>
+              <span class="viewer-state-label" id="viewerStateLabel">SPECTATOR</span>
+              <strong id="viewerStateTitle">YOU</strong>
+            </div>
+            <span id="viewerStateDetail">Watching Arena.</span>
+          </div>
+        </section>
+
         <div class="stack">
           <section class="panel" id="eventCard">
             <div class="section-head">
@@ -963,6 +1220,14 @@ img{display:block;max-width:100%}
           <h2 id="rosterHeading">Live Roster</h2>
         </div>
         <div class="roster" id="roster"></div>
+      </section>
+
+      <section class="sponsorship-card" aria-label="Arena sponsor">
+        <img src="/telegram/veil_ui_icon_sponsor.svg" alt="">
+        <div class="sponsorship-copy">
+          <small>Telegram Arena</small>
+          <strong>DWALLET × VEIL</strong>
+        </div>
       </section>
 
       <div class="footer-row">
@@ -1237,7 +1502,7 @@ async function act(action,extra={}){
 }
 
 function button(label,action,cls='',iconKey=''){
-  const icon=iconKey?'<img src="'+esc(icons[iconKey]||icons.arena)+'" alt="" style="width:20px;height:20px;display:inline-block;vertical-align:-5px;margin-right:7px">':'';
+  const icon=iconKey?'<img class="veil-button-icon" src="'+esc(icons[iconKey]||icons.arena)+'" alt="">':'';
   return '<button type="button" class="veil-button '+cls+'" data-action="'+action+'">'+icon+esc(label)+'</button>';
 }
 
@@ -1550,6 +1815,7 @@ function renderCrowdVote(){
 
 function render(){
   if(!state)return;
+  document.body.dataset.arenaPhase=state.status==='cancelled'?'finished':state.status;
   renderAssetPanels();
   renderRegistrationInline();
   const present=statusPresentation();
@@ -1605,16 +1871,11 @@ function render(){
     else if(!state.viewer.isHost)controls+=button('LEAVE','leave','','spectate');
     if(state.viewer.isHost){
       controls+=button('START ARENA','start','primary','success');
-      controls+=button('FORCE CLOSE','forceclose','danger','warning');
       if(state.testMode){
         controls+=button('ADD 4 BOTS','add4','','stats');
         controls+=button('FILL TO 12','fill','','leaderboard');
       }
     }
-  }else if(state.viewer.isHost&&state.status==='running'){
-    controls+=button('FORCE CLOSE','forceclose','danger','warning');
-  }else if(state.viewer.isHost&&(state.status==='finished'||state.status==='cancelled')){
-    controls+=button('START NEW GAME','newgame','primary','arena');
   }
   $('controls').innerHTML=controls;
 

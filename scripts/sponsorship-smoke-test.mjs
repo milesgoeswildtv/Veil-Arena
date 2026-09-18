@@ -10,7 +10,7 @@ import {
 import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
 import { applyTelegramProductPass } from "../src/telegram-product-pass.js";
 import { telegramFxMiniAppHtml } from "../src/telegram-fx-app.js";
-import { applyTelegramMiniAppAssetBatch3 } from "../src/telegram-miniapp-assets-batch3.js";
+import { buildTelegramMiniAppHtml } from "../src/telegram-ui.js";
 
 const game = {
   id: "test-arena",
@@ -112,7 +112,9 @@ assert(baseUi.includes("grid-template-columns:repeat(2,minmax(0,1fr))"));
 assert(baseUi.includes('background:url("/telegram/NewEventBackgroundPlate.PNG") center/100% 100% no-repeat'));
 assert(baseUi.includes(".live-event-entry{\n  min-width:0;\n  min-height:0;"));
 assert(baseUi.includes("background:transparent;"));
-assert(!baseUi.includes('background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;'));
+assert(baseUi.includes('.live-event-entry{\n  min-width:0;\n  min-height:0;\n  padding:11px 12px;\n  background:transparent;'));
+assert(baseUi.includes('.readout{'));
+assert(baseUi.includes('background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;'));
 assert(baseUi.includes("function renderCrowdVote"));
 assert(baseUi.includes("ELIMINATED"));
 assert(baseUi.includes("BACK IN THE ARENA"));
@@ -144,31 +146,42 @@ assert(baseUi.includes("disableVerticalSwipes"));
 assert(baseUi.includes("function registerRenderHook"));
 assert(baseUi.includes("function registerTimerHook"));
 
-const batch2Source = readFileSync(new URL("../src/telegram-miniapp-assets-batch2.js", import.meta.url), "utf8");
-assert(batch2Source.includes("aspect-ratio:2.72/1"));
-assert(batch2Source.includes("asset-revived"));
-assert(batch2Source.includes("veil_ui_player_state_revived.svg"));
-assert(batch2Source.includes("revived-now"));
-assert(batch2Source.includes(".viewer-state-card.live-compact"));
-assert(batch2Source.includes("'        <div class=\"stack\">'"));
+const composedUi = buildTelegramMiniAppHtml();
+const count = (text, needle) => text.split(needle).length - 1;
 
-const assetUi = applyTelegramMiniAppAssetBatch3(baseUi);
-assert(assetUi.includes(".roster-panel:before{display:none!important"));
-assert(assetUi.includes("#hero.asset-panel-lobby{padding:14px 12px 7px}"));
-assert(assetUi.includes(".roster-panel{padding:10px 0 0!important"));
-assert(assetUi.includes("#hero.asset-panel-stats{padding:10px 9px}"));
-assert(assetUi.includes("#eventCard.asset-panel-live{padding:10px 8px}"));
-assert(assetUi.includes("background-color:transparent!important;"));
-assert(!assetUi.includes("background:none!important;"));
-assert(assetUi.includes("#eventCard.asset-panel-live:before{display:none!important;background:none!important}"));
-assert(assetUi.includes("#eventCard.asset-panel-live{\n  background:transparent!important;"));
-assert(!assetUi.includes("veil_ui_live_round_panel.svg"));
-assert(assetUi.includes("#voteCard{padding:11px 9px}"));
-assert(!assetUi.includes("decorateAssetBatch3"));
+// Canonical visual ownership: accepted assets and layout now live in the base UI.
+assert(baseUi.includes('class="arena-splash-bg"'));
+assert(baseUi.includes('id="viewerStateCard"'));
+assert(baseUi.includes('id="finalFiveStrip"'));
+assert(baseUi.includes('class="sponsorship-card"'));
+assert(baseUi.includes("veil_ui_player_state_revived.svg"));
+assert(baseUi.includes("#eventCard.asset-panel-live:before{display:none;background:none}"));
+assert(baseUi.includes("#eventCard.asset-panel-live{\n  background:transparent;"));
+assert(baseUi.includes(".roster-panel:before{display:none;background:none}"));
+assert(baseUi.includes("#hero.asset-panel-lobby{padding:14px 12px 7px}"));
+assert(baseUi.includes("#hero.asset-panel-stats{padding:10px 9px}"));
+assert(baseUi.includes("#eventCard.asset-panel-live{padding:10px 8px}"));
+assert(baseUi.includes("#voteCard{padding:11px 9px}"));
+assert(!baseUi.includes("veil_ui_live_round_panel.svg"));
+
+// The exact production composition is now testable through one canonical builder.
+assert(composedUi.includes('id="veil-feature-pack-css"'));
+assert(composedUi.includes('id="veil-prize-pack-css"'));
+assert(composedUi.includes('id="veil-product-pass-css"'));
+assert(composedUi.includes('/sfx/veil-sfx-core.js'));
+assert(composedUi.includes('/sfx/veil-telegram-music.js'));
+assert.equal(count(composedUi, 'id="viewerStateCard"'), 1);
+assert.equal(count(composedUi, 'id="finalFiveStrip"'), 1);
+assert.equal(count(composedUi, 'class="arena-splash-bg"'), 1);
+assert.equal(count(composedUi, 'class="sponsorship-card"'), 1);
+assert(!composedUi.includes("background:none!important"));
 
 const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
 assert(!workerSource.includes("telegram-performance.js"));
 assert(!workerSource.includes("telegram-ui-polish.js"));
+assert(!workerSource.includes("telegram-miniapp-assets-batch2.js"));
+assert(!workerSource.includes("telegram-miniapp-assets-batch3.js"));
+assert(workerSource.includes('buildTelegramMiniAppHtml()'));
 
 const featureApiSource = readFileSync(new URL("../src/telegram-feature-api.js", import.meta.url), "utf8");
 assert(!featureApiSource.includes("state.serverTime = Date.now()"));
@@ -180,6 +193,11 @@ assert(featurePackSource.includes("SHOWDOWN VOTING OPENS HERE"));
 assert(featurePackSource.includes(".reaction-label"));
 assert(!featurePackSource.includes("function renderVoteProgress"));
 assert(!featurePackSource.includes("vote-progress-row"));
+assert(!featurePackSource.includes("function renderHostTools"));
+assert(!featurePackSource.includes("function renderRecap"));
+assert(!featurePackSource.includes('id="hostTools"'));
+assert(!featurePackSource.includes('id="recapPanel"'));
+assert(!featurePackSource.includes("strip=document.createElement"));
 assert(featurePackSource.includes("registerTimerHook(renderPausedTimer)"));
 assert(!featurePackSource.includes("render=function featureRender"));
 assert(featurePackSource.includes("width:94px"));
@@ -188,13 +206,13 @@ assert(!featurePackSource.includes("setConnection('syncing');\n    try{ const re
 
 const productPassSource = readFileSync(new URL("../src/telegram-product-pass.js", import.meta.url), "utf8");
 assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
-assert(productPassSource.includes('body[data-arena-phase="running"][data-arena-view="arena"] .main-grid'));
 assert(productPassSource.includes("⚙ HOST CONTROLS"));
 assert(productPassSource.includes("#hero.live-dashboard #hostTrigger"));
-assert(productPassSource.includes("body.crowd-vote-open #eventCard{display:none!important}"));
-assert(productPassSource.includes("body.crowd-vote-open #voteCard{display:block!important}"));
 assert(productPassSource.includes("margin-top:5px;min-height:36px"));
-assert(!productPassSource.includes('body[data-arena-phase="registration"] #hero .controls{grid-template-columns:repeat(2'));
+assert(!productPassSource.includes('body[data-arena-phase="running"][data-arena-view="arena"] .main-grid'));
+assert(!productPassSource.includes("body.crowd-vote-open #eventCard"));
+assert(!productPassSource.includes("document.body.dataset.arenaPhase=phase()"));
+assert(!productPassSource.includes("#controls [data-feature-action"));
 assert(!productPassSource.includes("render=function productRender"));
 
 const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", import.meta.url), "utf8");

@@ -1,19 +1,13 @@
 import { handleTelegramRoute } from "./telegram-control-fast.js";
-import { telegramFxMiniAppHtml } from "./telegram-fx-app.js";
-import { applyTelegramMiniAppAssetBatch2 } from "./telegram-miniapp-assets-batch2.js";
-import { applyTelegramMiniAppAssetBatch3 } from "./telegram-miniapp-assets-batch3.js";
-import { applyTelegramFeaturePack } from "./telegram-feature-pack.js";
-import { applyTelegramPrizePack } from "./telegram-prize-pack.js";
-import { applyTelegramProductPass } from "./telegram-product-pass.js";
+import { buildTelegramMiniAppHtml } from "./telegram-ui.js";
 import { handleDiscordRoute } from "./discord-control.js";
 import { ArenaCoordinator } from "./coordinator-features.js";
 import { handleDiscordActivityRoute } from "./discord-activity.js";
-import { injectVeilSfx } from "./sfx-integration.js";
 
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-18-telegram-event-plate-visible-1";
+const TELEGRAM_BUILD = "2026-09-18-telegram-visual-ownership-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -57,11 +51,7 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === "GET" && url.pathname === "/telegram/app") {
-      const telegramHtml = applyTelegramMiniAppAssetBatch2(telegramFxMiniAppHtml());
-      const assetHtml = applyTelegramMiniAppAssetBatch3(telegramHtml);
-      const featureHtml = applyTelegramFeaturePack(assetHtml);
-      const sponsorHtml = applyTelegramPrizePack(featureHtml);
-      return html(applyTelegramProductPass(injectVeilSfx(sponsorHtml)));
+      return html(buildTelegramMiniAppHtml());
     }
 
     if (url.pathname.startsWith("/telegram/")) {
