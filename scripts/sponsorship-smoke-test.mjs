@@ -98,8 +98,12 @@ assert(baseUi.includes("veil_ui_player_card.svg"));
 assert(baseUi.includes("veil_ui_player_state_alive.svg"));
 assert(baseUi.includes('id="registrationInline"'));
 assert(baseUi.includes("function renderRegistrationInline"));
-assert(baseUi.includes("repeat(auto-fit,minmax(88px,1fr))"));
 assert(baseUi.includes("ADD 4 BOTS"));
+assert(baseUi.includes("aspect-ratio:2.72/1"));
+assert(baseUi.includes("hero.classList.toggle('host-registration'"));
+assert(baseUi.includes("if(state.status==='registration'){\n    card.style.display='none'"));
+assert(baseUi.includes("grid-template-columns:repeat(3,minmax(0,1fr))"));
+assert(baseUi.includes(".hero-panel.host-registration #viewerReadout{display:none}"));
 assert(baseUi.includes("setInterval(updateTimerOnly,500)"));
 assert(!baseUi.includes("setInterval(()=>{if(state)render()},500)"));
 
@@ -108,8 +112,13 @@ assert(baseUi.includes("disableVerticalSwipes"));
 assert(baseUi.includes("function registerRenderHook"));
 assert(baseUi.includes("function registerTimerHook"));
 
+const batch2Source = readFileSync(new URL("../src/telegram-miniapp-assets-batch2.js", import.meta.url), "utf8");
+assert(batch2Source.includes("aspect-ratio:2.72/1"));
+
 const assetUi = applyTelegramMiniAppAssetBatch3(baseUi);
 assert(assetUi.includes(".roster-panel:before{display:none!important"));
+assert(assetUi.includes("#hero.asset-panel-lobby{padding:14px 12px 7px}"));
+assert(assetUi.includes(".roster-panel{padding:10px 0 0!important"));
 assert(!assetUi.includes("decorateAssetBatch3"));
 
 const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
@@ -129,6 +138,8 @@ assert(!featurePackSource.includes("setConnection('syncing');\n    try{ const re
 
 const productPassSource = readFileSync(new URL("../src/telegram-product-pass.js", import.meta.url), "utf8");
 assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
+assert(productPassSource.includes("margin-top:5px;min-height:36px"));
+assert(!productPassSource.includes('body[data-arena-phase="registration"] #hero .controls{grid-template-columns:repeat(2'));
 assert(!productPassSource.includes("render=function productRender"));
 
 const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", import.meta.url), "utf8");

@@ -25,14 +25,14 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   background:linear-gradient(155deg,#0e0b12e9,#070509ee)!important;
 }
 
-#hero.asset-panel-lobby{padding:clamp(34px,4vw,50px)}
+#hero.asset-panel-lobby{padding:clamp(22px,2.8vw,34px) clamp(24px,3.2vw,38px) clamp(14px,1.8vw,22px)}
 #hero.asset-panel-stats{padding:clamp(32px,4vw,48px)}
 #hero.asset-panel-results{padding:clamp(34px,4vw,50px)}
 #eventCard.asset-panel-live{padding:clamp(30px,3.8vw,46px)}
 #voteCard{padding:clamp(30px,3.8vw,46px)}
-.roster-panel{padding:18px 0 0!important;overflow:visible!important;background:transparent!important;filter:none!important}
+.roster-panel{padding:10px 0 0!important;overflow:visible!important;background:transparent!important;filter:none!important}
 .roster-panel:before{display:none!important;background:none!important}
-.roster-panel .section-head{padding:0 8px;margin-bottom:12px}
+.roster-panel .section-head{padding:0 8px;margin-bottom:8px}
 
 .event{
   position:relative;
@@ -65,7 +65,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 }
 
 @media(max-width:760px){
-  #hero.asset-panel-lobby{padding:24px 20px}
+  #hero.asset-panel-lobby{padding:18px 16px 10px}
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
@@ -77,7 +77,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 }
 
 @media(max-width:440px){
-  #hero.asset-panel-lobby{padding:18px 14px}
+  #hero.asset-panel-lobby{padding:14px 12px 7px}
   #hero.asset-panel-stats,
   #hero.asset-panel-results,
   #eventCard.asset-panel-live,
