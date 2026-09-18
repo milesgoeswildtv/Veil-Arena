@@ -1398,6 +1398,7 @@ function renderViewerStateCard(){
   const viewerId=String(state.viewer?.id||'');
   const transition=changeUntil.get(viewerId);
   const revivedNow=state.status==='running'&&state.viewer?.joined&&state.viewer?.alive&&transition?.kind==='back';
+  const eliminatedNow=state.status==='running'&&state.viewer?.joined&&!state.viewer?.alive&&transition?.kind==='out';
 
   let mode='spectator';
   let label='SPECTATOR';
@@ -1420,12 +1421,14 @@ function renderViewerStateCard(){
       detail='You are still alive in the Arena.';
     }else if(state.viewer.joined){
       mode='dead';
-      label='SPECTATING';
+      label=eliminatedNow?'ELIMINATED':'SPECTATING';
       title='OUT';
       icon='skull';
-      detail=state.viewer.canVote
-        ?'Community Showdown is open. Cast your vote.'
-        :'React below. Showdown voting unlocks when available.';
+      detail=eliminatedNow
+        ?'You are out. Spectator mode unlocked.'
+        :state.viewer.canVote
+          ?'Community Showdown is open. Cast your vote.'
+          :'React below. Showdown voting unlocks when available.';
     }else{
       mode='spectator';
       label='SPECTATOR';
@@ -1454,7 +1457,7 @@ function renderViewerStateCard(){
     }
   }
 
-  card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'')+(revivedNow?' revived-now':'');
+  card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'')+(revivedNow?' revived-now':'')+(eliminatedNow?' new-dead':'');
   card.style.display='block';
   $('viewerStateLabel').textContent=label;
   $('viewerStateTitle').textContent=title;
