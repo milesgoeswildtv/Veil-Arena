@@ -60,7 +60,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     }
     document.body.insertAdjacentHTML('beforeend','<div class="host-drawer" id="hostDrawer"><div class="host-drawer-sheet"><div class="drawer-head"><div class="drawer-title">HOST CONTROL</div><button type="button" class="feature-mini" data-product-close-host>CLOSE</button></div><div id="hostDrawerBody"></div></div></div><div class="player-sheet" id="playerSheet"><div class="player-sheet-card"><div class="drawer-head"><div><div class="player-sheet-name" id="playerSheetName">PLAYER</div><div class="player-sheet-state" id="playerSheetState"></div></div><button type="button" class="feature-mini" data-product-close-player>CLOSE</button></div><div class="player-sheet-grid" id="playerSheetGrid"></div></div></div>');
     const controls=q('controls');
-    if(controls&&!q('hostTrigger'))controls.insertAdjacentHTML('afterend','<button type="button" class="host-trigger" id="hostTrigger" data-product-host>⚙ HOST CONTROL</button>');
+    if(controls&&!q('hostTrigger'))controls.insertAdjacentHTML('afterend','<button type="button" class="host-trigger" id="hostTrigger" data-product-host>⚙ HOST CONTROLS</button>');
     const grid=q('featureGrid');
     if(grid){
       grid.classList.add('product-more');
