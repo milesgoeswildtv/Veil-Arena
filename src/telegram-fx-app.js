@@ -1299,13 +1299,13 @@ function renderViewerStateCard(){
 function currentRoundEvents(){
   const source=String(state?.lastEvent?.text||'').trim();
   if(!source)return [];
-  const firstNumber=source.search(/^\s*1\.\s+/m);
+  const firstNumber=source.search(/^\\s*1\\.\\s+/m);
   const body=(firstNumber>=0?source.slice(firstNumber):source)
-    .replace(/^\s*[^\n]*ROUND\s+\d+[^\n]*\n*/i,'')
+    .replace(/^\\s*[^\\n]*ROUND\\s+\\d+[^\\n]*\\n*/i,'')
     .trim();
   const parts=body
-    .split(/(?=^\s*\d+\.\s+)/m)
-    .map(part=>part.replace(/^\s*\d+\.\s+/,'').trim())
+    .split(/(?=^\\s*\\d+\\.\\s+)/m)
+    .map(part=>part.replace(/^\\s*\\d+\\.\\s+/,'').trim())
     .filter(Boolean);
   return (parts.length?parts:[body]).filter(Boolean).slice(0,4);
 }
