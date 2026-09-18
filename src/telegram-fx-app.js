@@ -1295,6 +1295,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 <script>
 const tg=window.Telegram&&window.Telegram.WebApp;
 const initData=tg?.initData||'';
+const afterdarkPreview=new URLSearchParams(location.search).get('afterdarkPreview')==='1';
 const A='/telegram/';
 const icons={
   arena:A+'veil_ui_icon_arena.svg',
@@ -2001,9 +2002,11 @@ async function bootTelegram(){
   scheduleRefresh();
 }
 
-bootTelegram();
-setInterval(updateTimerOnly,500);
-document.addEventListener('visibilitychange',()=>scheduleRefresh(250));
+if(!afterdarkPreview){
+  bootTelegram();
+  setInterval(updateTimerOnly,500);
+  document.addEventListener('visibilitychange',()=>scheduleRefresh(250));
+}
 </script>
 </body>
 </html>`;
