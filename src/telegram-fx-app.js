@@ -317,12 +317,6 @@ img{display:block;max-width:100%}
   padding:10px 11px;
   background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;
 }
-.live-event-label{
-  margin-bottom:6px;
-  color:#b98ad8;
-  font:950 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
-  letter-spacing:.15em;
-}
 .live-event-copy{
   color:#f4eef8;
   font-size:11px;
@@ -829,7 +823,7 @@ img{display:block;max-width:100%}
           <section class="panel" id="eventCard">
             <div class="section-head">
               <img id="eventIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
-              <h2>Live Event</h2>
+              <h2 id="eventHeading">Live Event</h2>
             </div>
             <div class="event" id="event">Waiting for Arena…</div>
             <div class="timer" id="timerRow">
@@ -1302,32 +1296,35 @@ function renderViewerStateCard(){
   $('viewerStateIcon').src=icons[icon]||icons.spectate;
 }
 
-function liveEventEntries(){
-  const rows=[];
-  const add=text=>{
-    const clean=String(text||'').trim();
-    if(clean&&!rows.includes(clean))rows.push(clean);
-  };
-  add(state?.lastEvent?.text);
-  for(const row of [...(state?.displayLog||[])].reverse()){
-    add(row?.text);
-    if(rows.length>=2)break;
-  }
-  return rows.slice(0,2);
+function currentRoundEvents(){
+  const source=String(state?.lastEvent?.text||'').trim();
+  if(!source)return [];
+  const firstNumber=source.search(/^\s*1\.\s+/m);
+  const body=(firstNumber>=0?source.slice(firstNumber):source)
+    .replace(/^\s*[^\n]*ROUND\s+\d+[^\n]*\n*/i,'')
+    .trim();
+  const parts=body
+    .split(/(?=^\s*\d+\.\s+)/m)
+    .map(part=>part.replace(/^\s*\d+\.\s+/,'').trim())
+    .filter(Boolean);
+  return (parts.length?parts:[body]).filter(Boolean).slice(0,4);
 }
 
 function renderEventText(){
   const target=$('event');
+  const heading=$('eventHeading');
   if(!target)return;
   if(state.status==='running'){
-    const rows=liveEventEntries();
+    const rows=currentRoundEvents();
     target.classList.add('live-event-grid');
-    target.innerHTML=(rows.length?rows:['Waiting for the next Arena event…']).map((text,index)=>
-      '<article class="live-event-entry"><div class="live-event-label">'+(index===0?'CURRENT':'PREVIOUS')+'</div><div class="live-event-copy">'+richText(text)+'</div></article>'
+    if(heading)heading.textContent='ROUND '+Number(state.round||0);
+    target.innerHTML=(rows.length?rows:['Waiting for the next Arena event…']).map(text=>
+      '<article class="live-event-entry"><div class="live-event-copy">'+richText(text)+'</div></article>'
     ).join('');
     return;
   }
   target.classList.remove('live-event-grid');
+  if(heading)heading.textContent='LIVE EVENT';
   const last=state.lastEvent?.text
     ||state.displayLog?.at(-1)?.text
     ||(state.status==='registration'?'Players are entering the Arena.':'No event yet.');
