@@ -11,6 +11,11 @@ import { applyTelegramPrizePack } from "../src/telegram-prize-pack.js";
 import { applyTelegramProductPass } from "../src/telegram-product-pass.js";
 import { telegramFxMiniAppHtml } from "../src/telegram-fx-app.js";
 import { buildTelegramMiniAppHtml } from "../src/telegram-ui.js";
+import {
+  compileTelegramVisualManifest,
+  TELEGRAM_VISUAL_DEFAULT_MANIFEST,
+  TELEGRAM_VISUAL_CAPABILITIES
+} from "../src/telegram-visual-contract.js";
 
 const game = {
   id: "test-arena",
@@ -100,7 +105,7 @@ assert(baseUi.includes('id="registrationInline"'));
 assert(baseUi.includes("function renderRegistrationInline"));
 assert(baseUi.includes("ADD 4 BOTS"));
 assert(baseUi.includes("aspect-ratio:2.72/1"));
-assert(baseUi.includes(".roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}"));
+assert(baseUi.includes(".roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--av-roster-gap,7px)}"));
 assert(baseUi.includes(".roster .player:last-child:nth-child(odd)"));
 assert(baseUi.includes(".player-badge{min-width:48px;height:18px"));
 assert(baseUi.includes(".hero-panel.live-dashboard"));
@@ -149,6 +154,22 @@ assert(baseUi.includes("--tg-viewport-stable-height"));
 assert(baseUi.includes("disableVerticalSwipes"));
 assert(baseUi.includes("function registerRenderHook"));
 assert(baseUi.includes("function registerTimerHook"));
+assert(baseUi.includes("const afterdarkPreview=new URLSearchParams(location.search).get('afterdarkPreview')==='1'"));
+assert(baseUi.includes("--av-event-padding:15px"));
+assert(baseUi.includes("var(--av-event-padding,15px)"));
+assert(baseUi.includes("var(--av-roster-gap,8px)"));
+assert(baseUi.includes("var(--av-sponsor-asset,url(\"/telegram/veil_ui_sponsor_panel.svg\"))"));
+
+const compiledVisuals = compileTelegramVisualManifest(structuredClone(TELEGRAM_VISUAL_DEFAULT_MANIFEST));
+assert(compiledVisuals.css.includes("--av-event-padding:15px"));
+assert(compiledVisuals.css.includes("@media(max-width:440px)"));
+assert(!compiledVisuals.css.includes("!important"));
+assert.equal(compiledVisuals.assets.eventPlate, "/telegram/NewEventBackgroundPlate.PNG");
+assert.deepEqual(compiledVisuals.capabilities, TELEGRAM_VISUAL_CAPABILITIES);
+assert.throws(
+  () => compileTelegramVisualManifest({ ...structuredClone(TELEGRAM_VISUAL_DEFAULT_MANIFEST), projectId: "not-arena" }),
+  /Wrong visual project manifest/
+);
 
 const composedUi = buildTelegramMiniAppHtml();
 const count = (text, needle) => text.split(needle).length - 1;
@@ -174,11 +195,25 @@ assert(composedUi.includes('id="veil-prize-pack-css"'));
 assert(composedUi.includes('id="veil-product-pass-css"'));
 assert(composedUi.includes('/sfx/veil-sfx-core.js'));
 assert(composedUi.includes('/sfx/veil-telegram-music.js'));
+assert(composedUi.includes('id="afterdark-visual-editor-adapter"'));
+assert(composedUi.includes("afterdark:ready"));
+assert(composedUi.includes("afterdark:manifest"));
+assert.equal(count(composedUi, 'id="afterdark-visual-editor-adapter"'), 1);
 assert.equal(count(composedUi, 'id="viewerStateCard"'), 1);
 assert.equal(count(composedUi, 'id="finalFiveStrip"'), 1);
 assert.equal(count(composedUi, 'class="arena-splash-bg"'), 1);
 assert.equal(count(composedUi, 'class="sponsorship-card"'), 1);
 assert(!composedUi.includes("background:none!important"));
+
+const visualAdapterSource = readFileSync(new URL("../src/telegram-visual-editor-adapter.js", import.meta.url), "utf8");
+assert(!visualAdapterSource.includes("../core/"));
+assert(!visualAdapterSource.includes("/telegram/api/action"));
+assert(visualAdapterSource.includes("CAPABILITIES"));
+assert(visualAdapterSource.includes("stopImmediatePropagation"));
+
+const packageSource = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+assert(packageSource.scripts["build:activity-client"].startsWith("npm run build:visuals"));
+assert(packageSource.scripts.test.startsWith("npm run build:visuals"));
 
 const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
 assert(!workerSource.includes("telegram-performance.js"));
