@@ -107,6 +107,11 @@ assert(baseUi.includes(".hero-panel.live-dashboard"));
 assert(baseUi.includes("function renderEventText"));
 assert(baseUi.includes("function currentRoundEvents"));
 assert(baseUi.includes("function renderCrowdVote"));
+assert(baseUi.includes("ELIMINATED"));
+assert(baseUi.includes("BACK IN THE ARENA"));
+assert(baseUi.includes("Spectator mode unlocked"));
+assert(baseUi.includes("mode==='revived'?'REVIVED'"));
+assert(baseUi.includes("renderViewerStateCard();"));
 assert(baseUi.includes("showdown-contender"));
 assert(baseUi.includes("voteCountdown"));
 assert(baseUi.includes("YOU CAN VOTE"));
@@ -134,6 +139,9 @@ assert(baseUi.includes("function registerTimerHook"));
 
 const batch2Source = readFileSync(new URL("../src/telegram-miniapp-assets-batch2.js", import.meta.url), "utf8");
 assert(batch2Source.includes("aspect-ratio:2.72/1"));
+assert(batch2Source.includes("asset-revived"));
+assert(batch2Source.includes("veil_ui_player_state_revived.svg"));
+assert(batch2Source.includes("revived-now"));
 assert(batch2Source.includes(".viewer-state-card.live-compact"));
 assert(batch2Source.includes("'        <div class=\"stack\">'"));
 
@@ -155,6 +163,9 @@ assert(!featureApiSource.includes("state.serverTime = Date.now()"));
 
 const featurePackSource = readFileSync(new URL("../src/telegram-feature-pack.js", import.meta.url), "utf8");
 assert(featurePackSource.includes("registerRenderHook(renderFeaturePack)"));
+assert(featurePackSource.includes("SPECTATOR REACTIONS"));
+assert(featurePackSource.includes("SHOWDOWN VOTING OPENS HERE"));
+assert(featurePackSource.includes(".reaction-label"));
 assert(!featurePackSource.includes("function renderVoteProgress"));
 assert(!featurePackSource.includes("vote-progress-row"));
 assert(featurePackSource.includes("registerTimerHook(renderPausedTimer)"));
