@@ -247,6 +247,92 @@ img{display:block;max-width:100%}
   margin-right:4px!important;
   vertical-align:-4px!important;
 }
+.hero-panel.live-dashboard{
+  min-height:0;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  grid-template-areas:
+    ". heading host"
+    "stats stats stats"
+    "error error error"
+    "controls controls controls";
+  align-items:center;
+  column-gap:8px;
+  row-gap:7px;
+}
+.hero-panel.live-dashboard .arena-heading{
+  grid-area:heading;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
+}
+.hero-panel.live-dashboard .arena-title{
+  gap:6px;
+  margin:0;
+}
+.hero-panel.live-dashboard .arena-title img{width:25px;height:25px}
+.hero-panel.live-dashboard .arena-title h1{
+  font-size:27px;
+  line-height:1;
+  letter-spacing:-.035em;
+}
+.hero-panel.live-dashboard .status-line{
+  min-height:0;
+  margin:0;
+  gap:4px;
+  font-size:9px;
+  white-space:nowrap;
+}
+.hero-panel.live-dashboard .status-line img{display:none}
+.hero-panel.live-dashboard .stats{
+  grid-area:stats;
+  gap:5px;
+}
+.hero-panel.live-dashboard .stat{
+  padding:6px 8px;
+  border-radius:10px;
+}
+.hero-panel.live-dashboard .stat-head{
+  font-size:7px;
+  letter-spacing:.08em;
+}
+.hero-panel.live-dashboard .stat-head img{width:13px;height:13px}
+.hero-panel.live-dashboard .stat b{
+  margin-top:3px;
+  font-size:20px;
+}
+.hero-panel.live-dashboard #viewerReadout{display:none}
+.hero-panel.live-dashboard #error{grid-area:error;margin-top:0}
+.hero-panel.live-dashboard #controls{grid-area:controls;margin-top:0}
+.hero-panel.live-dashboard #controls:empty{display:none}
+.live-event-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+.live-event-entry{
+  min-width:0;
+  padding:10px 11px;
+  background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;
+}
+.live-event-label{
+  margin-bottom:6px;
+  color:#b98ad8;
+  font:950 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.15em;
+}
+.live-event-copy{
+  color:#f4eef8;
+  font-size:11px;
+  line-height:1.38;
+  overflow-wrap:anywhere;
+}
+.live-event-copy .event-head{
+  margin-bottom:3px;
+  font-size:1em;
+}
 .stats{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -634,6 +720,15 @@ img{display:block;max-width:100%}
   .registration-inline{grid-template-columns:auto minmax(58px,1fr) auto;gap:6px;margin-bottom:7px}
   .registration-ready{font-size:8px;letter-spacing:.08em}
   .registration-lock{font-size:6px;padding:4px 6px}
+  .hero-panel.live-dashboard{padding-top:0}
+  .hero-panel.live-dashboard .arena-heading{gap:5px}
+  .hero-panel.live-dashboard .arena-title h1{font-size:24px}
+  .hero-panel.live-dashboard .status-line{font-size:8px}
+  .hero-panel.live-dashboard .stat{padding:5px 5px}
+  .hero-panel.live-dashboard .stat b{font-size:18px}
+  .live-event-grid{gap:5px}
+  .live-event-entry{padding:8px 8px}
+  .live-event-copy{font-size:10px;line-height:1.34}
   .roster{gap:6px}
   .player-name{left:28%;right:5%;top:18%;font-size:clamp(9px,2.8vw,12px);line-height:1.05}
   .bot-tag{margin-left:3px;padding:1px 3px;border-radius:4px;font-size:5px;vertical-align:1px}
@@ -686,13 +781,15 @@ img{display:block;max-width:100%}
 
       <div class="main-grid">
         <section class="panel hero-panel" id="hero">
-          <div class="arena-title">
-            <img src="/telegram/veil_ui_icon_arena.svg" alt="">
-            <h1>ARENA</h1>
-          </div>
-          <div class="status-line" id="statusLine">
-            <img id="statusIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
-            <span id="status">Connecting to Telegram…</span>
+          <div class="arena-heading">
+            <div class="arena-title">
+              <img src="/telegram/veil_ui_icon_arena.svg" alt="">
+              <h1>ARENA</h1>
+            </div>
+            <div class="status-line" id="statusLine">
+              <img id="statusIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
+              <span id="status">Connecting to Telegram…</span>
+            </div>
           </div>
 
           <div class="registration-inline" id="registrationInline" aria-live="polite">
@@ -754,7 +851,7 @@ img{display:block;max-width:100%}
       <section class="panel roster-panel">
         <div class="section-head">
           <img src="/telegram/veil_ui_icon_leaderboard.svg" alt="">
-          <h2>Live Roster</h2>
+          <h2 id="rosterHeading">Live Roster</h2>
         </div>
         <div class="roster" id="roster"></div>
       </section>
@@ -1154,6 +1251,7 @@ function renderAssetPanels(){
   if(hero){
     hero.classList.toggle('registration-mode',state.status==='registration');
     hero.classList.toggle('host-registration',state.status==='registration'&&Boolean(state.viewer?.isHost));
+    hero.classList.toggle('live-dashboard',state.status==='running');
   }
   if(eventCard)eventCard.classList.toggle('asset-panel-live',state.status==='running');
 }
@@ -1196,12 +1294,44 @@ function renderViewerStateCard(){
     if(won){mode='winner';label='WINNER';title='ARENA CHAMPION';icon='crown'}
     else{mode='spectator';label='COMPLETE';icon='success'}
   }
-  card.className='viewer-state-card asset-'+mode;
+  card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'');
   card.style.display='block';
   $('viewerStateLabel').textContent=label;
   $('viewerStateTitle').textContent=title;
   $('viewerStateDetail').textContent=$('viewerText').textContent||'Arena viewer state.';
   $('viewerStateIcon').src=icons[icon]||icons.spectate;
+}
+
+function liveEventEntries(){
+  const rows=[];
+  const add=text=>{
+    const clean=String(text||'').trim();
+    if(clean&&!rows.includes(clean))rows.push(clean);
+  };
+  add(state?.lastEvent?.text);
+  for(const row of [...(state?.displayLog||[])].reverse()){
+    add(row?.text);
+    if(rows.length>=2)break;
+  }
+  return rows.slice(0,2);
+}
+
+function renderEventText(){
+  const target=$('event');
+  if(!target)return;
+  if(state.status==='running'){
+    const rows=liveEventEntries();
+    target.classList.add('live-event-grid');
+    target.innerHTML=(rows.length?rows:['Waiting for the next Arena event…']).map((text,index)=>
+      '<article class="live-event-entry"><div class="live-event-label">'+(index===0?'CURRENT':'PREVIOUS')+'</div><div class="live-event-copy">'+richText(text)+'</div></article>'
+    ).join('');
+    return;
+  }
+  target.classList.remove('live-event-grid');
+  const last=state.lastEvent?.text
+    ||state.displayLog?.at(-1)?.text
+    ||(state.status==='registration'?'Players are entering the Arena.':'No event yet.');
+  target.innerHTML=richText(last);
 }
 
 function render(){
@@ -1225,6 +1355,8 @@ function render(){
   $('round').textContent=state.round;
   $('players').textContent=state.playerCount;
   $('alive').textContent=state.aliveCount;
+  const rosterHeading=$('rosterHeading');
+  if(rosterHeading)rosterHeading.textContent=state.status==='running'?'PLAYERS':'LIVE ROSTER';
 
   const frameKey=state.crowdVote?'vote':state.status;
   $('stateFrame').src=frames[frameKey]||frames.running;
@@ -1270,14 +1402,7 @@ function render(){
   }
   $('controls').innerHTML=controls;
 
-  const last=state.lastEvent?.text
-    ||state.displayLog?.at(-1)?.text
-    ||(state.status==='registration'
-      ?'Players are entering the Arena.'
-      :state.status==='running'
-        ?'Arena is moving…'
-        :'No event yet.');
-  $('event').innerHTML=richText(last);
+  renderEventText();
   $('eventIcon').src=icons[eventIconKey()]||icons.timer;
 
   updateTimerOnly();

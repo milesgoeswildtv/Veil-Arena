@@ -26,9 +26,9 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 }
 
 #hero.asset-panel-lobby{padding:clamp(22px,2.8vw,34px) clamp(24px,3.2vw,38px) clamp(14px,1.8vw,22px)}
-#hero.asset-panel-stats{padding:clamp(32px,4vw,48px)}
+#hero.asset-panel-stats{padding:clamp(14px,2vw,22px) clamp(18px,2.4vw,28px)}
 #hero.asset-panel-results{padding:clamp(34px,4vw,50px)}
-#eventCard.asset-panel-live{padding:clamp(30px,3.8vw,46px)}
+#eventCard.asset-panel-live{padding:14px 14px}
 #voteCard{padding:clamp(30px,3.8vw,46px)}
 .roster-panel{padding:10px 0 0!important;overflow:visible!important;background:transparent!important;filter:none!important}
 .roster-panel:before{display:none!important;background:none!important}
@@ -43,6 +43,11 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   border-radius:10px;
 }
 .event>*{position:relative;z-index:1}
+#eventCard.asset-panel-live .section-head{margin-bottom:8px}
+#eventCard.asset-panel-live .section-head img{width:20px;height:20px}
+#eventCard.asset-panel-live .section-head h2{font-size:9px}
+#eventCard.asset-panel-live .event{min-height:0;padding:0}
+#eventCard.asset-panel-live .timer{margin-top:7px;min-height:24px;font-size:10px}
 
 .readout{
   min-height:54px;
@@ -66,9 +71,9 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 
 @media(max-width:760px){
   #hero.asset-panel-lobby{padding:18px 16px 10px}
-  #hero.asset-panel-stats,
-  #hero.asset-panel-results,
-  #eventCard.asset-panel-live,
+  #hero.asset-panel-stats{padding:12px 12px}
+  #hero.asset-panel-results{padding:30px 24px}
+  #eventCard.asset-panel-live{padding:12px 10px}
   #voteCard{padding:30px 24px}
   .event{min-height:132px;padding:22px}
   #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px!important}
@@ -78,9 +83,9 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 
 @media(max-width:440px){
   #hero.asset-panel-lobby{padding:14px 12px 7px}
-  #hero.asset-panel-stats,
-  #hero.asset-panel-results,
-  #eventCard.asset-panel-live,
+  #hero.asset-panel-stats{padding:10px 9px}
+  #hero.asset-panel-results{padding:26px 19px}
+  #eventCard.asset-panel-live{padding:10px 8px}
   #voteCard{padding:26px 19px}
   .event{min-height:118px;padding:19px 18px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px!important}

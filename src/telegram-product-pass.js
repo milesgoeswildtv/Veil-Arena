@@ -8,7 +8,22 @@ export function applyTelegramProductPass(html) {
 @keyframes productPulse{to{opacity:.35;transform:scale(.72)}}
 body[data-arena-phase="registration"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr!important}
 body[data-arena-phase="registration"][data-arena-view="arena"] .stack{display:none!important}
-body[data-arena-phase="running"] #eventCard{box-shadow:0 0 0 1px #c45cff16,0 18px 38px #0008}
+body[data-arena-phase="running"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr!important;gap:8px}
+body[data-arena-phase="running"] #eventCard{box-shadow:0 0 0 1px #c45cff16,0 12px 28px #0007}
+body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{
+  grid-area:host;
+  display:block;
+  width:auto;
+  min-width:104px;
+  min-height:32px;
+  margin:0;
+  padding:0 9px;
+  justify-self:end;
+  border-radius:9px;
+  font-size:8px;
+  letter-spacing:.08em;
+}
+body[data-arena-phase="running"] #hero.live-dashboard #controls{display:none}
 body[data-arena-phase="running"] #timerRow{min-height:46px!important;margin-top:12px!important;padding:9px 13px!important;border:1px solid #4d335c;border-radius:12px;background:#0a0710;color:#dbc6e8!important;font:950 12px/1 ui-monospace,monospace;letter-spacing:.08em}
 body[data-arena-phase="running"] #timerRow img{width:23px!important;height:23px!important}
 body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-head h2:after{content:" // LIVE";color:#b56ee4}
@@ -27,7 +42,7 @@ body[data-arena-view="more"] #hostTools,body[data-arena-view="more"] #recapPanel
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex!important;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
-@media(max-width:440px){.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:92px;min-height:30px;font-size:7px;padding:0 7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
@@ -45,7 +60,7 @@ body.arena-network-offline .product-loading{display:flex!important;border-color:
     }
     document.body.insertAdjacentHTML('beforeend','<div class="host-drawer" id="hostDrawer"><div class="host-drawer-sheet"><div class="drawer-head"><div class="drawer-title">HOST CONTROL</div><button type="button" class="feature-mini" data-product-close-host>CLOSE</button></div><div id="hostDrawerBody"></div></div></div><div class="player-sheet" id="playerSheet"><div class="player-sheet-card"><div class="drawer-head"><div><div class="player-sheet-name" id="playerSheetName">PLAYER</div><div class="player-sheet-state" id="playerSheetState"></div></div><button type="button" class="feature-mini" data-product-close-player>CLOSE</button></div><div class="player-sheet-grid" id="playerSheetGrid"></div></div></div>');
     const controls=q('controls');
-    if(controls&&!q('hostTrigger'))controls.insertAdjacentHTML('afterend','<button type="button" class="host-trigger" id="hostTrigger" data-product-host>⚙ HOST CONTROL</button>');
+    if(controls&&!q('hostTrigger'))controls.insertAdjacentHTML('afterend','<button type="button" class="host-trigger" id="hostTrigger" data-product-host>⚙ HOST CONTROLS</button>');
     const grid=q('featureGrid');
     if(grid){
       grid.classList.add('product-more');
