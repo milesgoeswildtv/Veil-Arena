@@ -1139,8 +1139,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
             </div>
           </div>
 
-          <div class="final-five-strip" id="finalFiveStrip">FINAL FIVE // SPECIAL EVENTS LOCKED OUT</div>
-
           <div class="registration-inline" id="registrationInline" aria-live="polite">
             <span class="registration-ready" id="registrationReady">0 / 0 READY</span>
             <span class="registration-track"><span id="registrationProgress"></span></span>
@@ -1173,6 +1171,8 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
           </div>
           <div class="controls" id="controls"></div>
         </section>
+
+        <div class="final-five-strip" id="finalFiveStrip">FINAL FIVE // SPECIAL EVENTS LOCKED OUT</div>
 
         <section class="viewer-state-card asset-spectator" id="viewerStateCard" aria-label="Your Arena state">
           <div class="viewer-portrait"><img id="viewerStateIcon" src="/telegram/veil_ui_icon_spectate.svg" alt=""></div>
