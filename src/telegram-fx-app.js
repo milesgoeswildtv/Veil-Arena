@@ -473,16 +473,115 @@ img{display:block;max-width:100%}
 .timer img{width:20px;height:20px}
 .vote-panel{display:none}
 .vote-panel.live{animation:voteGlow 1.25s ease-in-out infinite alternate}
+.showdown-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+.showdown-header .section-head{margin:0}
+.showdown-status{
+  text-align:right;
+  color:#d7b0ef;
+  font:950 8px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.showdown-countdown{
+  display:block;
+  margin-top:4px;
+  color:#fff;
+  font-size:12px;
+  letter-spacing:.05em;
+}
 .vote-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
+  gap:7px;
 }
-.vote-note{
-  grid-column:1/-1;
-  color:#b8a9c3;
+.showdown-contender{
+  --showdown-select:none;
+  position:relative;
+  min-width:0;
+  min-height:112px;
+  padding:13px 12px 11px;
+  background-image:var(--showdown-select),url("/telegram/veil_ui_player_state_alive.svg"),url("/telegram/veil_ui_player_card.svg");
+  background-position:center,center,center;
+  background-repeat:no-repeat,no-repeat,no-repeat;
+  background-size:100% 100%,100% 100%,100% 100%;
+  filter:drop-shadow(0 8px 14px #0008);
+}
+.showdown-contender.selected{
+  --showdown-select:url("/telegram/veil_ui_player_state_selected.svg");
+  filter:drop-shadow(0 0 15px #c06cff77) drop-shadow(0 8px 14px #0008);
+}
+.showdown-contender-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding-right:6px;
   font-size:13px;
-  line-height:1.45;
+  font-weight:1000;
+}
+.showdown-contender-sub{
+  margin-top:3px;
+  color:#9f91aa;
+  font:850 7px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.1em;
+}
+.showdown-bar{
+  height:7px;
+  margin-top:16px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#24172d;
+  box-shadow:inset 0 0 0 1px #ffffff0a;
+}
+.showdown-bar span{
+  display:block;
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#8551d7,#d06cff);
+  transition:width .2s ease;
+}
+.showdown-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:5px;
+  color:#bcaec6;
+  font:850 7px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.08em;
+}
+.showdown-vote{
+  width:100%;
+  min-height:30px;
+  margin-top:9px;
+  border:1px solid #68437a;
+  border-radius:8px;
+  background:#130b1a;
+  color:#fff;
+  font:950 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+}
+.showdown-vote.selected{
+  border-color:#c178f3;
+  background:#4a2364;
+  box-shadow:0 0 12px #c178f344;
+}
+.showdown-vote:disabled{opacity:.46}
+.showdown-note{
+  grid-column:1/-1;
+  padding:8px 10px;
+  border:1px solid #493258;
+  border-radius:9px;
+  background:#0a0710;
+  color:#b8a9c3;
+  font-size:9px;
+  line-height:1.4;
 }
 .roster-panel{margin-top:14px}
 .roster{
@@ -723,6 +822,11 @@ img{display:block;max-width:100%}
   .live-event-grid{gap:5px}
   .live-event-entry{padding:8px 8px}
   .live-event-copy{font-size:10px;line-height:1.34}
+  .showdown-contender{min-height:98px;padding:10px 9px 8px}
+  .showdown-contender-name{font-size:11px}
+  .showdown-bar{margin-top:12px}
+  .showdown-status{font-size:7px}
+  .showdown-countdown{font-size:11px}
   .roster{gap:6px}
   .player-name{left:28%;right:5%;top:18%;font-size:clamp(9px,2.8vw,12px);line-height:1.05}
   .bot-tag{margin-left:3px;padding:1px 3px;border-radius:4px;font-size:5px;vertical-align:1px}
@@ -833,9 +937,15 @@ img{display:block;max-width:100%}
           </section>
 
           <section class="panel vote-panel" id="voteCard">
-            <div class="section-head">
-              <img src="/telegram/veil_ui_icon_vote.svg" alt="">
-              <h2>Community Showdown</h2>
+            <div class="showdown-header">
+              <div class="section-head">
+                <img src="/telegram/veil_ui_icon_vote.svg" alt="">
+                <h2>Community Showdown</h2>
+              </div>
+              <div class="showdown-status">
+                <span id="voteStateText">SPECTATORS VOTING</span>
+                <span class="showdown-countdown" id="voteCountdown"></span>
+              </div>
             </div>
             <div class="vote-grid" id="voteGrid"></div>
           </section>
@@ -1126,10 +1236,6 @@ function button(label,action,cls='',iconKey=''){
   return '<button type="button" class="veil-button '+cls+'" data-action="'+action+'">'+icon+esc(label)+'</button>';
 }
 
-function voteButton(label,id,selected){
-  return '<button type="button" class="veil-button '+(selected?'primary selected':'')+'" data-vote="'+esc(id)+'">'+esc(label)+'</button>';
-}
-
 function statusPresentation(){
   if(!state)return {label:'CONNECTING',cls:'pending',icon:'timer'};
   if(state.status==='registration'){
@@ -1155,11 +1261,20 @@ function updateTimerOnly(){
   if(!state)return;
   const timer=$('timer');
   const timerRow=$('timerRow');
-  if(state.status==='running'&&state.nextAdvanceAt){
+  const voteDeadline=Number(state.crowdVote?.closesAt||0);
+  const voteCountdown=$('voteCountdown');
+  if(voteDeadline){
+    const sec=Math.max(0,Math.ceil((voteDeadline-Date.now())/1000));
+    if(voteCountdown)voteCountdown.textContent=sec?sec+'s':'RESOLVING…';
+    timer.textContent='';
+    timerRow.style.display='none';
+  }else if(state.status==='running'&&state.nextAdvanceAt){
+    if(voteCountdown)voteCountdown.textContent='';
     const sec=Math.max(0,Math.ceil((state.nextAdvanceAt-Date.now())/1000));
     timer.textContent=sec?'Next event in '+sec+'s':'Resolving…';
     timerRow.style.display='flex';
   }else{
+    if(voteCountdown)voteCountdown.textContent='';
     timer.textContent='';
     timerRow.style.display='none';
   }
@@ -1331,6 +1446,48 @@ function renderEventText(){
   target.innerHTML=richText(last);
 }
 
+function renderCrowdVote(){
+  const card=$('voteCard');
+  const grid=$('voteGrid');
+  if(!card||!grid)return;
+  const vote=state.crowdVote;
+  document.body.classList.toggle('crowd-vote-open',Boolean(vote));
+  if(!vote){
+    card.style.display='none';
+    card.classList.remove('live');
+    grid.innerHTML='';
+    return;
+  }
+
+  card.style.display='block';
+  card.classList.add('live');
+  const totals=vote.totals||{};
+  const ids=vote.eligibleIds||[];
+  const totalVotes=Object.values(totals).reduce((sum,value)=>sum+Number(value||0),0);
+  const selectedId=vote.selectedId==null?null:String(vote.selectedId);
+  const canVote=Boolean(state.viewer?.canVote);
+  const stateText=$('voteStateText');
+  if(stateText)stateText.textContent=canVote?(selectedId?'VOTE LOCKED':'YOU CAN VOTE'):'SPECTATORS VOTING';
+
+  grid.innerHTML=ids.map(id=>{
+    const key=String(id);
+    const player=(state.players||[]).find(item=>String(item.id)===key);
+    const votes=Number(totals[id]??totals[key]??0);
+    const pct=totalVotes?Math.round(votes*100/totalVotes):0;
+    const selected=selectedId===key;
+    const button=canVote
+      ?'<button type="button" class="showdown-vote '+(selected?'selected':'')+'" data-vote="'+esc(key)+'">'+(selected?'VOTED':'VOTE')+'</button>'
+      :'';
+    return '<article class="showdown-contender '+(selected?'selected':'')+'">'
+      +'<div class="showdown-contender-name">'+esc(player?.displayName||'Player')+'</div>'
+      +'<div class="showdown-contender-sub">COMMUNITY TARGET</div>'
+      +'<div class="showdown-bar"><span style="width:'+pct+'%"></span></div>'
+      +'<div class="showdown-meta"><span>'+votes+' VOTE'+(votes===1?'':'S')+'</span><span>'+pct+'%</span></div>'
+      +button
+      +'</article>';
+  }).join('')+(canVote?'':'<div class="showdown-note">You are still in the Arena. Eliminated players and spectators are choosing who enters the showdown.</div>');
+}
+
 function render(){
   if(!state)return;
   renderAssetPanels();
@@ -1406,25 +1563,7 @@ function render(){
   renderRoster();
   renderViewerStateCard();
 
-  const vc=$('voteCard');
-  const vg=$('voteGrid');
-  if(state.crowdVote){
-    vc.style.display='block';
-    vc.classList.add('live');
-    if(state.viewer.canVote){
-      vg.innerHTML=state.crowdVote.eligibleIds.map(id=>{
-        const p=state.players.find(x=>x.id===id);
-        const selected=state.crowdVote.selectedId===id;
-        return voteButton(p?.displayName||'Player',id,selected);
-      }).join('');
-    }else{
-      vg.innerHTML='<div class="vote-note">Spectators are voting. The top two go to a 1v1.</div>';
-    }
-  }else{
-    vc.style.display='none';
-    vc.classList.remove('live');
-    vg.innerHTML='';
-  }
+  renderCrowdVote();
 
   runRenderHooks();
 }
