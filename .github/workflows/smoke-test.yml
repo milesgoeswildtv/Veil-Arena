@@ -42,6 +42,12 @@ jobs:
           node --check src/telegram-control.js
           node --check src/telegram-app.js
           node --check src/telegram-worker.js
+          node --check src/telegram-fx-app.js
+          node --check src/telegram-ui.js
+          node --check src/telegram-visual-contract.js
+          node --check src/telegram-visual-editor-adapter.js
+          node --check src/generated/telegram-visuals.js
+          node --check scripts/compile-telegram-visuals.mjs
           node --check src/dwallet-direct-tip.js
           node --check src/dwallet-payout.js
           node --check src/core/engine.js

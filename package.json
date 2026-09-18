@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:activity-client": "vite build --config activity/vite.config.js && node scripts/sync-telegram-assets.mjs",
+    "build:activity-client": "npm run build:visuals && vite build --config activity/vite.config.js && node scripts/sync-telegram-assets.mjs",
     "build": "npm run build:activity-client",
-    "test": "node scripts/smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/dwallet-payout-smoke-test.mjs",
-    "deploy": "npm run build:activity-client && wrangler deploy"
+    "test": "npm run build:visuals && node scripts/smoke-test.mjs && node scripts/full-tilt-copy-smoke-test.mjs && node scripts/sponsorship-smoke-test.mjs && node scripts/dwallet-payout-smoke-test.mjs",
+    "deploy": "npm run build:activity-client && wrangler deploy",
+    "build:visuals": "node scripts/compile-telegram-visuals.mjs"
   },
   "dependencies": {
     "@discord/embedded-app-sdk": "^2.5.0"
