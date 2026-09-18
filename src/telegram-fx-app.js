@@ -851,7 +851,7 @@ img{display:block;max-width:100%}
       <section class="panel roster-panel">
         <div class="section-head">
           <img src="/telegram/veil_ui_icon_leaderboard.svg" alt="">
-          <h2>Live Roster</h2>
+          <h2 id="rosterHeading">Live Roster</h2>
         </div>
         <div class="roster" id="roster"></div>
       </section>
@@ -1355,6 +1355,8 @@ function render(){
   $('round').textContent=state.round;
   $('players').textContent=state.playerCount;
   $('alive').textContent=state.aliveCount;
+  const rosterHeading=$('rosterHeading');
+  if(rosterHeading)rosterHeading.textContent=state.status==='running'?'PLAYERS':'LIVE ROSTER';
 
   const frameKey=state.crowdVote?'vote':state.status;
   $('stateFrame').src=frames[frameKey]||frames.running;
