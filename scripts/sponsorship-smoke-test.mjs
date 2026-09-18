@@ -111,7 +111,7 @@ assert(baseUi.includes("showdown-contender"));
 assert(baseUi.includes("voteCountdown"));
 assert(baseUi.includes("YOU CAN VOTE"));
 assert(baseUi.includes("SPECTATORS VOTING"));
-assert(baseUi.includes("vote.closesAt"));
+assert(baseUi.includes("state.crowdVote?.closesAt"));
 assert(baseUi.includes("crowd-vote-open"));
 assert(baseUi.includes("slice(0,4)"));
 assert(baseUi.includes("eventHeading"));
