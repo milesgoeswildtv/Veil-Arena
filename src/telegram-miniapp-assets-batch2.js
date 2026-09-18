@@ -60,7 +60,7 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   position:relative;
   display:none;
   width:min(520px,100%);
-  aspect-ratio:2/1;
+  aspect-ratio:2.72/1;
   margin:14px 0 0 auto;
   overflow:hidden;
   background-image:var(--viewer-state),url("/telegram/veil_ui_player_card.svg");
@@ -75,20 +75,20 @@ export function applyTelegramMiniAppAssetBatch2(html) {
 .viewer-state-card.asset-winner{--viewer-state:url("/telegram/veil_ui_player_state_winner.svg")}
 .viewer-state-card .viewer-portrait{
   position:absolute;
-  left:7.3%;
-  top:23%;
-  width:21%;
-  height:54%;
+  left:6.2%;
+  top:18%;
+  width:18.5%;
+  height:64%;
   display:grid;
   place-items:center;
 }
 .viewer-state-card .viewer-portrait img{width:46%;filter:drop-shadow(0 0 10px #a966ff88)}
 .viewer-state-copy{
   position:absolute;
-  left:34.5%;
-  right:7%;
-  top:24%;
-  bottom:17%;
+  left:29%;
+  right:6%;
+  top:19%;
+  bottom:14%;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -98,14 +98,14 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:clamp(14px,2vw,20px);
+  font-size:clamp(13px,1.8vw,18px);
   font-weight:1000;
   letter-spacing:.02em;
 }
 .viewer-state-copy span{
   color:#b8a9c3;
-  font-size:clamp(10px,1.3vw,12px);
-  line-height:1.35;
+  font-size:clamp(9px,1.15vw,11px);
+  line-height:1.25;
 }
 .viewer-state-label{
   align-self:flex-start;
@@ -139,7 +139,7 @@ export function applyTelegramMiniAppAssetBatch2(html) {
 .sponsorship-copy strong{display:block;margin-top:5px;font-size:14px;letter-spacing:.08em}
 @media(max-width:760px){
   .arena-splash-bg{opacity:.17;object-position:center top}
-  .viewer-state-card{width:100%;margin-top:10px}
+  .viewer-state-card{width:100%;margin-top:7px}
   .sponsorship-card{min-height:94px;padding:24px 34px}
 }
 @media(max-width:440px){
