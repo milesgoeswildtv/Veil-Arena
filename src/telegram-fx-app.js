@@ -1468,8 +1468,9 @@ function renderViewerStateCard(){
 function currentRoundEvents(){
   const source=String(state?.lastEvent?.text||'').trim();
   if(!source)return [];
-  const firstNumber=source.search(/^\\s*1\\.\\s+/m);
-  const body=(firstNumber>=0?source.slice(firstNumber):source)
+  const normalized=source.replaceAll(String.fromCharCode(92)+'.','.');
+  const firstNumber=normalized.search(/^\\s*1\\.\\s+/m);
+  const body=(firstNumber>=0?normalized.slice(firstNumber):normalized)
     .replace(/^\\s*[^\\n]*ROUND\\s+\\d+[^\\n]*\\n*/i,'')
     .trim();
   const parts=body
