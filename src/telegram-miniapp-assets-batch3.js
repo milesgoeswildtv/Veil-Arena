@@ -72,8 +72,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 @media(max-width:760px){
   #hero.asset-panel-lobby{padding:18px 16px 10px}
   #hero.asset-panel-stats{padding:12px 12px}
-  #hero.asset-panel-results,
-  #hero.asset-panel-results,
+  #hero.asset-panel-results{padding:30px 24px}
   #eventCard.asset-panel-live{padding:12px 10px}
   #voteCard{padding:30px 24px}
   .event{min-height:132px;padding:22px}
@@ -85,8 +84,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 @media(max-width:440px){
   #hero.asset-panel-lobby{padding:14px 12px 7px}
   #hero.asset-panel-stats{padding:10px 9px}
-  #hero.asset-panel-results,
-  #hero.asset-panel-results,
+  #hero.asset-panel-results{padding:26px 19px}
   #eventCard.asset-panel-live{padding:10px 8px}
   #voteCard{padding:26px 19px}
   .event{min-height:118px;padding:19px 18px}
