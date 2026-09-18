@@ -103,6 +103,12 @@ assert(baseUi.includes("aspect-ratio:2.72/1"));
 assert(baseUi.includes(".roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}"));
 assert(baseUi.includes(".roster .player:last-child:nth-child(odd)"));
 assert(baseUi.includes(".player-badge{min-width:48px;height:18px"));
+assert(baseUi.includes(".hero-panel.live-dashboard"));
+assert(baseUi.includes("function renderEventText"));
+assert(baseUi.includes("CURRENT"));
+assert(baseUi.includes("PREVIOUS"));
+assert(baseUi.includes("rosterHeading"));
+assert(baseUi.includes("live-compact"));
 assert(baseUi.includes("hero.classList.toggle('host-registration'"));
 assert(baseUi.includes("if(state.status==='registration'){\n    card.style.display='none'"));
 assert(baseUi.includes("grid-template-columns:repeat(3,minmax(0,1fr))"));
@@ -117,11 +123,15 @@ assert(baseUi.includes("function registerTimerHook"));
 
 const batch2Source = readFileSync(new URL("../src/telegram-miniapp-assets-batch2.js", import.meta.url), "utf8");
 assert(batch2Source.includes("aspect-ratio:2.72/1"));
+assert(batch2Source.includes(".viewer-state-card.live-compact"));
+assert(batch2Source.includes("'        <div class=\"stack\">'"));
 
 const assetUi = applyTelegramMiniAppAssetBatch3(baseUi);
 assert(assetUi.includes(".roster-panel:before{display:none!important"));
 assert(assetUi.includes("#hero.asset-panel-lobby{padding:14px 12px 7px}"));
 assert(assetUi.includes(".roster-panel{padding:10px 0 0!important"));
+assert(assetUi.includes("#hero.asset-panel-stats{padding:10px 9px}"));
+assert(assetUi.includes("#eventCard.asset-panel-live{padding:10px 8px}"));
 assert(!assetUi.includes("decorateAssetBatch3"));
 
 const workerSource = readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
@@ -141,6 +151,9 @@ assert(!featurePackSource.includes("setConnection('syncing');\n    try{ const re
 
 const productPassSource = readFileSync(new URL("../src/telegram-product-pass.js", import.meta.url), "utf8");
 assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
+assert(productPassSource.includes('body[data-arena-phase="running"][data-arena-view="arena"] .main-grid'));
+assert(productPassSource.includes("⚙ HOST CONTROLS"));
+assert(productPassSource.includes("#hero.live-dashboard #hostTrigger"));
 assert(productPassSource.includes("margin-top:5px;min-height:36px"));
 assert(!productPassSource.includes('body[data-arena-phase="registration"] #hero .controls{grid-template-columns:repeat(2'));
 assert(!productPassSource.includes("render=function productRender"));
