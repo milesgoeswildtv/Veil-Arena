@@ -310,12 +310,17 @@ img{display:block;max-width:100%}
 .live-event-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
+  grid-auto-rows:auto;
+  align-items:stretch;
+  gap:0;
+  padding:14px 15px 15px;
+  background:url("/telegram/NewEventBackgroundPlate.PNG") center/100% 100% no-repeat;
 }
 .live-event-entry{
   min-width:0;
-  padding:10px 11px;
-  background:url("/telegram/input_frame.svg") center/100% 100% no-repeat;
+  min-height:0;
+  padding:11px 12px;
+  background:transparent;
 }
 .live-event-copy{
   color:#f4eef8;
@@ -819,7 +824,7 @@ img{display:block;max-width:100%}
   .hero-panel.live-dashboard .status-line{font-size:8px}
   .hero-panel.live-dashboard .stat{padding:5px 5px}
   .hero-panel.live-dashboard .stat b{font-size:18px}
-  .live-event-grid{gap:5px}
+  .live-event-grid{gap:0;padding:10px 10px 11px}
   .live-event-entry{padding:8px 8px}
   .live-event-copy{font-size:10px;line-height:1.34}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
