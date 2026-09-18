@@ -154,6 +154,9 @@ assert(assetUi.includes("#hero.asset-panel-lobby{padding:14px 12px 7px}"));
 assert(assetUi.includes(".roster-panel{padding:10px 0 0!important"));
 assert(assetUi.includes("#hero.asset-panel-stats{padding:10px 9px}"));
 assert(assetUi.includes("#eventCard.asset-panel-live{padding:10px 8px}"));
+assert(assetUi.includes("#eventCard.asset-panel-live:before{display:none!important;background:none!important}"));
+assert(assetUi.includes("#eventCard.asset-panel-live{\n  background:transparent!important;"));
+assert(!assetUi.includes("veil_ui_live_round_panel.svg"));
 assert(assetUi.includes("#voteCard{padding:11px 9px}"));
 assert(!assetUi.includes("decorateAssetBatch3"));
 
