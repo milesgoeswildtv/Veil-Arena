@@ -1283,7 +1283,10 @@ function updateTimerOnly(){
   for(const [id,change] of changeUntil){
     if(change.until<=now){changeUntil.delete(id);expiredRosterFx=true}
   }
-  if(expiredRosterFx)renderRoster();
+  if(expiredRosterFx){
+    renderRoster();
+    renderViewerStateCard();
+  }
   const cooldown=document.querySelector('.cooldown-note');
   if(cooldown&&state.cooldownRemainingMs>0&&state.cooldownText)cooldown.textContent='Next Arena in '+state.cooldownText;
   runTimerHooks();
@@ -1340,7 +1343,7 @@ function renderRoster(){
     kos.style.visibility=player.eliminations?'visible':'hidden';
     const badge=row.querySelector('.player-badge');
     badge.className='player-badge '+(player.alive?'alive':'dead');
-    badge.textContent=player.alive?'ALIVE':'OUT';
+    badge.textContent=mode==='revived'?'REVIVED':(player.alive?'ALIVE':'OUT');
     const icon=row.querySelector('.player-state-icon');
     icon.src=mode==='winner'?icons.crown:(mode==='dead'?icons.skull:(mode==='revived'?icons.revive:icons.arena));
     roster.appendChild(row);
@@ -1391,23 +1394,71 @@ function renderViewerStateCard(){
     card.style.display='none';
     return;
   }
+
+  const viewerId=String(state.viewer?.id||'');
+  const transition=changeUntil.get(viewerId);
+  const revivedNow=state.status==='running'&&state.viewer?.joined&&state.viewer?.alive&&transition?.kind==='back';
+
   let mode='spectator';
   let label='SPECTATOR';
   let title='YOU';
   let icon='spectate';
-  if(state.status==='registration'&&state.viewer.joined){mode='alive';label='REGISTERED';icon='success'}
-  if(state.status==='running'&&state.viewer.alive){mode='alive';label='ALIVE';icon='arena'}
-  if(state.status==='running'&&state.viewer.joined&&!state.viewer.alive){mode='spectator';label='SPECTATING';icon='spectate'}
-  if(state.status==='finished'){
-    const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
-    if(won){mode='winner';label='WINNER';title='ARENA CHAMPION';icon='crown'}
-    else{mode='spectator';label='COMPLETE';icon='success'}
+  let detail='Watching Arena.';
+
+  if(state.status==='running'){
+    if(revivedNow){
+      mode='revived';
+      label='REVIVED';
+      title='BACK IN THE ARENA';
+      icon='revive';
+      detail='Second chance active. You are alive again.';
+    }else if(state.viewer.alive){
+      mode='alive';
+      label='ALIVE';
+      title='YOU';
+      icon='arena';
+      detail='You are still alive in the Arena.';
+    }else if(state.viewer.joined){
+      mode='dead';
+      label='SPECTATING';
+      title='OUT';
+      icon='skull';
+      detail=state.viewer.canVote
+        ?'Community Showdown is open. Cast your vote.'
+        :'React below. Showdown voting unlocks when available.';
+    }else{
+      mode='spectator';
+      label='SPECTATOR';
+      title='WATCHING';
+      icon='spectate';
+      detail=state.viewer.canVote
+        ?'Community Showdown is open. Cast your vote.'
+        :'Watch live. Showdown voting unlocks when available.';
+    }
   }
-  card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'');
+
+  if(state.status==='finished'){
+    const won=state.winnerId&&String(state.winnerId)===viewerId;
+    if(won){
+      mode='winner';
+      label='WINNER';
+      title='ARENA CHAMPION';
+      icon='crown';
+      detail='You won the Arena.';
+    }else{
+      mode='spectator';
+      label='COMPLETE';
+      title='MATCH OVER';
+      icon='success';
+      detail='Final result locked.';
+    }
+  }
+
+  card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'')+(revivedNow?' revived-now':'');
   card.style.display='block';
   $('viewerStateLabel').textContent=label;
   $('viewerStateTitle').textContent=title;
-  $('viewerStateDetail').textContent=$('viewerText').textContent||'Arena viewer state.';
+  $('viewerStateDetail').textContent=detail;
   $('viewerStateIcon').src=icons[icon]||icons.spectate;
 }
 
@@ -1523,9 +1574,11 @@ function render(){
       :'You are watching registration. Join before the host starts.';
     viewerIcon=state.viewer.joined?'success':'spectate';
   }else if(state.status==='running'){
-    if(state.viewer.alive){viewerText='You are still alive in the Arena.';viewerIcon='arena'}
-    else if(state.viewer.joined){viewerText='You are out. Keep watching for spectator votes.';viewerIcon='spectate'}
-    else{viewerText='Spectator mode. Community votes may open during the match.';viewerIcon='spectate'}
+    const viewerTransition=changeUntil.get(String(state.viewer?.id||''));
+    if(state.viewer.alive&&viewerTransition?.kind==='back'){viewerText='Back in the Arena. You are alive again.';viewerIcon='revive'}
+    else if(state.viewer.alive){viewerText='You are still alive in the Arena.';viewerIcon='arena'}
+    else if(state.viewer.joined){viewerText=state.viewer.canVote?'You are out. Community Showdown is open.':'You are out. Spectating the Arena.';viewerIcon='skull'}
+    else{viewerText=state.viewer.canVote?'Community Showdown is open.':'Spectator mode.';viewerIcon='spectate'}
   }else if(state.status==='finished'){
     const won=state.winnerId&&String(state.winnerId)===String(state.viewer.id);
     viewerText=won?'You won the Arena.':'Match complete. Final result locked.';
