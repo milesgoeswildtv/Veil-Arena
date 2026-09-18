@@ -1,3 +1,5 @@
+import { TELEGRAM_VISUAL_CSS, TELEGRAM_VISUAL_ASSETS } from "./generated/telegram-visuals.js";
+
 export function telegramFxMiniAppHtml() {
   return `<!doctype html>
 <html>
@@ -8,6 +10,7 @@ export function telegramFxMiniAppHtml() {
 <title>DWallet Arena</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+${TELEGRAM_VISUAL_CSS}
 :root{
   color-scheme:dark;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -200,7 +203,7 @@ img{display:block;max-width:100%}
 }
 #hero.asset-panel-lobby{padding:clamp(22px,2.8vw,34px) clamp(24px,3.2vw,38px) clamp(14px,1.8vw,22px)}
 #hero.asset-panel-stats{padding:clamp(14px,2vw,22px) clamp(18px,2.4vw,28px)}
-#hero.asset-panel-results{padding:clamp(34px,4vw,50px)}
+#hero.asset-panel-results{padding:clamp(34px,4vw,50px);opacity:var(--av-results-opacity,1)}
 #eventCard.asset-panel-live{padding:14px}
 #voteCard{padding:16px}
 body[data-arena-phase="registration"][data-arena-view="arena"] .main-grid{grid-template-columns:1fr}
@@ -297,7 +300,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .registration-lock.locked{border-color:#82642f;color:#ebca72}
 .hero-panel.registration-mode .status-line{margin:4px 0 6px;min-height:20px}
 .hero-panel.registration-mode .registration-inline{margin:0 0 6px}
-.hero-panel.registration-mode .stats{gap:5px}
+.hero-panel.registration-mode .stats{gap:var(--av-stats-gap,5px);opacity:var(--av-stats-opacity,1)}
 .hero-panel.registration-mode .stat{padding:7px 7px}
 .hero-panel.registration-mode .stat b{margin-top:4px;font-size:clamp(18px,3.2vw,25px)}
 .hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px;font-size:9px}
@@ -340,8 +343,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
+  gap:var(--av-header-gap,8px);
   min-width:0;
+  opacity:var(--av-header-opacity,1);
 }
 .hero-panel.live-dashboard .arena-title{
   gap:6px;
@@ -363,7 +367,8 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard .status-line img{display:none}
 .hero-panel.live-dashboard .stats{
   grid-area:stats;
-  gap:5px;
+  gap:var(--av-stats-gap,5px);
+  opacity:var(--av-stats-opacity,1);
 }
 .hero-panel.live-dashboard .stat{
   padding:6px 8px;
@@ -389,6 +394,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   padding:0;
   overflow:visible;
   background:none;
+  opacity:var(--av-event-opacity,1);
 }
 .live-event-row{
   position:relative;
@@ -419,8 +425,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:stretch;
   min-width:0;
-  padding-left:15px;
-  padding-right:15px;
+  column-gap:var(--av-event-gap,0px);
+  padding-left:var(--av-event-padding,15px);
+  padding-right:var(--av-event-padding,15px);
 }
 .live-event-row-top .live-event-row-content{padding-top:14px;padding-bottom:4px}
 .live-event-row-bottom .live-event-row-content{padding-top:4px;padding-bottom:15px}
@@ -431,9 +438,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   background:transparent;
 }
 .live-event-copy{
-  color:#f4eef8;
-  font-size:11px;
-  line-height:1.38;
+  color:var(--av-event-color,#f4eef8);
+  font-size:var(--av-event-font-size,11px);
+  line-height:var(--av-event-line-height,1.38);
   overflow-wrap:anywhere;
 }
 .live-event-copy .event-head{
@@ -726,7 +733,8 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .roster{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
+  gap:var(--av-roster-gap,8px);
+  opacity:var(--av-roster-opacity,1);
 }
 .player{
   --veil-player-state:url("/telegram/veil_ui_player_state_alive.svg");
@@ -822,6 +830,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .revived-now{animation:playerBack 1.4s ease both}
 .viewer-state-card{
   --viewer-state:url("/telegram/veil_ui_player_state_spectator.svg");
+  opacity:var(--av-viewer-opacity,1);
   position:relative;
   display:none;
   width:min(520px,100%);
@@ -909,15 +918,16 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .sponsorship-card{
   position:relative;
   width:min(720px,100%);
-  min-height:150px;
+  min-height:var(--av-sponsor-min-height,150px);
   margin:16px auto 0;
   padding:38px 60px;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:14px;
+  gap:var(--av-sponsor-gap,14px);
   text-align:center;
-  background:url("/telegram/veil_ui_sponsor_panel.svg") center/100% 100% no-repeat;
+  background:var(--av-sponsor-asset,url("/telegram/veil_ui_sponsor_panel.svg")) center/100% 100% no-repeat;
+  opacity:var(--av-sponsor-opacity,1);
   filter:drop-shadow(0 14px 24px #0008);
 }
 .sponsorship-card img{width:34px;height:34px;filter:drop-shadow(0 0 10px #ba69ff77)}
@@ -1057,8 +1067,8 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px}
   .readout{min-height:50px;padding:10px 20px}
   .viewer-state-card{width:100%;margin-top:7px}
-  .sponsorship-card{min-height:126px;padding:30px 42px}
-  .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .sponsorship-card{min-height:var(--av-sponsor-min-height,126px);padding:30px 42px}
+  .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--av-roster-gap,7px)}
   .roster .player:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - 3.5px);justify-self:center}
   .footer-row{flex-direction:column;align-items:stretch}
   .rules summary{justify-content:flex-start}
@@ -1070,7 +1080,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   .arena-title{gap:8px}
   .arena-title img{width:34px;height:34px}
   .arena-title h1{font-size:36px}
-  .stats{gap:5px}
+  .stats{gap:var(--av-stats-gap,5px)}
   .stat{padding:8px 7px}
   .stat-head{font-size:7px;letter-spacing:.06em}
   .controls{grid-template-columns:1fr}
@@ -1091,27 +1101,27 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
   .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
   .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
-  .sponsorship-card{min-height:110px;padding:26px 32px}
+  .sponsorship-card{min-height:var(--av-sponsor-min-height,110px);padding:26px 32px}
   .sponsorship-card img{width:28px;height:28px}
   .sponsorship-copy strong{font-size:13px}
   .hero-panel.live-dashboard{padding-top:0}
-  .hero-panel.live-dashboard .arena-heading{gap:5px}
+  .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
   .hero-panel.live-dashboard .status-line{font-size:8px}
   .hero-panel.live-dashboard .stat{padding:5px 5px}
   .hero-panel.live-dashboard .stat b{font-size:18px}
   .live-event-grid{gap:0;padding:0}
-  .live-event-row-content{padding-left:10px;padding-right:10px}
+  .live-event-row-content{padding-left:var(--av-event-padding,10px);padding-right:var(--av-event-padding,10px)}
   .live-event-row-top .live-event-row-content{padding-top:10px;padding-bottom:3px}
   .live-event-row-bottom .live-event-row-content{padding-top:3px;padding-bottom:11px}
   .live-event-entry{padding:8px 8px}
-  .live-event-copy{font-size:10px;line-height:1.34}
+  .live-event-copy{font-size:var(--av-event-font-size,10px);line-height:var(--av-event-line-height,1.34)}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
   .showdown-contender-name{font-size:11px}
   .showdown-bar{margin-top:12px}
   .showdown-status{font-size:7px}
   .showdown-countdown{font-size:11px}
-  .roster{gap:6px}
+  .roster{gap:var(--av-roster-gap,6px)}
   .player-name{left:28%;right:5%;top:18%;font-size:clamp(9px,2.8vw,12px);line-height:1.05}
   .bot-tag{margin-left:3px;padding:1px 3px;border-radius:4px;font-size:5px;vertical-align:1px}
   .player-meta{left:28%;right:5%;bottom:10%;gap:3px}
@@ -1795,7 +1805,7 @@ function renderEventText(){
     const cells=(rows.length?rows:['Waiting for the next Arena event…']).slice(0,4);
     while(cells.length<4)cells.push('');
     const eventCell=text=>'<article class="live-event-entry"><div class="live-event-copy">'+(text?richText(text):'')+'</div></article>';
-    const plateSlice='<div class="live-event-plate-slice" aria-hidden="true"><img src="/telegram/NewEventBackgroundPlate.PNG" alt=""></div>';
+    const plateSlice='<div class="live-event-plate-slice" aria-hidden="true"><img src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt=""></div>';
     target.classList.add('live-event-grid');
     if(heading)heading.textContent='ROUND '+Number(state.round||0);
     target.innerHTML=
