@@ -612,7 +612,8 @@ img{display:block;max-width:100%}
   .main-grid{grid-template-columns:1fr}
   .stack{gap:10px}
   .panel{border-width:13px;padding:18px}
-  .roster{grid-template-columns:1fr}
+  .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .roster .player:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - 3.5px);justify-self:center}
   .footer-row{flex-direction:column;align-items:stretch}
   .rules summary{justify-content:flex-start}
 }
@@ -633,6 +634,14 @@ img{display:block;max-width:100%}
   .registration-inline{grid-template-columns:auto minmax(58px,1fr) auto;gap:6px;margin-bottom:7px}
   .registration-ready{font-size:8px;letter-spacing:.08em}
   .registration-lock{font-size:6px;padding:4px 6px}
+  .roster{gap:6px}
+  .player-name{left:28%;right:5%;top:18%;font-size:clamp(9px,2.8vw,12px);line-height:1.05}
+  .bot-tag{margin-left:3px;padding:1px 3px;border-radius:4px;font-size:5px;vertical-align:1px}
+  .player-meta{left:28%;right:5%;bottom:10%;gap:3px}
+  .player-kos{font-size:6px}
+  .player-badge{min-width:48px;height:18px;padding:0 7px;font-size:5px;letter-spacing:.08em}
+  .player-portrait-token{left:5.5%;top:16%;width:18%;height:68%}
+  .player-portrait-token img{width:38%}
   .vote-grid{grid-template-columns:1fr}
   .event{min-height:90px}
 }
