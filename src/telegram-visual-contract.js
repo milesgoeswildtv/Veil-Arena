@@ -15,7 +15,7 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
   slots: {
     "arena.header": {
       label: "Arena Header",
-      layout: { desktop: { gap: 8 }, tablet: { gap: 8 }, mobile: { gap: 6 } },
+      layout: { desktop: { gap: 8 }, tablet: { gap: 8 }, mobile: { gap: 5 } },
       style: { desktop: { opacity: 1 }, tablet: { opacity: 1 }, mobile: { opacity: 1 } },
       asset: null
     },
@@ -27,7 +27,7 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
     },
     "arena.eventPlate": {
       label: "Current Round Events",
-      layout: { desktop: { padding: 15, gap: 0 }, tablet: { padding: 10, gap: 0 }, mobile: { padding: 10, gap: 0 } },
+      layout: { desktop: { padding: 15, gap: 0 }, tablet: { padding: 15, gap: 0 }, mobile: { padding: 10, gap: 0 } },
       style: {
         desktop: { opacity: 1, color: "#f4eef8", fontSize: 11, lineHeight: 1.38 },
         tablet: { opacity: 1, color: "#f4eef8", fontSize: 11, lineHeight: 1.38 },
@@ -47,7 +47,7 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
     },
     "arena.roster": {
       label: "Player Roster",
-      layout: { desktop: { gap: 8 }, tablet: { gap: 7 }, mobile: { gap: 7 } },
+      layout: { desktop: { gap: 8 }, tablet: { gap: 7 }, mobile: { gap: 6 } },
       style: { desktop: { opacity: 1 }, tablet: { opacity: 1 }, mobile: { opacity: 1 } },
       asset: null
     },
@@ -63,7 +63,7 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
     },
     "arena.results": {
       label: "Results",
-      layout: { desktop: { padding: 50 }, tablet: { padding: 40 }, mobile: { padding: 34 } },
+      layout: { desktop: {}, tablet: {}, mobile: {} },
       style: { desktop: { opacity: 1 }, tablet: { opacity: 1 }, mobile: { opacity: 1 } },
       asset: null
     }
@@ -74,10 +74,10 @@ export const TELEGRAM_VISUAL_CAPABILITIES = Object.freeze({
   "arena.header": Object.freeze({ layout: ["gap"], style: ["opacity"], asset: false }),
   "arena.stats": Object.freeze({ layout: ["gap"], style: ["opacity"], asset: false }),
   "arena.eventPlate": Object.freeze({ layout: ["padding", "gap"], style: ["opacity", "color", "fontSize", "lineHeight"], asset: true }),
-  "arena.viewerState": Object.freeze({ layout: ["width", "minHeight"], style: ["opacity"], asset: false }),
+  "arena.viewerState": Object.freeze({ layout: [], style: ["opacity"], asset: false }),
   "arena.roster": Object.freeze({ layout: ["gap"], style: ["opacity"], asset: false }),
   "arena.sponsor": Object.freeze({ layout: ["gap", "minHeight"], style: ["opacity"], asset: true }),
-  "arena.results": Object.freeze({ layout: ["padding"], style: ["opacity"], asset: false })
+  "arena.results": Object.freeze({ layout: [], style: ["opacity"], asset: false })
 });
 
 const SAFE_ASSET = /^(?:\/telegram\/[A-Za-z0-9%._()\- ]+|https:\/\/[^\s"'<>]+)$/;
@@ -128,19 +128,19 @@ export function compileTelegramVisualManifest(manifest = TELEGRAM_VISUAL_DEFAULT
       "--av-header-opacity": number(get("arena.header", "style", "opacity", 1), 1, 0, 1),
       "--av-stats-gap": number(get("arena.stats", "layout", "gap", 5), 5, 0, 200) + "px",
       "--av-stats-opacity": number(get("arena.stats", "style", "opacity", 1), 1, 0, 1),
-      "--av-event-padding": number(get("arena.eventPlate", "layout", "padding", bp === "desktop" ? 15 : 10), bp === "desktop" ? 15 : 10, 0, 300) + "px",
+      "--av-event-padding": number(get("arena.eventPlate", "layout", "padding", bp === "mobile" ? 10 : 15), bp === "mobile" ? 10 : 15, 0, 300) + "px",
       "--av-event-gap": number(get("arena.eventPlate", "layout", "gap", 0), 0, 0, 200) + "px",
       "--av-event-opacity": number(get("arena.eventPlate", "style", "opacity", 1), 1, 0, 1),
       "--av-event-color": text(get("arena.eventPlate", "style", "color", "#f4eef8"), "#f4eef8", 64),
-      "--av-event-font-size": number(get("arena.eventPlate", "style", "fontSize", 11), 11, 6, 72) + "px",
-      "--av-event-line-height": number(get("arena.eventPlate", "style", "lineHeight", 1.38), 1.38, 0.7, 4),
+      "--av-event-font-size": number(get("arena.eventPlate", "style", "fontSize", bp === "mobile" ? 10 : 11), bp === "mobile" ? 10 : 11, 6, 72) + "px",
+      "--av-event-line-height": number(get("arena.eventPlate", "style", "lineHeight", bp === "mobile" ? 1.34 : 1.38), bp === "mobile" ? 1.34 : 1.38, 0.7, 4),
       "--av-viewer-width": number(get("arena.viewerState", "layout", "width", 520), 520, 120, 1600) + "px",
       "--av-viewer-min-height": number(get("arena.viewerState", "layout", "minHeight", 72), 72, 0, 1000) + "px",
       "--av-viewer-opacity": number(get("arena.viewerState", "style", "opacity", 1), 1, 0, 1),
-      "--av-roster-gap": number(get("arena.roster", "layout", "gap", bp === "desktop" ? 8 : 7), bp === "desktop" ? 8 : 7, 0, 200) + "px",
+      "--av-roster-gap": number(get("arena.roster", "layout", "gap", bp === "desktop" ? 8 : bp === "tablet" ? 7 : 6), bp === "desktop" ? 8 : bp === "tablet" ? 7 : 6, 0, 200) + "px",
       "--av-roster-opacity": number(get("arena.roster", "style", "opacity", 1), 1, 0, 1),
       "--av-sponsor-gap": number(get("arena.sponsor", "layout", "gap", bp === "mobile" ? 10 : 14), bp === "mobile" ? 10 : 14, 0, 200) + "px",
-      "--av-sponsor-min-height": number(get("arena.sponsor", "layout", "minHeight", bp === "desktop" ? 150 : bp === "tablet" ? 132 : 118), bp === "desktop" ? 150 : bp === "tablet" ? 132 : 118, 0, 1000) + "px",
+      "--av-sponsor-min-height": number(get("arena.sponsor", "layout", "minHeight", bp === "desktop" ? 150 : bp === "tablet" ? 126 : 110), bp === "desktop" ? 150 : bp === "tablet" ? 126 : 110, 0, 1000) + "px",
       "--av-sponsor-opacity": number(get("arena.sponsor", "style", "opacity", 1), 1, 0, 1),
       "--av-results-padding": number(get("arena.results", "layout", "padding", bp === "desktop" ? 50 : bp === "tablet" ? 40 : 34), bp === "desktop" ? 50 : bp === "tablet" ? 40 : 34, 0, 300) + "px",
       "--av-results-opacity": number(get("arena.results", "style", "opacity", 1), 1, 0, 1)
@@ -154,7 +154,7 @@ export function compileTelegramVisualManifest(manifest = TELEGRAM_VISUAL_DEFAULT
   const css = [
     ":root{" + block(desktop) + "--av-sponsor-asset:" + cssUrl(assetValue(manifest, "arena.sponsor", defaults.slots["arena.sponsor"].asset)) + ";}",
     "@media(max-width:" + breakpoints.tablet + "px){:root{" + block(tablet) + "}}",
-    "@media(max-width:" + breakpoints.mobile + "px){:root{" + block(mobile) + "}}"
+    "@media(max-width:440px){:root{" + block(mobile) + "}}"
   ].join("\n");
 
   return {
