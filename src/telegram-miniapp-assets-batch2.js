@@ -71,6 +71,7 @@ export function applyTelegramMiniAppAssetBatch2(html) {
 }
 .viewer-state-card.asset-alive{--viewer-state:url("/telegram/veil_ui_player_state_alive.svg")}
 .viewer-state-card.asset-dead{--viewer-state:url("/telegram/veil_ui_player_state_dead.svg")}
+.viewer-state-card.asset-revived{--viewer-state:url("/telegram/veil_ui_player_state_revived.svg");filter:drop-shadow(0 0 18px #56e5bb66) drop-shadow(0 10px 20px #0008)}
 .viewer-state-card.asset-spectator{--viewer-state:url("/telegram/veil_ui_player_state_spectator.svg")}
 .viewer-state-card.asset-winner{--viewer-state:url("/telegram/veil_ui_player_state_winner.svg")}
 .viewer-state-card .viewer-portrait{
@@ -145,6 +146,10 @@ export function applyTelegramMiniAppAssetBatch2(html) {
 .viewer-state-card.live-compact .viewer-state-label{font-size:7px!important}
 .viewer-state-card.live-compact .viewer-state-copy strong{font-size:15px}
 .viewer-state-card.live-compact .viewer-state-copy span{font-size:9px;line-height:1.2}
+.viewer-state-card.live-compact.asset-dead .viewer-state-label{color:#ef7a90!important}
+.viewer-state-card.live-compact.asset-revived .viewer-state-label{color:#7ce7c2!important}
+.viewer-state-card.live-compact.asset-revived .viewer-state-copy strong{color:#eafff7}
+.viewer-state-card.live-compact.revived-now{animation:playerBack 1.4s ease both}
 .sponsorship-card{
   position:relative;
   width:min(660px,100%);
