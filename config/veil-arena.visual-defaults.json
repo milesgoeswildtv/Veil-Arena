@@ -6,63 +6,200 @@
   "revision": 0,
   "updatedAt": "2026-09-18T00:00:00Z",
   "breakpoints": {
-    "desktop": { "width": 1180 },
-    "tablet": { "width": 760 },
-    "mobile": { "width": 390 }
+    "desktop": {
+      "width": 1180
+    },
+    "tablet": {
+      "width": 760
+    },
+    "mobile": {
+      "width": 390
+    }
   },
   "slots": {
     "arena.header": {
       "label": "Arena Header",
-      "layout": { "desktop": { "gap": 8 }, "tablet": { "gap": 8 }, "mobile": { "gap": 6 } },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "layout": {
+        "desktop": {
+          "gap": 8
+        },
+        "tablet": {
+          "gap": 8
+        },
+        "mobile": {
+          "gap": 5
+        }
+      },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": null
     },
     "arena.stats": {
       "label": "Round / Players / Alive",
-      "layout": { "desktop": { "gap": 5 }, "tablet": { "gap": 5 }, "mobile": { "gap": 5 } },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "layout": {
+        "desktop": {
+          "gap": 5
+        },
+        "tablet": {
+          "gap": 5
+        },
+        "mobile": {
+          "gap": 5
+        }
+      },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": null
     },
     "arena.eventPlate": {
       "label": "Current Round Events",
-      "layout": { "desktop": { "padding": 15, "gap": 0 }, "tablet": { "padding": 10, "gap": 0 }, "mobile": { "padding": 10, "gap": 0 } },
+      "layout": {
+        "desktop": {
+          "padding": 15,
+          "gap": 0
+        },
+        "tablet": {
+          "padding": 15,
+          "gap": 0
+        },
+        "mobile": {
+          "padding": 10,
+          "gap": 0
+        }
+      },
       "style": {
-        "desktop": { "opacity": 1, "color": "#f4eef8", "fontSize": 11, "lineHeight": 1.38 },
-        "tablet": { "opacity": 1, "color": "#f4eef8", "fontSize": 11, "lineHeight": 1.38 },
-        "mobile": { "opacity": 1, "color": "#f4eef8", "fontSize": 11, "lineHeight": 1.38 }
+        "desktop": {
+          "opacity": 1,
+          "color": "#f4eef8",
+          "fontSize": 11,
+          "lineHeight": 1.38
+        },
+        "tablet": {
+          "opacity": 1,
+          "color": "#f4eef8",
+          "fontSize": 11,
+          "lineHeight": 1.38
+        },
+        "mobile": {
+          "opacity": 1,
+          "color": "#f4eef8",
+          "fontSize": 10,
+          "lineHeight": 1.34
+        }
       },
       "asset": "/telegram/NewEventBackgroundPlate.PNG"
     },
     "arena.viewerState": {
       "label": "Viewer State",
       "layout": {
-        "desktop": { "width": 520, "minHeight": 72 },
-        "tablet": { "width": 520, "minHeight": 72 },
-        "mobile": { "width": 520, "minHeight": 72 }
+        "desktop": {},
+        "tablet": {},
+        "mobile": {}
       },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": null
     },
     "arena.roster": {
       "label": "Player Roster",
-      "layout": { "desktop": { "gap": 8 }, "tablet": { "gap": 7 }, "mobile": { "gap": 7 } },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "layout": {
+        "desktop": {
+          "gap": 8
+        },
+        "tablet": {
+          "gap": 7
+        },
+        "mobile": {
+          "gap": 6
+        }
+      },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": null
     },
     "arena.sponsor": {
       "label": "Sponsor Panel",
       "layout": {
-        "desktop": { "gap": 14, "minHeight": 150 },
-        "tablet": { "gap": 14, "minHeight": 132 },
-        "mobile": { "gap": 10, "minHeight": 118 }
+        "desktop": {
+          "gap": 14,
+          "minHeight": 150
+        },
+        "tablet": {
+          "gap": 14,
+          "minHeight": 126
+        },
+        "mobile": {
+          "gap": 10,
+          "minHeight": 110
+        }
       },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": "/telegram/veil_ui_sponsor_panel.svg"
     },
     "arena.results": {
       "label": "Results",
-      "layout": { "desktop": { "padding": 50 }, "tablet": { "padding": 40 }, "mobile": { "padding": 34 } },
-      "style": { "desktop": { "opacity": 1 }, "tablet": { "opacity": 1 }, "mobile": { "opacity": 1 } },
+      "layout": {
+        "desktop": {},
+        "tablet": {},
+        "mobile": {}
+      },
+      "style": {
+        "desktop": {
+          "opacity": 1
+        },
+        "tablet": {
+          "opacity": 1
+        },
+        "mobile": {
+          "opacity": 1
+        }
+      },
       "asset": null
     }
   }
