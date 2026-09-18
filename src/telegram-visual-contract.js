@@ -31,17 +31,13 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
       style: {
         desktop: { opacity: 1, color: "#f4eef8", fontSize: 11, lineHeight: 1.38 },
         tablet: { opacity: 1, color: "#f4eef8", fontSize: 11, lineHeight: 1.38 },
-        mobile: { opacity: 1, color: "#f4eef8", fontSize: 11, lineHeight: 1.38 }
+        mobile: { opacity: 1, color: "#f4eef8", fontSize: 10, lineHeight: 1.34 }
       },
       asset: "/telegram/NewEventBackgroundPlate.PNG"
     },
     "arena.viewerState": {
       label: "Viewer State",
-      layout: {
-        desktop: { width: 520, minHeight: 72 },
-        tablet: { width: 520, minHeight: 72 },
-        mobile: { width: 520, minHeight: 72 }
-      },
+      layout: { desktop: {}, tablet: {}, mobile: {} },
       style: { desktop: { opacity: 1 }, tablet: { opacity: 1 }, mobile: { opacity: 1 } },
       asset: null
     },
@@ -55,8 +51,8 @@ export const TELEGRAM_VISUAL_DEFAULT_MANIFEST = Object.freeze({
       label: "Sponsor Panel",
       layout: {
         desktop: { gap: 14, minHeight: 150 },
-        tablet: { gap: 14, minHeight: 132 },
-        mobile: { gap: 10, minHeight: 118 }
+        tablet: { gap: 14, minHeight: 126 },
+        mobile: { gap: 10, minHeight: 110 }
       },
       style: { desktop: { opacity: 1 }, tablet: { opacity: 1 }, mobile: { opacity: 1 } },
       asset: "/telegram/veil_ui_sponsor_panel.svg"
@@ -134,15 +130,12 @@ export function compileTelegramVisualManifest(manifest = TELEGRAM_VISUAL_DEFAULT
       "--av-event-color": text(get("arena.eventPlate", "style", "color", "#f4eef8"), "#f4eef8", 64),
       "--av-event-font-size": number(get("arena.eventPlate", "style", "fontSize", bp === "mobile" ? 10 : 11), bp === "mobile" ? 10 : 11, 6, 72) + "px",
       "--av-event-line-height": number(get("arena.eventPlate", "style", "lineHeight", bp === "mobile" ? 1.34 : 1.38), bp === "mobile" ? 1.34 : 1.38, 0.7, 4),
-      "--av-viewer-width": number(get("arena.viewerState", "layout", "width", 520), 520, 120, 1600) + "px",
-      "--av-viewer-min-height": number(get("arena.viewerState", "layout", "minHeight", 72), 72, 0, 1000) + "px",
       "--av-viewer-opacity": number(get("arena.viewerState", "style", "opacity", 1), 1, 0, 1),
       "--av-roster-gap": number(get("arena.roster", "layout", "gap", bp === "desktop" ? 8 : bp === "tablet" ? 7 : 6), bp === "desktop" ? 8 : bp === "tablet" ? 7 : 6, 0, 200) + "px",
       "--av-roster-opacity": number(get("arena.roster", "style", "opacity", 1), 1, 0, 1),
       "--av-sponsor-gap": number(get("arena.sponsor", "layout", "gap", bp === "mobile" ? 10 : 14), bp === "mobile" ? 10 : 14, 0, 200) + "px",
       "--av-sponsor-min-height": number(get("arena.sponsor", "layout", "minHeight", bp === "desktop" ? 150 : bp === "tablet" ? 126 : 110), bp === "desktop" ? 150 : bp === "tablet" ? 126 : 110, 0, 1000) + "px",
       "--av-sponsor-opacity": number(get("arena.sponsor", "style", "opacity", 1), 1, 0, 1),
-      "--av-results-padding": number(get("arena.results", "layout", "padding", bp === "desktop" ? 50 : bp === "tablet" ? 40 : 34), bp === "desktop" ? 50 : bp === "tablet" ? 40 : 34, 0, 300) + "px",
       "--av-results-opacity": number(get("arena.results", "style", "opacity", 1), 1, 0, 1)
     };
   };
