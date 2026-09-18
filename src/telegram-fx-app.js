@@ -150,6 +150,7 @@ img{display:block;max-width:100%}
   filter:drop-shadow(0 16px 25px #0008);
 }
 .hero-panel{min-height:100%}
+.hero-panel.registration-mode{min-height:0}
 .arena-title{
   display:flex;
   align-items:center;
@@ -219,22 +220,26 @@ img{display:block;max-width:100%}
   white-space:nowrap;
 }
 .registration-lock.locked{border-color:#82642f;color:#ebca72}
-.hero-panel.registration-mode .status-line{margin:6px 0 8px;min-height:22px}
-.hero-panel.registration-mode .stats{gap:6px}
-.hero-panel.registration-mode .stat{padding:9px 9px}
-.hero-panel.registration-mode .stat b{margin-top:5px;font-size:clamp(20px,3.5vw,28px)}
-.hero-panel.registration-mode .readout{min-height:40px;margin-top:8px;padding:7px 14px!important;font-size:10px}
-.hero-panel.registration-mode .readout img{width:18px;height:18px}
+.hero-panel.registration-mode .status-line{margin:4px 0 6px;min-height:20px}
+.hero-panel.registration-mode .registration-inline{margin:0 0 6px}
+.hero-panel.registration-mode .stats{gap:5px}
+.hero-panel.registration-mode .stat{padding:7px 7px}
+.hero-panel.registration-mode .stat b{margin-top:4px;font-size:clamp(18px,3.2vw,25px)}
+.hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px!important;font-size:9px}
+.hero-panel.registration-mode .readout img{width:16px;height:16px}
+.hero-panel.host-registration #viewerReadout{display:none}
 .hero-panel.registration-mode .controls{
-  grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
-  gap:6px;
-  margin-top:8px;
+  gap:5px;
+  margin-top:6px;
+}
+.hero-panel.host-registration .controls{
+  grid-template-columns:repeat(3,minmax(0,1fr));
 }
 .hero-panel.registration-mode .veil-button{
-  min-height:42px;
-  padding:8px 8px;
-  font-size:10px;
-  line-height:1.1;
+  min-height:36px;
+  padding:6px 5px;
+  font-size:9px;
+  line-height:1.05;
 }
 .hero-panel.registration-mode .veil-button img{
   width:16px!important;
@@ -411,7 +416,7 @@ img{display:block;max-width:100%}
   position:relative;
   display:block;
   width:100%;
-  aspect-ratio:2/1;
+  aspect-ratio:2.72/1;
   min-width:0;
   min-height:0;
   padding:0;
@@ -436,9 +441,9 @@ img{display:block;max-width:100%}
 .player:active{transform:scale(.992)}
 .player-name{
   position:absolute;
-  left:34.5%;
-  right:6.5%;
-  top:25%;
+  left:29%;
+  right:6%;
+  top:20%;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -461,9 +466,9 @@ img{display:block;max-width:100%}
 }
 .player-meta{
   position:absolute;
-  left:34.5%;
-  right:6.5%;
-  bottom:16%;
+  left:29%;
+  right:6%;
+  bottom:13%;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -486,10 +491,10 @@ img{display:block;max-width:100%}
 .player-badge.dead{background-image:url("/telegram/veil_ui_badge_dead.svg")}
 .player-portrait-token{
   position:absolute;
-  left:7.1%;
-  top:22%;
-  width:21.5%;
-  height:56%;
+  left:6.2%;
+  top:18%;
+  width:18.5%;
+  height:64%;
   display:grid;
   place-items:center;
   pointer-events:none;
@@ -622,8 +627,9 @@ img{display:block;max-width:100%}
   .stat{padding:8px 7px}
   .stat-head{font-size:7px;letter-spacing:.06em}
   .controls{grid-template-columns:1fr}
-  .hero-panel.registration-mode .controls{grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
-  .hero-panel.registration-mode .veil-button{min-height:40px;font-size:9px;padding:7px 5px}
+  .hero-panel.registration-mode .controls{grid-template-columns:1fr}
+  .hero-panel.host-registration .controls{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hero-panel.registration-mode .veil-button{min-height:34px;font-size:8px;padding:5px 3px}
   .registration-inline{grid-template-columns:auto minmax(58px,1fr) auto;gap:6px;margin-bottom:7px}
   .registration-ready{font-size:8px;letter-spacing:.08em}
   .registration-lock{font-size:6px;padding:4px 6px}
@@ -1136,7 +1142,10 @@ function renderAssetPanels(){
     else hero.classList.add('asset-panel-stats');
   }
   const eventCard=$('eventCard');
-  if(hero)hero.classList.toggle('registration-mode',state.status==='registration');
+  if(hero){
+    hero.classList.toggle('registration-mode',state.status==='registration');
+    hero.classList.toggle('host-registration',state.status==='registration'&&Boolean(state.viewer?.isHost));
+  }
   if(eventCard)eventCard.classList.toggle('asset-panel-live',state.status==='running');
 }
 
@@ -1162,6 +1171,10 @@ function renderRegistrationInline(){
 function renderViewerStateCard(){
   const card=$('viewerStateCard');
   if(!card)return;
+  if(state.status==='registration'){
+    card.style.display='none';
+    return;
+  }
   let mode='spectator';
   let label='SPECTATOR';
   let title='YOU';
