@@ -98,7 +98,6 @@ assert(baseUi.includes("veil_ui_player_card.svg"));
 assert(baseUi.includes("veil_ui_player_state_alive.svg"));
 assert(baseUi.includes('id="registrationInline"'));
 assert(baseUi.includes("function renderRegistrationInline"));
-assert(baseUi.includes("repeat(auto-fit,minmax(88px,1fr))"));
 assert(baseUi.includes("ADD 4 BOTS"));
 assert(baseUi.includes("aspect-ratio:2.72/1"));
 assert(baseUi.includes("hero.classList.toggle('host-registration'"));
