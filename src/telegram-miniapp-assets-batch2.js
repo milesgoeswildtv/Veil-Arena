@@ -114,6 +114,37 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   letter-spacing:.16em;
   text-transform:uppercase;
 }
+.viewer-state-card.live-compact{
+  width:100%;
+  min-height:72px;
+  aspect-ratio:auto;
+  margin:7px 0 0;
+  background-position:left center,left center;
+  background-size:38% 100%,38% 100%;
+}
+.viewer-state-card.live-compact .viewer-portrait{
+  left:4.5%;
+  top:13%;
+  width:11.5%;
+  height:74%;
+}
+.viewer-state-card.live-compact .viewer-portrait img{width:42%}
+.viewer-state-card.live-compact .viewer-state-copy{
+  left:41%;
+  right:4%;
+  top:18%;
+  bottom:17%;
+  justify-content:center;
+  gap:5px;
+}
+.viewer-state-card.live-compact .viewer-state-copy > div{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.viewer-state-card.live-compact .viewer-state-label{font-size:7px!important}
+.viewer-state-card.live-compact .viewer-state-copy strong{font-size:15px}
+.viewer-state-card.live-compact .viewer-state-copy span{font-size:9px;line-height:1.2}
 .sponsorship-card{
   position:relative;
   width:min(660px,100%);
@@ -143,6 +174,10 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   .sponsorship-card{min-height:94px;padding:24px 34px}
 }
 @media(max-width:440px){
+  .viewer-state-card.live-compact{min-height:64px}
+  .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
+  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
+  .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
   .sponsorship-card{min-height:84px;padding:20px 28px;gap:10px}
   .sponsorship-card img{width:25px;height:25px}
   .sponsorship-copy strong{font-size:12px}
@@ -157,19 +192,19 @@ export function applyTelegramMiniAppAssetBatch2(html) {
   );
 
   html = html.replace(
-    '      <section class="panel roster-panel">',
-    `      <section class="viewer-state-card asset-spectator" id="viewerStateCard" aria-label="Your Arena state">
-        <div class="viewer-portrait"><img id="viewerStateIcon" src="/telegram/veil_ui_icon_spectate.svg" alt=""></div>
-        <div class="viewer-state-copy">
-          <div>
-            <span class="viewer-state-label" id="viewerStateLabel">SPECTATOR</span>
-            <strong id="viewerStateTitle">YOU</strong>
+    '        <div class="stack">',
+    `        <section class="viewer-state-card asset-spectator" id="viewerStateCard" aria-label="Your Arena state">
+          <div class="viewer-portrait"><img id="viewerStateIcon" src="/telegram/veil_ui_icon_spectate.svg" alt=""></div>
+          <div class="viewer-state-copy">
+            <div>
+              <span class="viewer-state-label" id="viewerStateLabel">SPECTATOR</span>
+              <strong id="viewerStateTitle">YOU</strong>
+            </div>
+            <span id="viewerStateDetail">Watching Arena.</span>
           </div>
-          <span id="viewerStateDetail">Watching Arena.</span>
-        </div>
-      </section>
+        </section>
 
-      <section class="panel roster-panel">`
+        <div class="stack">`
   );
 
   html = html.replace(
