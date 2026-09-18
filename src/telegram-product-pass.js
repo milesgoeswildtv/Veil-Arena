@@ -24,6 +24,10 @@ body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{
   letter-spacing:.08em;
 }
 body[data-arena-phase="running"] #hero.live-dashboard #controls{display:none}
+body.crowd-vote-open #eventCard{display:none!important}
+body.crowd-vote-open #voteCard{display:block!important}
+body.crowd-vote-open .stack{gap:0}
+body.crowd-vote-open #viewerStateCard.live-compact{margin-bottom:0}
 body[data-arena-phase="running"] #timerRow{min-height:46px!important;margin-top:12px!important;padding:9px 13px!important;border:1px solid #4d335c;border-radius:12px;background:#0a0710;color:#dbc6e8!important;font:950 12px/1 ui-monospace,monospace;letter-spacing:.08em}
 body[data-arena-phase="running"] #timerRow img{width:23px!important;height:23px!important}
 body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-head h2:after{content:" // LIVE";color:#b56ee4}
