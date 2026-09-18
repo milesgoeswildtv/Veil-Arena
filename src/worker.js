@@ -13,7 +13,7 @@ import { injectVeilSfx } from "./sfx-integration.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-17-telegram-current-round-grid-1";
+const TELEGRAM_BUILD = "2026-09-18-telegram-community-showdown-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
