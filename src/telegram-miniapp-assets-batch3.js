@@ -43,7 +43,7 @@ export function applyTelegramMiniAppAssetBatch3(html) {
   min-height:148px;
   padding:24px 26px;
   overflow:hidden;
-  background:none!important;
+  background-color:transparent!important;
   border-radius:10px;
 }
 .event>*{position:relative;z-index:1}
