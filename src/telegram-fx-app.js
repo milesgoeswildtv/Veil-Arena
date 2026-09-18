@@ -300,7 +300,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.registration-mode .stats{gap:5px}
 .hero-panel.registration-mode .stat{padding:7px 7px}
 .hero-panel.registration-mode .stat b{margin-top:4px;font-size:clamp(18px,3.2vw,25px)}
-.hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px!important;font-size:9px}
+.hero-panel.registration-mode .readout{min-height:36px;margin-top:6px;padding:5px 11px;font-size:9px}
 .hero-panel.registration-mode .readout img{width:16px;height:16px}
 .hero-panel.host-registration #viewerReadout{display:none}
 .hero-panel.registration-mode .controls{
@@ -316,11 +316,11 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   font-size:9px;
   line-height:1.05;
 }
-.hero-panel.registration-mode .veil-button img{
-  width:16px!important;
-  height:16px!important;
-  margin-right:4px!important;
-  vertical-align:-4px!important;
+.hero-panel.registration-mode .veil-button-icon{
+  width:16px;
+  height:16px;
+  margin-right:4px;
+  vertical-align:-4px;
 }
 .hero-panel.live-dashboard{
   min-height:0;
@@ -480,6 +480,13 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   transition:transform .15s ease,filter .15s ease,opacity .15s ease;
+}
+.veil-button-icon{
+  width:20px;
+  height:20px;
+  display:inline-block;
+  vertical-align:-5px;
+  margin-right:7px;
 }
 .veil-button:before{
   content:"";
@@ -1495,7 +1502,7 @@ async function act(action,extra={}){
 }
 
 function button(label,action,cls='',iconKey=''){
-  const icon=iconKey?'<img src="'+esc(icons[iconKey]||icons.arena)+'" alt="" style="width:20px;height:20px;display:inline-block;vertical-align:-5px;margin-right:7px">':'';
+  const icon=iconKey?'<img class="veil-button-icon" src="'+esc(icons[iconKey]||icons.arena)+'" alt="">':'';
   return '<button type="button" class="veil-button '+cls+'" data-action="'+action+'">'+icon+esc(label)+'</button>';
 }
 
