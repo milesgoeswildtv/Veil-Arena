@@ -14,15 +14,19 @@ export function applyTelegramMiniAppAssetBatch3(html) {
 #hero.asset-panel-lobby:before{background-image:url("/telegram/veil_ui_lobby_panel.svg")!important}
 #hero.asset-panel-stats:before{background-image:url("/telegram/veil_ui_stats_panel.svg")!important}
 #hero.asset-panel-results:before{background-image:url("/telegram/veil_ui_results_panel.svg")!important}
-#eventCard.asset-panel-live:before{background-image:url("/telegram/veil_ui_live_round_panel.svg")!important}
+#eventCard.asset-panel-live:before{display:none!important;background:none!important}
 #voteCard:before{background-image:url("/telegram/veil_ui_vote_panel.svg")!important}
 
 #hero.asset-panel-lobby,
 #hero.asset-panel-stats,
 #hero.asset-panel-results,
-#eventCard.asset-panel-live,
 #voteCard{
   background:linear-gradient(155deg,#0e0b12e9,#070509ee)!important;
+}
+#eventCard.asset-panel-live{
+  background:transparent!important;
+  filter:none!important;
+  overflow:visible!important;
 }
 
 #hero.asset-panel-lobby{padding:clamp(22px,2.8vw,34px) clamp(24px,3.2vw,38px) clamp(14px,1.8vw,22px)}
