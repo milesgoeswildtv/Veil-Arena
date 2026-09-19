@@ -150,7 +150,7 @@ assert(!baseUi.includes(".event>:not(.live-event-plate)"));
 assert(baseUi.includes("/* LIVE EVENT: canonical visual owner. Plate + heading + 2x2 copy move as one stage. */"));
 assert.equal(baseUi.split(".viewer-state-card{").length-1,1);
 assert.equal(baseUi.split(".viewer-state-card.live-compact{").length-1,1);
-assert.equal(baseUi.split(".live-event-stage{").length-1,1);
+assert.equal(baseUi.split("\n.live-event-stage{").length-1,1);
 assert.equal(baseUi.split(".live-event-grid{").length-1,1);
 assert.equal(baseUi.split(".live-event-content{").length-1,1);
 assert.equal(baseUi.split(".live-event-entry{").length-1,1);
