@@ -829,91 +829,96 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .new-dead{animation:playerOut 1.1s ease both}
 .revived-now{animation:playerBack 1.4s ease both}
 .viewer-state-card{
-  --viewer-state:url("/telegram/veil_ui_player_state_spectator.svg");
   opacity:var(--av-viewer-opacity,1);
-  position:relative;
   display:none;
-  width:min(520px,100%);
-  aspect-ratio:2.72/1;
-  margin:14px 0 0 auto;
-  overflow:hidden;
-  background-image:var(--viewer-state),url("/telegram/veil_ui_player_card.svg");
-  background-position:center,center;
-  background-repeat:no-repeat,no-repeat;
-  background-size:100% 100%,100% 100%;
-  filter:drop-shadow(0 12px 24px #0009);
 }
-.viewer-state-card.asset-alive{--viewer-state:url("/telegram/veil_ui_player_state_alive.svg")}
-.viewer-state-card.asset-dead{--viewer-state:url("/telegram/veil_ui_player_state_dead.svg")}
-.viewer-state-card.asset-revived{--viewer-state:url("/telegram/veil_ui_player_state_revived.svg");filter:drop-shadow(0 0 18px #56e5bb66) drop-shadow(0 10px 20px #0008)}
-.viewer-state-card.asset-spectator{--viewer-state:url("/telegram/veil_ui_player_state_spectator.svg")}
-.viewer-state-card.asset-winner{--viewer-state:url("/telegram/veil_ui_player_state_winner.svg")}
-.viewer-state-card .viewer-portrait{
-  position:absolute;
-  left:6.2%;
-  top:18%;
-  width:18.5%;
-  height:64%;
+.viewer-state-card.live-compact{
+  display:grid;
+  grid-template-columns:26px minmax(0,auto) minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  width:100%;
+  min-height:44px;
+  margin:7px 0 2px;
+  padding:7px 10px;
+  overflow:hidden;
+  border:1px solid #4d335c;
+  border-radius:11px;
+  background:linear-gradient(145deg,#100b15e8,#08060ceb);
+  box-shadow:0 8px 18px #0007;
+}
+.viewer-state-card.live-compact .viewer-portrait{
+  position:static;
+  width:26px;
+  height:26px;
   display:grid;
   place-items:center;
 }
-.viewer-state-card .viewer-portrait img{width:46%;filter:drop-shadow(0 0 10px #a966ff88)}
-.viewer-state-copy{
-  position:absolute;
-  left:29%;
-  right:6%;
-  top:19%;
-  bottom:14%;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  min-width:0;
+.viewer-state-card.live-compact .viewer-portrait img{
+  width:19px;
+  height:19px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 8px #a966ff66);
 }
-.viewer-state-copy strong{
+.viewer-state-card.live-compact .viewer-state-copy{
+  position:static;
+  display:contents;
+}
+.viewer-state-card.live-compact .viewer-state-copy > div{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  white-space:nowrap;
+}
+.viewer-state-card.live-compact .viewer-state-label{
+  flex:none;
+  color:#cdb9d9;
+  font:950 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.viewer-state-card.live-compact .viewer-state-copy strong{
+  min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:clamp(13px,1.8vw,18px);
+  font-size:12px;
+  line-height:1;
   font-weight:1000;
   letter-spacing:.02em;
 }
-.viewer-state-copy span{
-  color:#b8a9c3;
-  font-size:clamp(9px,1.15vw,11px);
-  line-height:1.25;
+.viewer-state-card.live-compact .viewer-state-copy > span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#9e90a8;
+  font-size:8px;
+  line-height:1.1;
+  text-align:right;
 }
-.viewer-state-label{
-  align-self:flex-start;
-  color:#e5d8ed;
-  font:950 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
-  letter-spacing:.16em;
-  text-transform:uppercase;
+.viewer-state-card.live-compact.asset-alive{
+  border-color:#315f55;
+  background:linear-gradient(145deg,#0d1716e8,#080b0beb);
 }
-.viewer-state-card.live-compact{
-  width:100%;
-  min-height:72px;
-  aspect-ratio:auto;
-  margin:7px 0 0;
-  background-position:left center,left center;
-  background-size:38% 100%,38% 100%;
+.viewer-state-card.live-compact.asset-alive .viewer-state-label{color:#7ce7c2}
+.viewer-state-card.live-compact.asset-dead{
+  border-color:#633544;
+  background:linear-gradient(145deg,#1a0d13e8,#0b0709eb);
 }
-.viewer-state-card.live-compact .viewer-portrait{left:4.5%;top:13%;width:11.5%;height:74%}
-.viewer-state-card.live-compact .viewer-portrait img{width:42%}
-.viewer-state-card.live-compact .viewer-state-copy{
-  left:41%;
-  right:4%;
-  top:18%;
-  bottom:17%;
-  justify-content:center;
-  gap:5px;
-}
-.viewer-state-card.live-compact .viewer-state-copy > div{display:flex;align-items:center;gap:7px}
-.viewer-state-card.live-compact .viewer-state-label{font-size:7px}
-.viewer-state-card.live-compact .viewer-state-copy strong{font-size:15px}
-.viewer-state-card.live-compact .viewer-state-copy span{font-size:9px;line-height:1.2}
 .viewer-state-card.live-compact.asset-dead .viewer-state-label{color:#ef7a90}
+.viewer-state-card.live-compact.asset-revived{
+  border-color:#3d806e;
+  background:linear-gradient(145deg,#0c1d19e8,#080d0beb);
+  box-shadow:0 0 16px #56e5bb22,0 8px 18px #0007;
+}
 .viewer-state-card.live-compact.asset-revived .viewer-state-label{color:#7ce7c2}
 .viewer-state-card.live-compact.asset-revived .viewer-state-copy strong{color:#eafff7}
+.viewer-state-card.live-compact.asset-winner{
+  border-color:#786032;
+  background:linear-gradient(145deg,#1b160ce8,#0c0907eb);
+}
 .viewer-state-card.live-compact.revived-now{animation:playerBack 1.4s ease both}
 .sponsorship-card{
   position:relative;
@@ -1729,31 +1734,31 @@ function renderViewerStateCard(){
       label='REVIVED';
       title='BACK IN THE ARENA';
       icon='revive';
-      detail='Second chance active. You are alive again.';
+      detail='Second chance active.';
     }else if(state.viewer.alive){
       mode='alive';
       label='ALIVE';
       title='YOU';
       icon='arena';
-      detail='You are still alive in the Arena.';
+      detail='Still alive.';
     }else if(state.viewer.joined){
       mode='dead';
       label=eliminatedNow?'ELIMINATED':'SPECTATING';
       title='OUT';
       icon='skull';
       detail=eliminatedNow
-        ?'You are out. Spectator mode unlocked.'
+        ?'Spectator mode unlocked.'
         :state.viewer.canVote
-          ?'Community Showdown is open. Cast your vote.'
-          :'React below. Showdown voting unlocks when available.';
+          ?'Showdown open · vote now.'
+          :'Reactions open · waiting for Showdown.';
     }else{
       mode='spectator';
       label='SPECTATOR';
       title='WATCHING';
       icon='spectate';
       detail=state.viewer.canVote
-        ?'Community Showdown is open. Cast your vote.'
-        :'Watch live. Showdown voting unlocks when available.';
+        ?'Showdown open · vote now.'
+        :'Watching live · reactions open.';
     }
   }
 
