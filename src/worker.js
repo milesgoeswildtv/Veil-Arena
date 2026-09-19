@@ -7,7 +7,7 @@ import { handleDiscordActivityRoute } from "./discord-activity.js";
 export { ArenaCoordinator };
 
 const BASELINE = "2026-09-13-discord-activity-official-1";
-const TELEGRAM_BUILD = "2026-09-19-arena-layout-doozy-pass-1";
+const TELEGRAM_BUILD = "2026-09-19-registration-layout-perfect-pass-1";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
