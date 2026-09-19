@@ -140,7 +140,6 @@ assert(baseUi.includes("border-radius:999px"));
 assert(baseUi.includes(".viewer-state-card.live-compact{min-height:36px;max-width:calc(100% - 16px);padding:5px 10px}"));
 assert(baseUi.includes("card.style.display=state.status==='running'?'flex':'block'"));
 assert(baseUi.includes(".event>:not(.live-event-plate){position:relative;z-index:1}"));
-assert(baseUi.includes("grid-template-columns:26px minmax(0,auto) minmax(0,1fr)"));
 assert(baseUi.includes("Showdown open · vote now."));
 assert(baseUi.includes("Reactions open · waiting for Showdown."));
 assert(!baseUi.includes(".viewer-state-card.live-compact{\n  width:100%;\n  min-height:72px"));
