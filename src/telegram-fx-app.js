@@ -387,21 +387,25 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard #error{grid-area:error;margin-top:0}
 .hero-panel.live-dashboard #controls{grid-area:controls;margin-top:0}
 .hero-panel.live-dashboard #controls:empty{display:none}
-/* LIVE EVENT: canonical visual owner. Keep responsive behavior inside this block. */
-.live-event-grid{
+/* LIVE EVENT: canonical visual owner. Plate + heading + 2x2 copy move as one stage. */
+.live-event-stage{
   position:relative;
-  display:block;
   min-width:0;
-  padding:0;
   overflow:hidden;
-  background:none;
   border-radius:10px;
   opacity:var(--av-event-opacity,1);
 }
-.live-event-plate{
+.live-event-stage .live-event-plate{
+  display:none;
+}
+#eventCard.asset-panel-live .live-event-stage{
+  padding:clamp(10px,1.4vw,14px) clamp(8px,1.2vw,12px) clamp(12px,1.7vw,18px);
+}
+#eventCard.asset-panel-live .live-event-plate{
   position:absolute;
   inset:0;
   z-index:0;
+  display:block;
   width:100%;
   height:100%;
   max-width:none;
@@ -409,15 +413,42 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   pointer-events:none;
   user-select:none;
 }
-.live-event-content{
+#eventCard.asset-panel-live .section-head,
+#eventCard.asset-panel-live .event{
   position:relative;
   z-index:1;
+}
+#eventCard.asset-panel-live .section-head{
+  min-height:34px;
+  margin:0 0 6px;
+  padding:0 clamp(28px,6vw,44px);
+  justify-content:center;
+  text-align:center;
+}
+#eventCard.asset-panel-live .section-head img{
+  position:absolute;
+  left:clamp(4px,1vw,10px);
+  top:50%;
+  transform:translateY(-50%);
+}
+#eventCard.asset-panel-live .section-head h2{
+  width:100%;
+  text-align:center;
+}
+.live-event-grid{
+  display:block;
+  min-width:0;
+  padding:0;
+  overflow:visible;
+  background:none;
+}
+.live-event-content{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:stretch;
   min-width:0;
   gap:var(--av-event-gap,0px);
-  padding:clamp(14px,1.55vw,18px) var(--av-event-padding,15px) clamp(16px,1.75vw,20px);
+  padding:clamp(8px,1vw,12px) var(--av-event-padding,15px) clamp(10px,1.25vw,14px);
 }
 .live-event-entry{
   min-width:0;
@@ -1200,11 +1231,14 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 
         <div class="stack">
           <section class="panel" id="eventCard">
-            <div class="section-head">
-              <img id="eventIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
-              <h2 id="eventHeading">Live Event</h2>
+            <div class="live-event-stage" id="liveEventStage">
+              <img class="live-event-plate" src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt="" aria-hidden="true">
+              <div class="section-head">
+                <img id="eventIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
+                <h2 id="eventHeading">Live Event</h2>
+              </div>
+              <div class="event" id="event">Waiting for Arena…</div>
             </div>
-            <div class="event" id="event">Waiting for Arena…</div>
             <div class="timer" id="timerRow">
               <img src="/telegram/veil_ui_icon_timer.svg" alt="">
               <span id="timer"></span>
@@ -1771,10 +1805,9 @@ function renderEventText(){
       const density=length>280?' ultra-dense':length>190?' dense':'';
       return '<article class="live-event-entry'+density+'"><div class="live-event-copy">'+(text?richText(text):'')+'</div></article>';
     };
-    const plate='<img class="live-event-plate" src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt="" aria-hidden="true">';
     target.classList.add('live-event-grid');
     if(heading)heading.textContent='ROUND '+Number(state.round||0);
-    target.innerHTML=plate+'<div class="live-event-content">'+cells.map(eventCell).join('')+'</div>';
+    target.innerHTML='<div class="live-event-content">'+cells.map(eventCell).join('')+'</div>';
     return;
   }
   target.classList.remove('live-event-grid');
