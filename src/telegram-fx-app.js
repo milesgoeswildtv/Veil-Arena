@@ -299,6 +299,8 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   white-space:nowrap;
 }
 .registration-lock.locked{border-color:#82642f;color:#ebca72}
+.pregame-ready-stage{display:contents}
+.pregame-ready-frame{display:none}
 .hero-panel.registration-mode .status-line{margin:4px 0 6px;min-height:20px}
 .hero-panel.registration-mode .registration-inline{margin:0 0 6px}
 .hero-panel.registration-mode .stats{gap:var(--av-stats-gap,5px);opacity:var(--av-stats-opacity,1)}
@@ -330,13 +332,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   overflow:visible;
   background:transparent;
 }
-#hero.asset-panel-lobby.registration-mode:before{
-  top:36%;
-  right:0;
-  bottom:8%;
-  left:0;
-  background-size:100% 100%;
-}
+#hero.asset-panel-lobby.registration-mode:before{display:none}
 .hero-panel.registration-mode .arena-heading{
   display:block;
 }
@@ -344,7 +340,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   display:block;
   width:clamp(230px,60vw,310px);
   max-width:82%;
-  margin:-22px auto -2px;
+  margin:-22px auto -8px;
   transform:translateX(clamp(2px,1vw,6px));
 }
 .hero-panel.registration-mode .arena-title .arena-mark,
@@ -362,10 +358,78 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.registration-mode .status-line{
   display:none;
 }
-body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline,
-body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats,
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{
+  position:relative;
+  display:block;
+  width:100%;
+  aspect-ratio:3/1;
+  margin:-6px 0 -34px;
+  isolation:isolate;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-frame{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline{
+  position:absolute;
+  z-index:1;
+  left:8%;
+  right:8%;
+  top:20%;
+  height:15%;
+  margin:0;
+  grid-template-columns:auto minmax(72px,1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats{
+  position:absolute;
+  z-index:1;
+  left:5.3%;
+  right:5.3%;
+  top:38%;
+  height:38%;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:2.2%;
+  align-items:stretch;
+  opacity:1;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:0;
+  padding:6% 9%;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat:after{display:none}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat-head{
+  font-size:clamp(7px,1.8vw,10px);
+  letter-spacing:.1em;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat-head img{
+  width:clamp(13px,3vw,18px);
+  height:clamp(13px,3vw,18px);
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat b{
+  margin-top:5px;
+  font-size:clamp(20px,5vw,34px);
+}
 body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{
-  transform:translateY(-18px);
+  transform:none;
+  margin-top:-2px;
 }
 body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{
   transform:translate(clamp(42px,16vw,72px),-35px);
@@ -1175,12 +1239,17 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .hero-panel.registration-mode .arena-title{width:250px;max-width:82%;margin:-28px auto -4px;transform:translateX(2px)}
+  .hero-panel.registration-mode .arena-title{width:250px;max-width:82%;margin:-28px auto -8px;transform:translateX(2px)}
   .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:118px}
-  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.asset-panel-lobby.registration-mode:before{top:36%;bottom:8%}
-  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline,
-  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats,
-  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{transform:translateY(-18px)}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{margin:-8px 0 -30px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline{left:8%;right:8%;top:20%;height:15%;gap:6px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-ready{font-size:7px;letter-spacing:.07em}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-lock{font-size:6px;padding:3px 6px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-track{height:5px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats{left:5.3%;right:5.3%;top:38%;height:38%;gap:2.2%}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat{padding:5% 8%}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat b{font-size:clamp(18px,5vw,28px)}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{margin-top:-2px}
   body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{transform:translate(64px,-35px)}
   .hero-panel.live-dashboard{padding-top:0}
   #hero.asset-panel-stats.live-dashboard{padding:2px 7px 7px}
@@ -1261,24 +1330,27 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
             </div>
           </div>
 
-          <div class="registration-inline" id="registrationInline" aria-live="polite">
-            <span class="registration-ready" id="registrationReady">0 / 0 READY</span>
-            <span class="registration-track"><span id="registrationProgress"></span></span>
-            <span class="registration-lock" id="registrationLock">OPEN</span>
-          </div>
+          <div class="pregame-ready-stage">
+            <img class="pregame-ready-frame" src="/telegram/crashout%20ui/PregameReadyCheckFrame.PNG" alt="" aria-hidden="true">
+            <div class="registration-inline" id="registrationInline" aria-live="polite">
+              <span class="registration-ready" id="registrationReady">0 / 0 READY</span>
+              <span class="registration-track"><span id="registrationProgress"></span></span>
+              <span class="registration-lock" id="registrationLock">OPEN</span>
+            </div>
 
-          <div class="stats">
-            <div class="stat">
-              <div class="stat-head"><img src="/telegram/veil_ui_icon_timer.svg" alt="">ROUND</div>
-              <b id="round">0</b>
-            </div>
-            <div class="stat">
-              <div class="stat-head"><img src="/telegram/veil_ui_icon_stats.svg" alt="">PLAYERS</div>
-              <b id="players">0</b>
-            </div>
-            <div class="stat">
-              <div class="stat-head"><img src="/telegram/veil_ui_icon_skull.svg" alt="">ALIVE</div>
-              <b id="alive">0</b>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-head"><img src="/telegram/veil_ui_icon_timer.svg" alt="">ROUND</div>
+                <b id="round">0</b>
+              </div>
+              <div class="stat">
+                <div class="stat-head"><img src="/telegram/veil_ui_icon_stats.svg" alt="">PLAYERS</div>
+                <b id="players">0</b>
+              </div>
+              <div class="stat">
+                <div class="stat-head"><img src="/telegram/veil_ui_icon_skull.svg" alt="">ALIVE</div>
+                <b id="alive">0</b>
+              </div>
             </div>
           </div>
 
