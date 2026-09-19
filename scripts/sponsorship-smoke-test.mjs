@@ -149,7 +149,7 @@ assert.equal(baseUi.split(".viewer-state-card.live-compact{").length-1,1);
 assert.equal(baseUi.split(".live-event-grid{").length-1,1);
 assert.equal(baseUi.split(".live-event-content{").length-1,1);
 assert.equal(baseUi.split(".live-event-entry{").length-1,1);
-assert.equal(count(baseUi,"\n.live-event-copy{"),1);
+assert.equal(baseUi.split("\n.live-event-copy{").length-1,1);
 assert(baseUi.includes("Showdown open · vote now."));
 assert(baseUi.includes("Reactions open · waiting for Showdown."));
 assert(!baseUi.includes(".viewer-state-card.live-compact{\n  width:100%;\n  min-height:72px"));
