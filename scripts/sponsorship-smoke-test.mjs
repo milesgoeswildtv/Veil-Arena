@@ -117,7 +117,7 @@ assert(baseUi.includes(".hero-panel.registration-mode .status-line{\n  display:n
 assert(baseUi.includes(".hero-panel.registration-mode .arena-title{width:200px;max-width:68%;margin:-8px auto -4px;transform:translateX(8px)}"));
 assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] .roster-panel .section-head{transform:translate(64px,-35px)}"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-heading{\n  display:contents;"));
-assert(baseUi.includes(".hero-panel.live-dashboard .arena-title{width:220px;margin:-13px 0 -7px}"));
+assert(baseUi.includes(".hero-panel.live-dashboard .arena-title{width:220px;margin:-2px 0 -4px}"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-live-logo{width:100%;height:auto;max-height:108px}"));
 assert(!baseUi.includes("DWALLET ARENA // POWERED BY VEIL"));
 assert(baseUi.includes("function renderEventText"));
@@ -316,9 +316,9 @@ const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", im
 assert(prizePackSource.includes("width:86%;max-width:620px"));
 assert(prizePackSource.includes("margin:-10px auto 4px"));
 assert(prizePackSource.includes("min-height:30px"));
-assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-24px}"));
+assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-30px}"));
 assert(prizePackSource.includes(".arena-nav{width:84%;gap:3px;padding:2px;margin-top:-12px}"));
-assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-32px}"));
+assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-38px}"));
 assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
 assert(!prizePackSource.includes("render=function prizeRender"));
 
