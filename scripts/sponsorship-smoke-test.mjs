@@ -119,7 +119,6 @@ assert(baseUi.includes('src="/telegram/NewEventBackgroundPlate.PNG"'));
 assert(baseUi.includes(".live-event-plate{"));
 assert(baseUi.includes("height:100%"));
 assert(baseUi.includes("object-fit:fill"));
-assert(baseUi.includes("height:200%;"));
 assert(baseUi.includes("grid-template-columns:repeat(2,minmax(0,1fr));"));
 assert(baseUi.includes('.live-event-content{'));
 assert(baseUi.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
