@@ -1169,7 +1169,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #hero.asset-panel-stats.live-dashboard{padding:2px 7px 7px}
   .hero-panel.live-dashboard{grid-template-columns:minmax(46px,1fr) minmax(0,220px) minmax(88px,1fr);column-gap:3px;row-gap:0}
   .hero-panel.live-dashboard .arena-live-logo{width:100%;height:auto;max-height:108px}
-  .hero-panel.live-dashboard .arena-title{width:220px;margin:-13px 0 -7px}
+  .hero-panel.live-dashboard .arena-title{width:220px;margin:-2px 0 -4px}
   .hero-panel.live-dashboard .status-line{font-size:7px;gap:4px}
   .hero-panel.live-dashboard .status-line:before{width:5px;height:5px}
   .hero-panel.live-dashboard .stat{min-height:38px;padding:3px 5px}
