@@ -577,7 +577,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   font-size:15px;
   overflow-wrap:anywhere;
 }
-.event>*{position:relative;z-index:1}
+.event>:not(.live-event-plate){position:relative;z-index:1}
 #eventCard.asset-panel-live .section-head{margin-bottom:8px}
 #eventCard.asset-panel-live .section-head img{width:20px;height:20px}
 #eventCard.asset-panel-live .section-head h2{font-size:9px}
@@ -828,17 +828,18 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   display:none;
 }
 .viewer-state-card.live-compact{
-  display:grid;
-  grid-template-columns:26px minmax(0,auto) minmax(0,1fr);
+  display:flex;
   align-items:center;
-  gap:8px;
-  width:100%;
-  min-height:44px;
-  margin:7px 0 2px;
-  padding:7px 10px;
+  justify-content:center;
+  gap:7px;
+  width:max-content;
+  max-width:min(100%,420px);
+  min-height:38px;
+  margin:7px auto 2px;
+  padding:6px 12px;
   overflow:hidden;
   border:1px solid #4d335c;
-  border-radius:11px;
+  border-radius:999px;
   background:linear-gradient(145deg,#100b15e8,#08060ceb);
   box-shadow:0 8px 18px #0007;
 }
@@ -857,7 +858,11 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 .viewer-state-card.live-compact .viewer-state-copy{
   position:static;
-  display:contents;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:0;
 }
 .viewer-state-card.live-compact .viewer-state-copy > div{
   display:flex;
@@ -891,7 +896,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   color:#9e90a8;
   font-size:8px;
   line-height:1.1;
-  text-align:right;
+  text-align:center;
 }
 .viewer-state-card.live-compact.asset-alive{
   border-color:#315f55;
@@ -1072,10 +1077,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .viewer-state-card.live-compact{min-height:64px}
-  .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
-  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
-  .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
+  .viewer-state-card.live-compact{min-height:36px;max-width:calc(100% - 16px);padding:5px 10px}
+  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:11px}
+  .viewer-state-card.live-compact .viewer-state-copy span{font-size:7px}
   .hero-panel.live-dashboard{padding-top:0}
   .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
@@ -1740,7 +1744,7 @@ function renderViewerStateCard(){
   }
 
   card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'')+(revivedNow?' revived-now':'')+(eliminatedNow?' new-dead':'');
-  card.style.display='block';
+  card.style.display=state.status==='running'?'flex':'block';
   $('viewerStateLabel').textContent=label;
   $('viewerStateTitle').textContent=title;
   $('viewerStateDetail').textContent=detail;
