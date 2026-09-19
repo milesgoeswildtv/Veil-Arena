@@ -2,7 +2,7 @@ export function applyTelegramFeaturePack(html) {
   if (typeof html !== "string" || !html) return html;
 
   const css = `<style id="veil-feature-pack-css">
-.connection-chip{display:inline-flex;align-items:center;justify-content:center;flex:none;width:94px;gap:6px;margin-left:auto;margin-right:8px;padding:6px 7px;border:1px solid #49355e;border-radius:999px;background:#0a0710cc;color:#b8a9c3;font:850 8px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap;overflow:hidden}.connection-dot{width:7px;height:7px;border-radius:50%;background:#e3b64d;box-shadow:0 0 8px #e3b64d88}.connection-chip.live .connection-dot{background:#55e2ae;box-shadow:0 0 8px #55e2ae99}.connection-chip.offline .connection-dot{background:#ef526f;box-shadow:0 0 8px #ef526f99}.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.feature-card{border:1px solid #3f2b4c;border-radius:14px;background:linear-gradient(155deg,#120d18e8,#09070deb);padding:14px;min-width:0}.feature-card summary{cursor:pointer;list-style:none;color:#d9c5e8;font:950 10px/1.2 ui-monospace,monospace;letter-spacing:.14em}.feature-card summary::-webkit-details-marker{display:none}.feature-body{margin-top:12px;color:#b9acc4;font-size:12px;line-height:1.45}.feature-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff0b}.feature-row:last-child{border-bottom:0}.feature-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.feature-mini{appearance:none;border:1px solid #654676;border-radius:9px;background:#160e1d;color:#fff;padding:8px 10px;font-weight:900;font-size:11px}.feature-mini.primary{border-color:#a867e8;background:#472361}.feature-mini.danger{border-color:#8f2c3e;background:#341018}.feature-mini:disabled{opacity:.42}.final-five-strip{display:none;margin:0 0 12px;padding:10px 12px;border:1px solid #9b7338;border-radius:12px;background:linear-gradient(90deg,#2b1a0d,#1a0d22,#2b1a0d);color:#f2c968;text-align:center;font:1000 11px/1.2 ui-monospace,monospace;letter-spacing:.18em}.final-five-mode .final-five-strip{display:block}.final-five-mode .state-shell{box-shadow:0 26px 80px #000b,inset 0 0 0 1px #e3b64d44,0 0 34px #c58d3150}.history-entry{padding:8px 0;border-bottom:1px solid #ffffff0b}.history-entry:last-child{border-bottom:0}.reaction-bar{display:none;position:relative;z-index:2;margin:6px 0 0;padding:7px;border:1px solid #553866;border-radius:12px;background:linear-gradient(145deg,#100b15e8,#08060ceb);grid-template-columns:repeat(6,1fr);gap:5px}.reaction-bar.show{display:grid}.reaction-label{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:1px 2px 2px;color:#c8b5d5;font:950 7px/1.2 ui-monospace,monospace;letter-spacing:.13em}.reaction-label span{color:#826f90;font-size:6px;letter-spacing:.07em}.reaction-button{min-width:0;min-height:36px;border:1px solid #4b3559;border-radius:9px;background:#140d1a;color:#fff;font-size:19px;padding:5px}.reaction-layer{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}.reaction-float{position:absolute;bottom:12%;font-size:30px;animation:reactionFloat 2.4s ease-out both;filter:drop-shadow(0 3px 8px #000)}@keyframes reactionFloat{0%{opacity:0;transform:translateY(30px) scale(.7)}15%{opacity:1}100%{opacity:0;transform:translateY(-58vh) translateX(var(--drift)) scale(1.25) rotate(var(--rot))}}.audio-range{width:100%;accent-color:#a45ee8}.diag-modal{display:none;position:fixed;inset:0;z-index:1200;background:#050308e8;padding:18px;place-items:center}.diag-modal.show{display:grid}.diag-box{width:min(560px,100%);max-height:80vh;overflow:auto;border:1px solid #6a477e;border-radius:18px;background:#0d0912;padding:18px}.diag-box pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#cbbfd6;font:12px/1.55 ui-monospace,monospace}.share-code{font:950 13px/1 ui-monospace,monospace;letter-spacing:.18em;color:#d8b7f2}.paused-mark{color:#f2c968}.hall-list{display:grid;gap:6px}.hall-item{display:flex;justify-content:space-between;gap:10px;padding:8px;border:1px solid #352642;border-radius:10px;background:#0b080f}.utility-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}@media(max-width:760px){.feature-grid{grid-template-columns:1fr}.connection-chip{margin-left:0}}
+.connection-chip{display:inline-flex;align-items:center;justify-content:center;flex:none;width:94px;gap:6px;margin-left:auto;margin-right:8px;padding:6px 7px;border:1px solid #49355e;border-radius:999px;background:#0a0710cc;color:#b8a9c3;font:850 8px/1 ui-monospace,monospace;letter-spacing:.08em;white-space:nowrap;overflow:hidden}.connection-dot{width:7px;height:7px;border-radius:50%;background:#e3b64d;box-shadow:0 0 8px #e3b64d88}.connection-chip.live .connection-dot{background:#55e2ae;box-shadow:0 0 8px #55e2ae99}.connection-chip.offline .connection-dot{background:#ef526f;box-shadow:0 0 8px #ef526f99}.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.feature-card{border:1px solid #3f2b4c;border-radius:14px;background:linear-gradient(155deg,#120d18e8,#09070deb);padding:14px;min-width:0}.feature-card summary{cursor:pointer;list-style:none;color:#d9c5e8;font:950 10px/1.2 ui-monospace,monospace;letter-spacing:.14em}.feature-card summary::-webkit-details-marker{display:none}.feature-body{margin-top:12px;color:#b9acc4;font-size:12px;line-height:1.45}.feature-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff0b}.feature-row:last-child{border-bottom:0}.feature-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.feature-mini{appearance:none;border:1px solid #654676;border-radius:9px;background:#160e1d;color:#fff;padding:8px 10px;font-weight:900;font-size:11px}.feature-mini.primary{border-color:#a867e8;background:#472361}.feature-mini.danger{border-color:#8f2c3e;background:#341018}.feature-mini:disabled{opacity:.42}.final-five-strip{display:none;margin:0 0 12px;padding:10px 12px;border:1px solid #9b7338;border-radius:12px;background:linear-gradient(90deg,#2b1a0d,#1a0d22,#2b1a0d);color:#f2c968;text-align:center;font:1000 11px/1.2 ui-monospace,monospace;letter-spacing:.18em}.final-five-mode .final-five-strip{display:block}.final-five-mode .state-shell{box-shadow:0 26px 80px #000b,inset 0 0 0 1px #e3b64d44,0 0 34px #c58d3150}.history-entry{padding:8px 0;border-bottom:1px solid #ffffff0b}.history-entry:last-child{border-bottom:0}.reaction-bar{display:none;position:relative;z-index:2;width:max-content;max-width:100%;margin:6px auto 0;text-align:center}.reaction-bar.show{display:block}.reaction-toggle{appearance:none;display:flex;align-items:center;justify-content:center;gap:7px;width:max-content;min-height:34px;margin:0 auto;padding:6px 11px;border:1px solid #5d3d70;border-radius:10px;background:linear-gradient(145deg,#160e1d,#09070d);color:#f4eaf9;font:950 9px/1 ui-monospace,monospace;letter-spacing:.09em;cursor:pointer;box-shadow:0 6px 14px #0005;-webkit-tap-highlight-color:transparent}.reaction-toggle-icon{color:#d86cff;font-size:16px;line-height:1}.reaction-toggle-chevron{color:#bd78e9;font-size:13px;line-height:1;transition:transform .16s ease}.reaction-bar.open .reaction-toggle-chevron{transform:rotate(180deg)}.reaction-choices{display:none;width:min(286px,calc(100vw - 32px));grid-template-columns:repeat(6,minmax(36px,1fr));gap:5px;margin-top:6px;padding:6px;border:1px solid #553866;border-radius:11px;background:linear-gradient(145deg,#100b15f4,#08060cf4);box-shadow:0 10px 24px #0008}.reaction-bar.open .reaction-choices{display:grid}.reaction-button{min-width:0;min-height:34px;border:1px solid #4b3559;border-radius:9px;background:#140d1a;color:#fff;font-size:18px;padding:4px}.reaction-layer{position:fixed;inset:0;pointer-events:none;z-index:998;overflow:hidden}.reaction-float{position:absolute;bottom:12%;font-size:30px;animation:reactionFloat 2.4s ease-out both;filter:drop-shadow(0 3px 8px #000)}@keyframes reactionFloat{0%{opacity:0;transform:translateY(30px) scale(.7)}15%{opacity:1}100%{opacity:0;transform:translateY(-58vh) translateX(var(--drift)) scale(1.25) rotate(var(--rot))}}.audio-range{width:100%;accent-color:#a45ee8}.diag-modal{display:none;position:fixed;inset:0;z-index:1200;background:#050308e8;padding:18px;place-items:center}.diag-modal.show{display:grid}.diag-box{width:min(560px,100%);max-height:80vh;overflow:auto;border:1px solid #6a477e;border-radius:18px;background:#0d0912;padding:18px}.diag-box pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#cbbfd6;font:12px/1.55 ui-monospace,monospace}.share-code{font:950 13px/1 ui-monospace,monospace;letter-spacing:.18em;color:#d8b7f2}.paused-mark{color:#f2c968}.hall-list{display:grid;gap:6px}.hall-item{display:flex;justify-content:space-between;gap:10px;padding:8px;border:1px solid #352642;border-radius:10px;background:#0b080f}.utility-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}@media(max-width:760px){.feature-grid{grid-template-columns:1fr}.connection-chip{margin-left:0}}
 </style>`;
 
   const script = `<script id="veil-feature-pack-js">
@@ -10,6 +10,7 @@ export function applyTelegramFeaturePack(html) {
   const featureEsc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const featureButton = (label, action, cls = '', extra = '') => '<button type="button" class="feature-mini '+cls+'" data-feature-action="'+action+'" '+extra+'>'+featureEsc(label)+'</button>';
   const seenReactions = new Set();
+  let reactionsOpen = false;
   let hallLoaded = false;
   let lastConnectionAt = 0;
 
@@ -33,7 +34,7 @@ export function applyTelegramFeaturePack(html) {
     }
     const viewerState=document.getElementById('viewerStateCard');
     if(viewerState&&!document.getElementById('reactionBar')){
-      viewerState.insertAdjacentHTML('afterend','<div class="reaction-bar" id="reactionBar"><div class="reaction-label">SPECTATOR REACTIONS <span>REACT WHILE YOU WATCH</span></div>'+['💀','🔥','😂','😈','👀','💜'].map(x=>'<button class="reaction-button" data-reaction="'+x+'">'+x+'</button>').join('')+'</div>');
+      viewerState.insertAdjacentHTML('afterend','<div class="reaction-bar" id="reactionBar"><button type="button" class="reaction-toggle" id="reactionToggle" data-reaction-toggle aria-expanded="false" aria-controls="reactionChoices"><span class="reaction-toggle-icon">☺</span><span>[ EMOJIS ]</span><span class="reaction-toggle-chevron">⌄</span></button><div class="reaction-choices" id="reactionChoices">'+['💀','🔥','😂','😈','👀','💜'].map(x=>'<button type="button" class="reaction-button" data-reaction="'+x+'" aria-label="React '+x+'">'+x+'</button>').join('')+'</div></div>');
     }
     document.body.insertAdjacentHTML('beforeend','<div class="reaction-layer" id="reactionLayer"></div><div class="diag-modal" id="diagModal"><div class="diag-box"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><strong>HOST DIAGNOSTICS</strong><button class="feature-mini" id="diagClose">CLOSE</button></div><pre id="diagText"></pre></div></div>');
     wireAudioControls();
@@ -118,7 +119,15 @@ export function applyTelegramFeaturePack(html) {
 
 
   function renderReactions(){
-    const bar=document.getElementById('reactionBar'); if(bar)bar.classList.toggle('show',Boolean(state?.status==='running'&&!state?.viewer?.alive));
+    const bar=document.getElementById('reactionBar');
+    const available=Boolean(state?.status==='running'&&!state?.viewer?.alive);
+    if(bar){
+      bar.classList.toggle('show',available);
+      if(!available){reactionsOpen=false;bar.classList.remove('open')}
+      else bar.classList.toggle('open',reactionsOpen);
+      const toggle=document.getElementById('reactionToggle');
+      if(toggle)toggle.setAttribute('aria-expanded',String(available&&reactionsOpen));
+    }
     const layer=document.getElementById('reactionLayer'); if(!layer)return;
     for(const reaction of state?.reactions||[]){
       const key=String(reaction.user_id)+'|'+String(reaction.created_at); if(seenReactions.has(key))continue; seenReactions.add(key);
@@ -170,7 +179,24 @@ export function applyTelegramFeaturePack(html) {
       if(action==='remove'&&!confirm('Remove this player from registration?'))return;
       await act(action,action==='remove'?{targetId:feature.dataset.targetId}:{}); return;
     }
-    const reaction=event.target.closest('[data-reaction]'); if(reaction){await act('reaction',{emoji:reaction.dataset.reaction});return}
+    const reactionToggle=event.target.closest('[data-reaction-toggle]');
+    if(reactionToggle){
+      const bar=document.getElementById('reactionBar');
+      reactionsOpen=!reactionsOpen;
+      if(bar)bar.classList.toggle('open',reactionsOpen);
+      reactionToggle.setAttribute('aria-expanded',String(reactionsOpen));
+      return;
+    }
+    const reaction=event.target.closest('[data-reaction]');
+    if(reaction){
+      await act('reaction',{emoji:reaction.dataset.reaction});
+      reactionsOpen=false;
+      const bar=document.getElementById('reactionBar');
+      if(bar)bar.classList.remove('open');
+      const toggle=document.getElementById('reactionToggle');
+      if(toggle)toggle.setAttribute('aria-expanded','false');
+      return;
+    }
   });
 
   document.addEventListener('click',event=>{
