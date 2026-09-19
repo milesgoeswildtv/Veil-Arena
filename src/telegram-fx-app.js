@@ -326,21 +326,52 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   margin-right:4px;
   vertical-align:-4px;
 }
+.hero-panel.registration-mode{
+  overflow:visible;
+}
+.hero-panel.registration-mode .arena-heading{
+  display:block;
+}
+.hero-panel.registration-mode .arena-title{
+  display:block;
+  width:clamp(190px,52vw,260px);
+  max-width:72%;
+  margin:-6px auto -2px;
+  transform:translateX(clamp(4px,2vw,12px));
+}
+.hero-panel.registration-mode .arena-title .arena-mark,
+.hero-panel.registration-mode .arena-title h1{
+  display:none;
+}
+.hero-panel.registration-mode .arena-live-logo{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:118px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 15px #bd64ff66);
+}
+.hero-panel.registration-mode .status-line{
+  display:none;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{
+  transform:translate(clamp(42px,16vw,72px),-35px);
+}
 .hero-panel.live-dashboard{
   min-height:0;
   display:grid;
-  grid-template-columns:minmax(66px,1fr) minmax(172px,230px) minmax(104px,1fr);
+  grid-template-columns:minmax(54px,1fr) minmax(200px,270px) minmax(96px,1fr);
   grid-template-areas:
     "status logo host"
     "stats stats stats"
     "error error error"
     "controls controls controls";
   align-items:center;
-  column-gap:6px;
-  row-gap:2px;
+  column-gap:5px;
+  row-gap:1px;
 }
 #hero.asset-panel-stats.live-dashboard{
-  padding:5px 9px 8px;
+  padding:3px 9px 8px;
 }
 .hero-panel.live-dashboard .arena-heading{
   display:contents;
@@ -348,9 +379,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard .arena-title{
   grid-area:logo;
   display:block;
-  width:clamp(172px,31vw,230px);
+  width:clamp(210px,36vw,270px);
   max-width:100%;
-  margin:-4px 0 -2px;
+  margin:-10px 0 -5px;
   justify-self:center;
 }
 .hero-panel.live-dashboard .arena-title .arena-mark,
@@ -361,9 +392,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   display:block;
   width:100%;
   height:auto;
-  max-height:92px;
+  max-height:118px;
   object-fit:contain;
-  filter:drop-shadow(0 0 14px #bd64ff66);
+  filter:drop-shadow(0 0 16px #bd64ff70);
 }
 .hero-panel.live-dashboard .status-line{
   grid-area:status;
@@ -978,7 +1009,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .footer-row{
   display:flex;
   align-items:flex-start;
-  justify-content:space-between;
+  justify-content:flex-end;
   gap:12px;
   margin-top:14px;
   color:#9f91aa;
@@ -1131,11 +1162,14 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
+  .hero-panel.registration-mode .arena-title{width:200px;max-width:68%;margin:-8px auto -4px;transform:translateX(8px)}
+  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:98px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{transform:translate(64px,-35px)}
   .hero-panel.live-dashboard{padding-top:0}
-  #hero.asset-panel-stats.live-dashboard{padding:4px 7px 7px}
-  .hero-panel.live-dashboard{grid-template-columns:minmax(58px,1fr) minmax(0,172px) minmax(92px,1fr);column-gap:4px;row-gap:1px}
-  .hero-panel.live-dashboard .arena-live-logo{max-height:82px}
-  .hero-panel.live-dashboard .arena-title{width:172px;margin:-6px 0 -4px}
+  #hero.asset-panel-stats.live-dashboard{padding:2px 7px 7px}
+  .hero-panel.live-dashboard{grid-template-columns:minmax(46px,1fr) minmax(0,220px) minmax(88px,1fr);column-gap:3px;row-gap:0}
+  .hero-panel.live-dashboard .arena-live-logo{width:100%;height:auto;max-height:108px}
+  .hero-panel.live-dashboard .arena-title{width:220px;margin:-13px 0 -7px}
   .hero-panel.live-dashboard .status-line{font-size:7px;gap:4px}
   .hero-panel.live-dashboard .status-line:before{width:5px;height:5px}
   .hero-panel.live-dashboard .stat{min-height:38px;padding:3px 5px}
@@ -1298,10 +1332,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 
 
       <div class="footer-row">
-        <div class="footer-mark">
-          <img src="/telegram/veil_ui_icon_wallet.svg" alt="">
-          DWALLET ARENA // POWERED BY VEIL
-        </div>
         <details class="rules">
           <summary><img src="/telegram/veil_ui_icon_rules.svg" alt="">QUICK RULES</summary>
           <div class="rules-copy">
