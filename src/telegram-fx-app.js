@@ -387,6 +387,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard #error{grid-area:error;margin-top:0}
 .hero-panel.live-dashboard #controls{grid-area:controls;margin-top:0}
 .hero-panel.live-dashboard #controls:empty{display:none}
+/* LIVE EVENT: canonical visual owner. Keep responsive behavior inside this block. */
 .live-event-grid{
   position:relative;
   display:block;
@@ -599,7 +600,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   min-height:30px;
   margin-top:10px;
   color:#a99ab5;
-  font-size:11px;
+  font-size:12px;
   font-weight:800;
 }
 .timer img{width:20px;height:20px}
@@ -822,6 +823,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
 .new-dead{animation:playerOut 1.1s ease both}
 .revived-now{animation:playerBack 1.4s ease both}
+/* VIEWER STATUS: canonical visual owner. Do not add breakpoint overrides elsewhere. */
 .viewer-state-card{
   opacity:var(--av-viewer-opacity,1);
   display:none;
@@ -882,7 +884,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:12px;
+  font-size:11px;
   line-height:1;
   font-weight:1000;
   letter-spacing:.02em;
