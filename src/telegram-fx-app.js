@@ -328,16 +328,24 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 .hero-panel.registration-mode{
   overflow:visible;
+  background:transparent;
+}
+#hero.asset-panel-lobby.registration-mode:before{
+  top:36%;
+  right:0;
+  bottom:8%;
+  left:0;
+  background-size:100% 100%;
 }
 .hero-panel.registration-mode .arena-heading{
   display:block;
 }
 .hero-panel.registration-mode .arena-title{
   display:block;
-  width:clamp(190px,52vw,260px);
-  max-width:72%;
-  margin:-6px auto -2px;
-  transform:translateX(clamp(4px,2vw,12px));
+  width:clamp(230px,60vw,310px);
+  max-width:82%;
+  margin:-22px auto -2px;
+  transform:translateX(clamp(2px,1vw,6px));
 }
 .hero-panel.registration-mode .arena-title .arena-mark,
 .hero-panel.registration-mode .arena-title h1{
@@ -353,6 +361,11 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 .hero-panel.registration-mode .status-line{
   display:none;
+}
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline,
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats,
+body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{
+  transform:translateY(-18px);
 }
 body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{
   transform:translate(clamp(42px,16vw,72px),-35px);
@@ -1162,8 +1175,12 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .hero-panel.registration-mode .arena-title{width:200px;max-width:68%;margin:-8px auto -4px;transform:translateX(8px)}
-  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:98px}
+  .hero-panel.registration-mode .arena-title{width:250px;max-width:82%;margin:-28px auto -4px;transform:translateX(2px)}
+  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:118px}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.asset-panel-lobby.registration-mode:before{top:36%;bottom:8%}
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline,
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stats,
+  body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{transform:translateY(-18px)}
   body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{transform:translate(64px,-35px)}
   .hero-panel.live-dashboard{padding-top:0}
   #hero.asset-panel-stats.live-dashboard{padding:2px 7px 7px}
