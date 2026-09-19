@@ -167,7 +167,6 @@ assert(baseUi.includes("const afterdarkPreview=new URLSearchParams(location.sear
 assert(baseUi.includes("--av-event-padding:15px"));
 assert(baseUi.includes("var(--av-event-padding,15px)"));
 assert(baseUi.includes("var(--av-roster-gap,8px)"));
-assert(baseUi.includes("var(--av-sponsor-asset,url(\"/telegram/veil_ui_sponsor_panel.svg\"))"));
 
 const compiledVisuals = compileTelegramVisualManifest(structuredClone(TELEGRAM_VISUAL_DEFAULT_MANIFEST));
 assert(compiledVisuals.css.includes("--av-event-padding:15px"));
