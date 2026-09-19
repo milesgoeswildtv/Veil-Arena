@@ -240,7 +240,7 @@ assert(featurePackSource.includes("SPECTATOR REACTIONS"));
 assert(featurePackSource.includes("viewerState.insertAdjacentHTML('afterend'"));
 assert(featurePackSource.includes("REACT WHILE YOU WATCH"));
 assert(!featurePackSource.includes("position:sticky;bottom:8px"));
-assert(featurePackSource.includes("SHOWDOWN VOTING OPENS HERE"));
+assert(!featurePackSource.includes("SHOWDOWN VOTING OPENS HERE"));
 assert(featurePackSource.includes(".reaction-label"));
 assert(!featurePackSource.includes("function renderVoteProgress"));
 assert(!featurePackSource.includes("vote-progress-row"));
