@@ -114,11 +114,13 @@ assert(baseUi.includes('"status logo host"'));
 assert(baseUi.includes("#hero.asset-panel-stats.live-dashboard{"));
 assert(baseUi.includes(".hero-panel.registration-mode .arena-live-logo{"));
 assert(baseUi.includes(".hero-panel.registration-mode .status-line{\n  display:none;"));
-assert(baseUi.includes(".hero-panel.registration-mode .arena-title{width:250px;max-width:82%;margin:-28px auto -4px;transform:translateX(2px)}"));
-assert(baseUi.includes(".hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:118px}"));
-assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.asset-panel-lobby.registration-mode:before{top:36%;bottom:8%}"));
-assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.registration-mode .registration-inline,"));
-assert(baseUi.includes("transform:translateY(-18px)"));
+assert(baseUi.includes('class="pregame-ready-stage"'));
+assert(baseUi.includes('src="/telegram/crashout%20ui/PregameReadyCheckFrame.PNG"'));
+assert(baseUi.includes(".pregame-ready-stage{display:contents}"));
+assert(baseUi.includes("#hero.asset-panel-lobby.registration-mode:before{display:none}"));
+assert(baseUi.includes("aspect-ratio:3/1"));
+assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.registration-mode .registration-inline{"));
+assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.registration-mode .stats{"));
 assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] .roster-panel .section-head{transform:translate(64px,-35px)}"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-heading{\n  display:contents;"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-title{width:220px;margin:-2px 0 -4px}"));
@@ -253,6 +255,15 @@ assert(!composedUi.includes("background:none!important"));
 const statsPanelSource = readFileSync(new URL("../assets/telegram/veil_ui_stats_panel.svg", import.meta.url), "utf8");
 assert(statsPanelSource.includes('preserveAspectRatio="none"'));
 
+const pregameHeaderAsset = readFileSync(new URL("../assets/telegram/crashout ui/PregameLobbyHeader.PNG", import.meta.url));
+const pregameReadyAsset = readFileSync(new URL("../assets/telegram/crashout ui/PregameReadyCheckFrame.PNG", import.meta.url));
+assert(pregameHeaderAsset.length > 1000);
+assert(pregameReadyAsset.length > 1000);
+
+const syncAssetsSource = readFileSync(new URL("../scripts/sync-telegram-assets.mjs", import.meta.url), "utf8");
+assert(syncAssetsSource.includes("async function copySupportedTree"));
+assert(syncAssetsSource.includes("await copySupportedTree(source, destination)"));
+
 const visualAdapterSource = readFileSync(new URL("../src/telegram-visual-editor-adapter.js", import.meta.url), "utf8");
 assert(!visualAdapterSource.includes("../core/"));
 assert(!visualAdapterSource.includes("/telegram/api/action"));
@@ -323,6 +334,9 @@ assert(prizePackSource.includes("min-height:30px"));
 assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-30px}"));
 assert(prizePackSource.includes(".arena-nav{width:84%;gap:3px;padding:2px;margin-top:-12px}"));
 assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-view=\"arena\"] .arena-nav{margin-top:-38px}"));
+assert(prizePackSource.includes('PregameLobbyHeader.PNG'));
+assert(prizePackSource.includes('body[data-arena-phase="registration"] .arena-nav'));
+assert(prizePackSource.includes('>SPONSORS<span'));
 assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
 assert(!prizePackSource.includes("render=function prizeRender"));
 
