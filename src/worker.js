@@ -50,6 +50,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (request.method === "GET" && (url.pathname === "/ritual-prototype" || url.pathname === "/ritual-prototype/")) {
+      const assetUrl = new URL("/ritual-prototype.html", request.url);
+      return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+    }
+
     if (request.method === "GET" && url.pathname === "/telegram/app") {
       return html(buildTelegramMiniAppHtml());
     }
