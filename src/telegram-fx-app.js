@@ -247,6 +247,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   letter-spacing:-.055em;
   font-weight:1000;
 }
+.arena-live-logo{display:none}
 .status-line{
   display:flex;
   align-items:center;
@@ -328,41 +329,59 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard{
   min-height:0;
   display:grid;
-  grid-template-columns:1fr auto 1fr;
+  grid-template-columns:minmax(76px,1fr) auto minmax(104px,1fr);
   grid-template-areas:
-    ". heading host"
+    "status logo host"
     "stats stats stats"
     "error error error"
     "controls controls controls";
   align-items:center;
-  column-gap:8px;
-  row-gap:7px;
+  column-gap:7px;
+  row-gap:4px;
+}
+#hero.asset-panel-stats.live-dashboard{
+  padding:8px 10px 9px;
 }
 .hero-panel.live-dashboard .arena-heading{
-  grid-area:heading;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:var(--av-header-gap,8px);
-  min-width:0;
-  opacity:var(--av-header-opacity,1);
+  display:contents;
 }
 .hero-panel.live-dashboard .arena-title{
-  gap:6px;
+  grid-area:logo;
+  display:block;
+  width:clamp(122px,22vw,168px);
+  max-width:100%;
   margin:0;
+  justify-self:center;
 }
-.hero-panel.live-dashboard .arena-title img{width:25px;height:25px}
+.hero-panel.live-dashboard .arena-title .arena-mark,
 .hero-panel.live-dashboard .arena-title h1{
-  font-size:27px;
-  line-height:1;
-  letter-spacing:-.035em;
+  display:none;
+}
+.hero-panel.live-dashboard .arena-live-logo{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:46px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 11px #bd64ff55);
 }
 .hero-panel.live-dashboard .status-line{
+  grid-area:status;
+  justify-self:start;
   min-height:0;
   margin:0;
-  gap:4px;
-  font-size:9px;
+  gap:5px;
+  font-size:8px;
   white-space:nowrap;
+}
+.hero-panel.live-dashboard .status-line:before{
+  content:"";
+  flex:none;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#c45cff;
+  box-shadow:0 0 9px #c45cffaa;
 }
 .hero-panel.live-dashboard .status-line img{display:none}
 .hero-panel.live-dashboard .stats{
@@ -371,17 +390,18 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   opacity:var(--av-stats-opacity,1);
 }
 .hero-panel.live-dashboard .stat{
-  padding:6px 8px;
-  border-radius:10px;
+  min-height:43px;
+  padding:4px 7px;
+  border-radius:9px;
 }
 .hero-panel.live-dashboard .stat-head{
   font-size:7px;
   letter-spacing:.08em;
 }
-.hero-panel.live-dashboard .stat-head img{width:13px;height:13px}
+.hero-panel.live-dashboard .stat-head img{width:12px;height:12px}
 .hero-panel.live-dashboard .stat b{
-  margin-top:3px;
-  font-size:20px;
+  margin-top:2px;
+  font-size:18px;
 }
 .hero-panel.live-dashboard #viewerReadout{display:none}
 .hero-panel.live-dashboard #error{grid-area:error;margin-top:0}
@@ -1109,11 +1129,14 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
   .hero-panel.live-dashboard{padding-top:0}
-  .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
-  .hero-panel.live-dashboard .arena-title h1{font-size:24px}
-  .hero-panel.live-dashboard .status-line{font-size:8px}
-  .hero-panel.live-dashboard .stat{padding:5px 5px}
-  .hero-panel.live-dashboard .stat b{font-size:18px}
+  #hero.asset-panel-stats.live-dashboard{padding:7px 8px 8px}
+  .hero-panel.live-dashboard{grid-template-columns:minmax(70px,1fr) auto minmax(92px,1fr);column-gap:5px;row-gap:3px}
+  .hero-panel.live-dashboard .arena-live-logo{max-height:40px}
+  .hero-panel.live-dashboard .arena-title{width:clamp(108px,29vw,136px)}
+  .hero-panel.live-dashboard .status-line{font-size:7px;gap:4px}
+  .hero-panel.live-dashboard .status-line:before{width:5px;height:5px}
+  .hero-panel.live-dashboard .stat{min-height:40px;padding:4px 5px}
+  .hero-panel.live-dashboard .stat b{font-size:17px}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
   .showdown-contender-name{font-size:11px}
   .showdown-bar{margin-top:12px}
@@ -1174,8 +1197,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
         <section class="panel hero-panel" id="hero">
           <div class="arena-heading">
             <div class="arena-title">
-              <img src="/telegram/veil_ui_icon_arena.svg" alt="">
+              <img class="arena-mark" src="/telegram/veil_ui_icon_arena.svg" alt="">
               <h1>ARENA</h1>
+              <img class="arena-live-logo" src="/telegram/CrashoutArenaLogoNew.svg" alt="Crashout Arena">
             </div>
             <div class="status-line" id="statusLine">
               <img id="statusIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
