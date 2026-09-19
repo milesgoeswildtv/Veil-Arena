@@ -388,53 +388,40 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard #controls{grid-area:controls;margin-top:0}
 .hero-panel.live-dashboard #controls:empty{display:none}
 .live-event-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:0;
+  position:relative;
+  display:block;
+  min-width:0;
   padding:0;
-  overflow:visible;
+  overflow:hidden;
   background:none;
+  border-radius:10px;
   opacity:var(--av-event-opacity,1);
 }
-.live-event-row{
-  position:relative;
-  min-width:0;
-  overflow:hidden;
-}
-.live-event-plate-slice{
+.live-event-plate{
   position:absolute;
   inset:0;
   z-index:0;
-  overflow:hidden;
-  pointer-events:none;
-}
-.live-event-plate-slice img{
-  position:absolute;
-  left:0;
   width:100%;
+  height:100%;
   max-width:none;
-  height:200%;
   object-fit:fill;
+  pointer-events:none;
+  user-select:none;
 }
-.live-event-row-top .live-event-plate-slice img{top:0}
-.live-event-row-bottom .live-event-plate-slice img{bottom:0}
-.live-event-row-content{
+.live-event-content{
   position:relative;
   z-index:1;
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:stretch;
   min-width:0;
-  column-gap:var(--av-event-gap,0px);
-  padding-left:var(--av-event-padding,15px);
-  padding-right:var(--av-event-padding,15px);
+  gap:var(--av-event-gap,0px);
+  padding:18px var(--av-event-padding,15px) 20px;
 }
-.live-event-row-top .live-event-row-content{padding-top:14px;padding-bottom:4px}
-.live-event-row-bottom .live-event-row-content{padding-top:4px;padding-bottom:15px}
 .live-event-entry{
   min-width:0;
   min-height:0;
-  padding:11px 12px;
+  padding:10px 12px;
   background:transparent;
 }
 .live-event-copy{
@@ -442,6 +429,14 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   font-size:var(--av-event-font-size,11px);
   line-height:var(--av-event-line-height,1.38);
   overflow-wrap:anywhere;
+}
+.live-event-entry.dense .live-event-copy{
+  font-size:calc(var(--av-event-font-size,11px) - 1px);
+  line-height:1.3;
+}
+.live-event-entry.ultra-dense .live-event-copy{
+  font-size:calc(var(--av-event-font-size,11px) - 2px);
+  line-height:1.24;
 }
 .live-event-copy .event-head{
   margin-bottom:3px;
@@ -920,30 +915,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   background:linear-gradient(145deg,#1b160ce8,#0c0907eb);
 }
 .viewer-state-card.live-compact.revived-now{animation:playerBack 1.4s ease both}
-.sponsorship-card{
-  position:relative;
-  width:min(720px,100%);
-  min-height:var(--av-sponsor-min-height,150px);
-  margin:16px auto 0;
-  padding:38px 60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:var(--av-sponsor-gap,14px);
-  text-align:center;
-  background:var(--av-sponsor-asset,url("/telegram/veil_ui_sponsor_panel.svg")) center/100% 100% no-repeat;
-  opacity:var(--av-sponsor-opacity,1);
-  filter:drop-shadow(0 14px 24px #0008);
-}
-.sponsorship-card img{width:34px;height:34px;filter:drop-shadow(0 0 10px #ba69ff77)}
-.sponsorship-copy small{
-  display:block;
-  color:#a99ab6;
-  font:900 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-}
-.sponsorship-copy strong{display:block;margin-top:5px;font-size:15px;letter-spacing:.08em}
 .footer-row{
   display:flex;
   align-items:flex-start;
@@ -1072,7 +1043,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px}
   .readout{min-height:50px;padding:10px 20px}
   .viewer-state-card{width:100%;margin-top:7px}
-  .sponsorship-card{min-height:var(--av-sponsor-min-height,126px);padding:30px 42px}
   .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--av-roster-gap,7px)}
   .roster .player:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - 3.5px);justify-self:center}
   .footer-row{flex-direction:column;align-items:stretch}
@@ -1106,21 +1076,18 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
   .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
   .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
-  .sponsorship-card{min-height:var(--av-sponsor-min-height,110px);padding:26px 32px}
-  .sponsorship-card img{width:28px;height:28px}
-  .sponsorship-copy strong{font-size:13px}
   .hero-panel.live-dashboard{padding-top:0}
   .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
   .hero-panel.live-dashboard .status-line{font-size:8px}
   .hero-panel.live-dashboard .stat{padding:5px 5px}
   .hero-panel.live-dashboard .stat b{font-size:18px}
-  .live-event-grid{gap:0;padding:0}
-  .live-event-row-content{padding-left:var(--av-event-padding,10px);padding-right:var(--av-event-padding,10px)}
-  .live-event-row-top .live-event-row-content{padding-top:10px;padding-bottom:3px}
-  .live-event-row-bottom .live-event-row-content{padding-top:3px;padding-bottom:11px}
-  .live-event-entry{padding:8px 8px}
+  .live-event-grid{padding:0}
+  .live-event-content{gap:var(--av-event-gap,0px);padding:14px var(--av-event-padding,10px) 16px}
+  .live-event-entry{padding:7px 7px}
   .live-event-copy{font-size:var(--av-event-font-size,10px);line-height:var(--av-event-line-height,1.34)}
+  .live-event-entry.dense .live-event-copy{font-size:calc(var(--av-event-font-size,10px) - 1px);line-height:1.27}
+  .live-event-entry.ultra-dense .live-event-copy{font-size:calc(var(--av-event-font-size,10px) - 2px);line-height:1.2}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
   .showdown-contender-name{font-size:11px}
   .showdown-bar{margin-top:12px}
@@ -1273,13 +1240,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
         <div class="roster" id="roster"></div>
       </section>
 
-      <section class="sponsorship-card" aria-label="Arena sponsor">
-        <img src="/telegram/veil_ui_icon_sponsor.svg" alt="">
-        <div class="sponsorship-copy">
-          <small>Telegram Arena</small>
-          <strong>DWALLET × VEIL</strong>
-        </div>
-      </section>
 
       <div class="footer-row">
         <div class="footer-mark">
@@ -1810,13 +1770,15 @@ function renderEventText(){
     const rows=currentRoundEvents();
     const cells=(rows.length?rows:['Waiting for the next Arena event…']).slice(0,4);
     while(cells.length<4)cells.push('');
-    const eventCell=text=>'<article class="live-event-entry"><div class="live-event-copy">'+(text?richText(text):'')+'</div></article>';
-    const plateSlice='<div class="live-event-plate-slice" aria-hidden="true"><img src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt=""></div>';
+    const eventCell=text=>{
+      const length=String(text||'').length;
+      const density=length>280?' ultra-dense':length>190?' dense':'';
+      return '<article class="live-event-entry'+density+'"><div class="live-event-copy">'+(text?richText(text):'')+'</div></article>';
+    };
+    const plate='<img class="live-event-plate" src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt="" aria-hidden="true">';
     target.classList.add('live-event-grid');
     if(heading)heading.textContent='ROUND '+Number(state.round||0);
-    target.innerHTML=
-      '<div class="live-event-row live-event-row-top">'+plateSlice+'<div class="live-event-row-content">'+cells.slice(0,2).map(eventCell).join('')+'</div></div>'
-      +'<div class="live-event-row live-event-row-bottom">'+plateSlice+'<div class="live-event-row-content">'+cells.slice(2,4).map(eventCell).join('')+'</div></div>';
+    target.innerHTML=plate+'<div class="live-event-content">'+cells.map(eventCell).join('')+'</div>';
     return;
   }
   target.classList.remove('live-event-grid');
