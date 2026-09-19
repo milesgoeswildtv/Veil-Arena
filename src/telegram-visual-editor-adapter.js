@@ -8,7 +8,7 @@ export function applyTelegramVisualEditorAdapter(html) {
   const SLOT_SELECTORS={
     'arena.header':'.arena-heading',
     'arena.stats':'.stats',
-    'arena.eventPlate':'#event',
+    'arena.eventPlate':'#liveEventStage',
     'arena.viewerState':'#viewerStateCard',
     'arena.roster':'.roster-panel',
     'arena.sponsor':'.sponsorship-card',
@@ -61,7 +61,7 @@ export function applyTelegramVisualEditorAdapter(html) {
     }
     const eventAsset=manifest.slots?.['arena.eventPlate']?.asset;
     if(typeof eventAsset==='string'&&(eventAsset.startsWith('/telegram/')||eventAsset.startsWith('https://'))){
-      document.querySelectorAll('.live-event-plate-slice img').forEach(img=>img.src=eventAsset);
+      document.querySelectorAll('.live-event-plate').forEach(img=>img.src=eventAsset);
     }
     const sponsorAsset=manifest.slots?.['arena.sponsor']?.asset;
     if(typeof sponsorAsset==='string'&&(sponsorAsset.startsWith('/telegram/')||sponsorAsset.startsWith('https://'))){
