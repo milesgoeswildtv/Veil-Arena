@@ -113,6 +113,8 @@ assert(baseUi.includes('class="arena-live-logo" src="/telegram/CrashoutArenaLogo
 assert(baseUi.includes('"status logo host"'));
 assert(baseUi.includes("#hero.asset-panel-stats.live-dashboard{"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-heading{\n  display:contents;"));
+assert(baseUi.includes(".hero-panel.live-dashboard .arena-title{width:172px;margin:-6px 0 -4px}"));
+assert(baseUi.includes(".hero-panel.live-dashboard .arena-live-logo{max-height:82px}"));
 assert(baseUi.includes("function renderEventText"));
 assert(baseUi.includes("function currentRoundEvents"));
 assert(baseUi.includes("replaceAll(String.fromCharCode(92)+'.','.')"));
@@ -127,6 +129,8 @@ assert(baseUi.includes("#eventCard.asset-panel-live .section-head h2{\n  width:1
 assert(baseUi.includes(".live-event-plate{"));
 assert(baseUi.includes("height:100%"));
 assert(baseUi.includes("object-fit:fill"));
+assert(baseUi.includes("transform:scale(1.04,1.28)"));
+assert(baseUi.includes("#eventCard.asset-panel-live .live-event-stage{\n  padding:clamp(10px,1.4vw,14px) clamp(8px,1.2vw,12px) clamp(12px,1.7vw,18px);\n  overflow:visible;"));
 assert(baseUi.includes("grid-template-columns:repeat(2,minmax(0,1fr));"));
 assert(baseUi.includes('.live-event-content{'));
 assert(baseUi.includes('grid-template-columns:repeat(2,minmax(0,1fr))'));
@@ -302,7 +306,10 @@ assert(!productPassSource.includes("#controls [data-feature-action"));
 assert(!productPassSource.includes("render=function productRender"));
 
 const prizePackSource = readFileSync(new URL("../src/telegram-prize-pack.js", import.meta.url), "utf8");
-assert(prizePackSource.includes("min-height:38px"));
+assert(prizePackSource.includes("width:86%;max-width:620px"));
+assert(prizePackSource.includes("margin:-10px auto 4px"));
+assert(prizePackSource.includes("min-height:30px"));
+assert(prizePackSource.includes(".arena-nav{width:84%;gap:3px;padding:2px;margin-top:-12px}"));
 assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
 assert(!prizePackSource.includes("render=function prizeRender"));
 
