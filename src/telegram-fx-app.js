@@ -1747,18 +1747,18 @@ function renderViewerStateCard(){
       title='OUT';
       icon='skull';
       detail=eliminatedNow
-        ?'You are out. Spectator mode unlocked.'
+        ?'Spectator mode unlocked.'
         :state.viewer.canVote
-          ?'Community Showdown is open. Cast your vote.'
-          :'React below. Showdown voting unlocks when available.';
+          ?'Showdown open · vote now.'
+          :'Reactions open · waiting for Showdown.';
     }else{
       mode='spectator';
       label='SPECTATOR';
       title='WATCHING';
       icon='spectate';
       detail=state.viewer.canVote
-        ?'Community Showdown is open. Cast your vote.'
-        :'Watch live. Showdown voting unlocks when available.';
+        ?'Showdown open · vote now.'
+        :'Watching live · reactions open.';
     }
   }
 
