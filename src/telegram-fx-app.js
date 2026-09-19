@@ -1077,10 +1077,9 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .viewer-state-card.live-compact{min-height:64px}
-  .viewer-state-card.live-compact .viewer-state-copy{left:40%;right:3.5%}
-  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:13px}
-  .viewer-state-card.live-compact .viewer-state-copy span{font-size:8px}
+  .viewer-state-card.live-compact{min-height:36px;max-width:calc(100% - 16px);padding:5px 10px}
+  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:11px}
+  .viewer-state-card.live-compact .viewer-state-copy span{font-size:7px}
   .hero-panel.live-dashboard{padding-top:0}
   .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
