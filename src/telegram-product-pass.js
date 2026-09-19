@@ -21,14 +21,14 @@ body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{
 body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode #hostTrigger.show{
   position:absolute;
   z-index:20;
-  top:-88px;
-  left:-12px;
+  top:-104px;
+  left:46px;
   display:block;
   width:max-content;
   min-width:0;
   min-height:36px;
   margin:0;
-  padding:0 16px;
+  padding:0 10px;
   border-radius:10px;
   font-size:10px;
   letter-spacing:.09em;
@@ -47,7 +47,7 @@ body[data-arena-phase="finished"][data-arena-view="arena"] .footer-row{display:n
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
-@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode #hostTrigger.show{top:-84px;left:-11px;min-height:34px;padding:0 14px;font-size:9px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode #hostTrigger.show{top:-106px;left:50px;min-height:34px;padding:0 9px;font-size:9px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
