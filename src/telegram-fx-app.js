@@ -387,6 +387,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .hero-panel.live-dashboard #error{grid-area:error;margin-top:0}
 .hero-panel.live-dashboard #controls{grid-area:controls;margin-top:0}
 .hero-panel.live-dashboard #controls:empty{display:none}
+/* LIVE EVENT: canonical visual owner. Keep responsive behavior inside this block. */
 .live-event-grid{
   position:relative;
   display:block;
@@ -416,12 +417,12 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   align-items:stretch;
   min-width:0;
   gap:var(--av-event-gap,0px);
-  padding:18px var(--av-event-padding,15px) 20px;
+  padding:clamp(14px,1.55vw,18px) var(--av-event-padding,15px) clamp(16px,1.75vw,20px);
 }
 .live-event-entry{
   min-width:0;
   min-height:0;
-  padding:10px 12px;
+  padding:clamp(7px,.9vw,10px) clamp(7px,1.05vw,12px);
   background:transparent;
 }
 .live-event-copy{
@@ -432,11 +433,11 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 .live-event-entry.dense .live-event-copy{
   font-size:calc(var(--av-event-font-size,11px) - 1px);
-  line-height:1.3;
+  line-height:1.28;
 }
 .live-event-entry.ultra-dense .live-event-copy{
   font-size:calc(var(--av-event-font-size,11px) - 2px);
-  line-height:1.24;
+  line-height:1.22;
 }
 .live-event-copy .event-head{
   margin-bottom:3px;
@@ -577,7 +578,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   font-size:15px;
   overflow-wrap:anywhere;
 }
-.event>:not(.live-event-plate){position:relative;z-index:1}
 #eventCard.asset-panel-live .section-head{margin-bottom:8px}
 #eventCard.asset-panel-live .section-head img{width:20px;height:20px}
 #eventCard.asset-panel-live .section-head h2{font-size:9px}
@@ -823,6 +823,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 .player-portrait-token img{width:42%;height:auto;filter:drop-shadow(0 0 8px #a966ff88)}
 .new-dead{animation:playerOut 1.1s ease both}
 .revived-now{animation:playerBack 1.4s ease both}
+/* VIEWER STATUS: canonical visual owner. Do not add breakpoint overrides elsewhere. */
 .viewer-state-card{
   opacity:var(--av-viewer-opacity,1);
   display:none;
@@ -833,10 +834,10 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   justify-content:center;
   gap:7px;
   width:max-content;
-  max-width:min(100%,420px);
-  min-height:38px;
+  max-width:min(calc(100% - 16px),420px);
+  min-height:36px;
   margin:7px auto 2px;
-  padding:6px 12px;
+  padding:5px 10px;
   overflow:hidden;
   border:1px solid #4d335c;
   border-radius:999px;
@@ -883,7 +884,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:12px;
+  font-size:11px;
   line-height:1;
   font-weight:1000;
   letter-spacing:.02em;
@@ -894,7 +895,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   text-overflow:ellipsis;
   white-space:nowrap;
   color:#9e90a8;
-  font-size:8px;
+  font-size:7px;
   line-height:1.1;
   text-align:center;
 }
@@ -1047,7 +1048,6 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   .event{min-height:132px;padding:22px}
   #hero.asset-panel-lobby .readout{min-height:42px;padding:7px 14px}
   .readout{min-height:50px;padding:10px 20px}
-  .viewer-state-card{width:100%;margin-top:7px}
   .roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--av-roster-gap,7px)}
   .roster .player:last-child:nth-child(odd){grid-column:1/-1;width:calc(50% - 3.5px);justify-self:center}
   .footer-row{flex-direction:column;align-items:stretch}
@@ -1077,21 +1077,12 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .viewer-state-card.live-compact{min-height:36px;max-width:calc(100% - 16px);padding:5px 10px}
-  .viewer-state-card.live-compact .viewer-state-copy strong{font-size:11px}
-  .viewer-state-card.live-compact .viewer-state-copy span{font-size:7px}
   .hero-panel.live-dashboard{padding-top:0}
   .hero-panel.live-dashboard .arena-heading{gap:var(--av-header-gap,5px)}
   .hero-panel.live-dashboard .arena-title h1{font-size:24px}
   .hero-panel.live-dashboard .status-line{font-size:8px}
   .hero-panel.live-dashboard .stat{padding:5px 5px}
   .hero-panel.live-dashboard .stat b{font-size:18px}
-  .live-event-grid{padding:0}
-  .live-event-content{gap:var(--av-event-gap,0px);padding:14px var(--av-event-padding,10px) 16px}
-  .live-event-entry{padding:7px 7px}
-  .live-event-copy{font-size:var(--av-event-font-size,10px);line-height:var(--av-event-line-height,1.34)}
-  .live-event-entry.dense .live-event-copy{font-size:calc(var(--av-event-font-size,10px) - 1px);line-height:1.27}
-  .live-event-entry.ultra-dense .live-event-copy{font-size:calc(var(--av-event-font-size,10px) - 2px);line-height:1.2}
   .showdown-contender{min-height:98px;padding:10px 9px 8px}
   .showdown-contender-name{font-size:11px}
   .showdown-bar{margin-top:12px}
@@ -1744,7 +1735,8 @@ function renderViewerStateCard(){
   }
 
   card.className='viewer-state-card asset-'+mode+(state.status==='running'?' live-compact':'')+(revivedNow?' revived-now':'')+(eliminatedNow?' new-dead':'');
-  card.style.display=state.status==='running'?'flex':'block';
+  if(state.status==='running')card.style.removeProperty('display');
+  else card.style.display='block';
   $('viewerStateLabel').textContent=label;
   $('viewerStateTitle').textContent=title;
   $('viewerStateDetail').textContent=detail;
