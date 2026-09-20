@@ -361,7 +361,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode{
   padding:0 clamp(12px,3.2vw,24px) clamp(7px,1.8vw,14px);
 }
-.hero-panel.registration-mode .arena-heading{
+body[data-arena-phase="registration"] .arena-heading{
   position:relative;
   z-index:2;
   display:grid;
@@ -369,7 +369,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registratio
   min-height:92px;
   margin:0 0 -2px;
 }
-.hero-panel.registration-mode .arena-title{
+body[data-arena-phase="registration"] .arena-heading .arena-title{
   position:relative;
   z-index:2;
   display:block;
@@ -378,11 +378,11 @@ body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registratio
   margin:0 auto;
   transform:none;
 }
-.hero-panel.registration-mode .arena-title .arena-mark,
-.hero-panel.registration-mode .arena-title h1{
+body[data-arena-phase="registration"] .arena-heading .arena-title .arena-mark,
+body[data-arena-phase="registration"] .arena-heading .arena-title h1{
   display:none;
 }
-.hero-panel.registration-mode .arena-live-logo{
+body[data-arena-phase="registration"] .arena-heading .arena-live-logo{
   display:block;
   width:100%;
   height:auto;
@@ -390,7 +390,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registratio
   object-fit:contain;
   filter:drop-shadow(0 0 15px #bd64ff66);
 }
-.hero-panel.registration-mode .status-line{
+body[data-arena-phase="registration"] .arena-heading .status-line{
   display:none;
 }
 body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{
@@ -1279,9 +1279,9 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   body[data-arena-phase="registration"] .topline{min-height:34px;margin:0}
   body[data-arena-phase="registration"] #stateBadge{right:0;bottom:0;width:96px;min-width:96px;height:30px;padding:0 8px;transform:none;font-size:8px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode{padding:0 12px 7px}
-  .hero-panel.registration-mode .arena-heading{min-height:88px;margin:0 0 -2px}
-  .hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:0 auto;transform:none}
-  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:96px}
+  body[data-arena-phase="registration"] .arena-heading{min-height:88px;margin:0 0 -2px}
+  body[data-arena-phase="registration"] .arena-heading .arena-title{width:215px;max-width:72%;margin:0 auto;transform:none}
+  body[data-arena-phase="registration"] .arena-heading .arena-live-logo{width:100%;height:auto;max-height:96px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{margin:0 0 -24px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline{left:8%;right:8%;top:20%;height:15%;gap:6px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-ready{font-size:7px;letter-spacing:.07em}
