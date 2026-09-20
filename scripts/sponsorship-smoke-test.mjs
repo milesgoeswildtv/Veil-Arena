@@ -117,7 +117,8 @@ assert(baseUi.includes(".hero-panel.registration-mode .status-line{\n  display:n
 assert(baseUi.includes('body[data-arena-phase="registration"] #stateBadge{'));
 assert(baseUi.includes("width:96px;"));
 assert(baseUi.includes("transform:translate(-14px,34px)"));
-assert(baseUi.includes(".hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateX(0)}"));
+assert(baseUi.includes(".hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateY(40px)}"));
+assert(baseUi.includes(".hero-panel.registration-mode .arena-heading{\n  position:relative;\n  z-index:12;"));
 assert(baseUi.includes(".hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:96px}"));
 assert(baseUi.includes('class="pregame-ready-stage"'));
 assert(baseUi.includes('src="/telegram/crashout%20ui/PregameReadyCheckFrame.PNG"'));
@@ -326,7 +327,9 @@ assert(productPassSource.includes("⚙ HOST CONTROLS"));
 assert(productPassSource.includes("#hero.live-dashboard #hostTrigger"));
 assert(productPassSource.includes("margin-top:5px;min-height:36px"));
 assert(productPassSource.includes('#hero.registration-mode #hostTrigger.show'));
-assert(productPassSource.includes("top:-20px;left:79px;width:84px;min-width:84px;min-height:28px;padding:0 6px;font-size:7px"));
+assert(productPassSource.includes("top:-108px;left:52px;width:104px;min-width:104px;min-height:32px;padding:0 8px;font-size:8px"));
+assert(productPassSource.includes("more-rules-card"));
+assert(productPassSource.includes("grid.prepend(footer)"));
 assert(!productPassSource.includes('body[data-arena-phase="running"][data-arena-view="arena"] .main-grid'));
 assert(!productPassSource.includes("body.crowd-vote-open #eventCard"));
 assert(!productPassSource.includes("document.body.dataset.arenaPhase=phase()"));
@@ -343,6 +346,7 @@ assert(prizePackSource.includes("body[data-arena-phase=\"running\"][data-arena-v
 assert(prizePackSource.includes('PregameLobbyHeader.PNG'));
 assert(prizePackSource.includes('body[data-arena-phase="registration"] .arena-nav'));
 assert(prizePackSource.includes('>SPONSORS<span'));
+assert(!prizePackSource.includes('body[data-arena-view="more"] .footer-row'));
 assert(prizePackSource.includes("registerRenderHook(renderSponsor)"));
 assert(!prizePackSource.includes("render=function prizeRender"));
 

@@ -343,14 +343,18 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 #hero.asset-panel-lobby.registration-mode:before{display:none}
 .hero-panel.registration-mode .arena-heading{
+  position:relative;
+  z-index:12;
   display:block;
 }
 .hero-panel.registration-mode .arena-title{
+  position:relative;
+  z-index:12;
   display:block;
   width:clamp(205px,53vw,270px);
   max-width:72%;
   margin:-14px auto -8px;
-  transform:translateX(0);
+  transform:translateY(40px);
 }
 .hero-panel.registration-mode .arena-title .arena-mark,
 .hero-panel.registration-mode .arena-title h1{
@@ -369,6 +373,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{
   position:relative;
+  z-index:1;
   display:block;
   width:100%;
   aspect-ratio:3/1;
@@ -1249,7 +1254,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
   body[data-arena-phase="registration"] #stateBadge{width:96px;min-width:96px;height:30px;padding:0 8px;transform:translate(-14px,34px);font-size:8px}
-  .hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateX(0)}
+  .hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateY(40px)}
   .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:96px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{margin:-8px 0 -30px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline{left:8%;right:8%;top:20%;height:15%;gap:6px}
