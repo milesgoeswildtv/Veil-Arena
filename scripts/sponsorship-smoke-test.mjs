@@ -134,8 +134,8 @@ assert(baseUi.includes("#hero.asset-panel-lobby.registration-mode:before{display
 assert(baseUi.includes("aspect-ratio:3/1"));
 assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.registration-mode .registration-inline{"));
 assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] #hero.registration-mode .stats{"));
-assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] .roster-panel .section-head{margin-top:-35px;transform:translateX(64px)}"));
-assert(baseUi.includes("margin-top:-35px;\n  transform:translateX(clamp(42px,16vw,72px));"));
+assert(baseUi.includes("body[data-arena-phase=\"registration\"][data-arena-view=\"arena\"] .roster-panel .section-head{margin-top:-45px;transform:translateX(64px)}"));
+assert(baseUi.includes("margin-top:-45px;\n  transform:translateX(clamp(42px,16vw,72px));"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-heading{\n  display:contents;"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-title{width:220px;margin:-2px 0 -4px}"));
 assert(baseUi.includes(".hero-panel.live-dashboard .arena-live-logo{width:100%;height:auto;max-height:108px}"));
