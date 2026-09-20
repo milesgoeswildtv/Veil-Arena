@@ -5,20 +5,7 @@ export function applyTelegramProductPass(html) {
 .results-stage{overflow-anchor:none}
 .product-loading{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 12px;padding:10px 13px;border:1px solid #4a3458;border-radius:12px;background:#0b0711;color:#bcaec7;font:900 9px/1.2 ui-monospace,monospace;letter-spacing:.14em}.product-loading.ready{display:none}.product-loading-dot{width:8px;height:8px;border-radius:50%;background:#c45cff;box-shadow:0 0 12px #c45cffaa;animation:productPulse 1s ease-in-out infinite alternate}
 @keyframes productPulse{to{opacity:.35;transform:scale(.72)}}
-body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{
-  grid-area:host;
-  display:block;
-  width:auto;
-  min-width:104px;
-  min-height:32px;
-  margin:0;
-  padding:0 9px;
-  justify-self:end;
-  border-radius:9px;
-  font-size:8px;
-  letter-spacing:.08em;
-}
-body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{
+body:is([data-arena-phase="registration"],[data-arena-phase="running"])[data-arena-view="arena"] .topline #hostTrigger.show{
   position:absolute;
   z-index:20;
   left:0;
@@ -34,7 +21,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTri
   letter-spacing:.08em;
   white-space:nowrap;
 }
-body[data-arena-phase="registration"]:not([data-arena-view="arena"]) .topline #hostTrigger{display:none}
+body:is([data-arena-phase="registration"],[data-arena-phase="running"]):not([data-arena-view="arena"]) .topline #hostTrigger{display:none}
 .results-stage{display:none}.results-stage.show{display:block}\nbody:not([data-arena-view="arena"]) .results-stage{display:none}
 body[data-arena-phase="finished"][data-arena-view="arena"] .main-grid,
 body[data-arena-phase="finished"][data-arena-view="arena"] .roster-panel,
@@ -48,7 +35,7 @@ body[data-arena-phase="finished"][data-arena-view="arena"] .footer-row{display:n
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
-@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{left:0;bottom:0;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body:is([data-arena-phase="registration"],[data-arena-phase="running"])[data-arena-view="arena"] .topline #hostTrigger.show{left:0;bottom:0;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
@@ -121,7 +108,7 @@ body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;co
     const top=document.querySelector('.topline');
     const heading=document.querySelector('.arena-heading');
     const content=document.querySelector('.state-content');
-    if(state.status==='registration'){
+    if(['registration','running'].includes(state.status)){
       if(content&&top&&heading&&heading.parentElement!==content)content.insertBefore(heading,top);
       if(top&&trigger.parentElement!==top)top.appendChild(trigger);
     }else{
