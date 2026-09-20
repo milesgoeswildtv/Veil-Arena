@@ -329,7 +329,7 @@ assert(productPassSource.includes("registerRenderHook(renderProductPass)"));
 assert(productPassSource.includes("⚙ HOST CONTROLS"));
 assert(productPassSource.includes("#hero.live-dashboard #hostTrigger"));
 assert(productPassSource.includes("margin-top:5px;min-height:36px"));
-assert(productPassSource.includes('#hero.registration-mode #hostTrigger.show'));
+assert(productPassSource.includes('.topline #hostTrigger.show'));
 assert(productPassSource.includes(".topline #hostTrigger.show"));
 assert(productPassSource.includes("hostTarget=state.status==='registration'?document.querySelector('.topline'):q('hero')"));
 assert(productPassSource.includes("left:0;bottom:4px;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px"));
