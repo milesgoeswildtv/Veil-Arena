@@ -469,7 +469,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registratio
   margin-top:-2px;
 }
 body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{
-  margin-top:-35px;
+  margin-top:-45px;
   transform:translateX(clamp(42px,16vw,72px));
 }
 .hero-panel.live-dashboard{
@@ -1292,7 +1292,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat{padding:5% 8%}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .stat b{font-size:clamp(18px,5vw,28px)}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .controls{margin-top:-2px}
-  body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{margin-top:-35px;transform:translateX(64px)}
+  body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .section-head{margin-top:-45px;transform:translateX(64px)}
   .hero-panel.live-dashboard{padding-top:0}
   #hero.asset-panel-stats.live-dashboard{padding:2px 7px 7px}
   .hero-panel.live-dashboard{grid-template-columns:minmax(46px,1fr) minmax(0,220px) minmax(88px,1fr);column-gap:3px;row-gap:0}
