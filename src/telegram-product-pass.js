@@ -22,7 +22,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTri
   position:absolute;
   z-index:20;
   left:0;
-  bottom:6px;
+  bottom:0;
   display:block;
   width:104px;
   min-width:104px;
@@ -48,7 +48,7 @@ body[data-arena-phase="finished"][data-arena-view="arena"] .footer-row{display:n
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
-@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{left:0;bottom:4px;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{left:0;bottom:0;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
@@ -117,8 +117,17 @@ body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;co
 
   function renderHostDrawer(){
     const trigger=q('hostTrigger');if(!trigger||!state)return;
-    const hostTarget=state.status==='registration'?document.querySelector('.topline'):q('hero');
-    if(hostTarget&&trigger.parentElement!==hostTarget)hostTarget.appendChild(trigger);
+    const hero=q('hero');
+    const top=document.querySelector('.topline');
+    const heading=document.querySelector('.arena-heading');
+    const content=document.querySelector('.state-content');
+    if(state.status==='registration'){
+      if(content&&top&&heading&&heading.parentElement!==content)content.insertBefore(heading,top);
+      if(top&&trigger.parentElement!==top)top.appendChild(trigger);
+    }else{
+      if(hero&&heading&&heading.parentElement!==hero)hero.insertBefore(heading,hero.firstChild);
+      if(hero&&trigger.parentElement!==hero)hero.appendChild(trigger);
+    }
     const host=Boolean(state.viewer?.isHost);
     trigger.classList.toggle('show',host&&['registration','running'].includes(state.status));
     if(!host)return;
