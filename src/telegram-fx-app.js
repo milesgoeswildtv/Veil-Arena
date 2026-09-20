@@ -163,7 +163,7 @@ body[data-arena-phase="registration"] #stateBadge{
   min-width:96px;
   height:30px;
   padding:0 8px;
-  transform:translate(-12px,48px);
+  transform:translate(-14px,34px);
   font-size:8px;
   letter-spacing:.1em;
 }
@@ -1248,7 +1248,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  body[data-arena-phase="registration"] #stateBadge{width:96px;min-width:96px;height:30px;padding:0 8px;transform:translate(-12px,48px);font-size:8px}
+  body[data-arena-phase="registration"] #stateBadge{width:96px;min-width:96px;height:30px;padding:0 8px;transform:translate(-14px,34px);font-size:8px}
   .hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateX(0)}
   .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:96px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{margin:-8px 0 -30px}
