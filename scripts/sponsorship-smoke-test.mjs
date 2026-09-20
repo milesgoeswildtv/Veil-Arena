@@ -144,6 +144,15 @@ assert(baseUi.includes("grid-template-columns:repeat(2,minmax(0,1fr))"));
 assert(baseUi.includes('id="liveEventStage"'));
 assert(baseUi.includes('class="live-event-plate"'));
 assert(baseUi.includes('src="/telegram/NewEventBackgroundPlate.PNG"'));
+assert(baseUi.includes('src="/telegram/EliminationPanel.PNG"'));
+assert(baseUi.includes('id="eliminationBanner"'));
+assert(baseUi.includes(".elimination-banner{"));
+assert(baseUi.includes(".elimination-banner.show{"));
+assert(baseUi.includes("function eliminatedPlayerNames"));
+assert(baseUi.includes("function showEliminationBanner"));
+assert(baseUi.includes("showEliminationBanner(eliminatedPlayerNames(next,prev))"));
+assert(!baseUi.includes("showFx('elimination'"));
+assert(!baseUi.includes(".fx-layer.elimination"));
 assert(baseUi.includes("#eventCard.asset-panel-live .section-head{"));
 assert(baseUi.includes("justify-content:center"));
 assert(baseUi.includes("#eventCard.asset-panel-live .section-head h2{\n  width:100%;\n  text-align:center;"));
@@ -267,8 +276,10 @@ assert(statsPanelSource.includes('preserveAspectRatio="none"'));
 
 const pregameHeaderAsset = readFileSync(new URL("../assets/telegram/crashout ui/PregameLobbyHeader.PNG", import.meta.url));
 const pregameReadyAsset = readFileSync(new URL("../assets/telegram/crashout ui/PregameReadyCheckFrame.PNG", import.meta.url));
+const eliminationPanelAsset = readFileSync(new URL("../assets/telegram/EliminationPanel.PNG", import.meta.url));
 assert(pregameHeaderAsset.length > 1000);
 assert(pregameReadyAsset.length > 1000);
+assert(eliminationPanelAsset.length > 1000);
 
 const syncAssetsSource = readFileSync(new URL("../scripts/sync-telegram-assets.mjs", import.meta.url), "utf8");
 assert(syncAssetsSource.includes("async function copySupportedTree"));

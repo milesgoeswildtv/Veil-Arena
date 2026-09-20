@@ -515,6 +515,65 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   pointer-events:none;
   user-select:none;
 }
+.elimination-banner{
+  position:absolute;
+  left:50%;
+  top:8px;
+  z-index:4;
+  width:min(92%,520px);
+  min-height:78px;
+  transform:translate(-50%,-10px) scale(.97);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;
+}
+.elimination-banner.show{
+  opacity:1;
+  transform:translate(-50%,0) scale(1);
+}
+.elimination-banner-asset{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+  filter:drop-shadow(0 8px 18px #0009);
+}
+.elimination-banner-copy{
+  position:relative;
+  z-index:1;
+  min-height:78px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:10px 52px 9px;
+  text-align:center;
+  text-shadow:0 2px 8px #000;
+}
+.elimination-banner-kicker{
+  color:#f0d8ff;
+  font:950 8px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.18em;
+}
+.elimination-banner-name{
+  max-width:100%;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#fff;
+  font:1000 clamp(16px,4.2vw,24px)/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.03em;
+}
+.elimination-banner-subline{
+  margin-top:4px;
+  color:#c8b6d2;
+  font:900 7px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+}
 #eventCard.asset-panel-live .section-head,
 #eventCard.asset-panel-live .event{
   position:relative;
@@ -1135,7 +1194,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
 .fx-particle{position:absolute;left:50%;top:48%;font-size:20px;opacity:0;will-change:transform,opacity}
 .fx-layer.active .fx-banner{animation:bannerIn 1.65s cubic-bezier(.2,.8,.2,1) both}
 .fx-layer.active .fx-flash{animation:flash 1s ease-out both}
-.fx-layer.mass .fx-flash,.fx-layer.elimination .fx-flash,.fx-layer.showdown .fx-flash{background:radial-gradient(circle,#c52d4c77 0,#6b153f44 35%,transparent 70%)}
+.fx-layer.mass .fx-flash,.fx-layer.showdown .fx-flash{background:radial-gradient(circle,#c52d4c77 0,#6b153f44 35%,transparent 70%)}
 .fx-layer.revival .fx-flash{background:radial-gradient(circle,#31e0a755 0,#1b7d6844 35%,transparent 72%)}
 .fx-layer.vote .fx-flash,.fx-layer.glitch .fx-flash{background:radial-gradient(circle,#9c5eff55 0,#5d21a144 40%,transparent 72%)}
 .fx-layer.finalfive .fx-flash,.fx-layer.winner .fx-flash{background:radial-gradient(circle,#f5c45c66 0,#9f6d2444 42%,transparent 74%)}
@@ -1251,6 +1310,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important}
   .fx-layer *,.screen-shake,.hero-event,.glitching,.ambient-pulse,.winner-glow,.final-five-glow,.new-dead,.revived-now,.vote-panel.live{animation:none!important}
+  .elimination-banner{transition:none!important}
   .fx-layer{display:none}
 }
 </style>
@@ -1349,6 +1409,14 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
           <section class="panel" id="eventCard">
             <div class="live-event-stage" id="liveEventStage">
               <img class="live-event-plate" src="${TELEGRAM_VISUAL_ASSETS.eventPlate}" alt="" aria-hidden="true">
+              <div class="elimination-banner" id="eliminationBanner" role="status" aria-live="polite" aria-hidden="true">
+                <img class="elimination-banner-asset" src="/telegram/EliminationPanel.PNG" alt="" aria-hidden="true">
+                <div class="elimination-banner-copy">
+                  <span class="elimination-banner-kicker">ELIMINATION</span>
+                  <strong class="elimination-banner-name" id="eliminationBannerName">PLAYER OUT</strong>
+                  <span class="elimination-banner-subline" id="eliminationBannerSubline">THE ROSTER JUST GOT SMALLER</span>
+                </div>
+              </div>
               <div class="section-head">
                 <img id="eventIcon" src="/telegram/veil_ui_icon_timer.svg" alt="">
                 <h2 id="eventHeading">Live Event</h2>
@@ -1427,6 +1495,7 @@ const frames={
 };
 let state=null,busy=false,lastFxKey='',finalFiveSeen=false,lastStateSignature='',refreshTimer=null,refreshing=false;
 const changeUntil=new Map();
+let eliminationBannerTimer=null;
 const playerRows=new Map();
 const renderHooks=[];
 const timerHooks=[];
@@ -1546,6 +1615,41 @@ function showFx(type,title,sub,iconKey,particleMode='burst',particleChars=['✦'
   setTimeout(clearFx,2500);
 }
 
+function eliminatedPlayerNames(next,prev){
+  if(!prev)return [];
+  const current=new Map((next.players||[]).map(player=>[String(player.id),player]));
+  return (prev.players||[])
+    .filter(player=>player.alive&&current.has(String(player.id))&&!current.get(String(player.id)).alive)
+    .map(player=>String(player.displayName||'Player'));
+}
+
+function hideEliminationBanner(){
+  const banner=$('eliminationBanner');
+  if(!banner)return;
+  banner.classList.remove('show');
+  banner.setAttribute('aria-hidden','true');
+}
+
+function showEliminationBanner(names=[]){
+  const banner=$('eliminationBanner');
+  if(!banner)return;
+  const clean=names.filter(Boolean);
+  const name=clean.length>1?clean.slice(0,2).join(' + '):(clean[0]||'PLAYER OUT');
+  $('eliminationBannerName').textContent=name;
+  $('eliminationBannerSubline').textContent=clean.length>1
+    ?clean.length+' PLAYERS ELIMINATED'
+    :'THE ROSTER JUST GOT SMALLER';
+  if(eliminationBannerTimer)clearTimeout(eliminationBannerTimer);
+  banner.classList.remove('show');
+  banner.setAttribute('aria-hidden','false');
+  void banner.offsetWidth;
+  banner.classList.add('show');
+  eliminationBannerTimer=setTimeout(()=>{
+    hideEliminationBanner();
+    eliminationBannerTimer=null;
+  },2400);
+}
+
 function markRosterChanges(next,prev){
   if(!prev)return;
   const old=new Map((prev.players||[]).map(p=>[String(p.id),p]));
@@ -1608,8 +1712,7 @@ function triggerEventFx(next,prev){
   }
   const lost=prev&&Number(prev.aliveCount)>Number(next.aliveCount);
   if(lost){
-    showFx('elimination','ELIMINATION','THE ROSTER JUST GOT SMALLER','skull','burst',['✕','◆','✦'],16);
-    $('app').classList.add('screen-shake');
+    showEliminationBanner(eliminatedPlayerNames(next,prev));
     haptic('medium');
     return;
   }
