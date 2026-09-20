@@ -158,6 +158,15 @@ img{display:block;max-width:100%}
 .status-badge.pending{background-image:url("/telegram/veil_ui_badge_pending.svg")}
 .status-badge.live{background-image:url("/telegram/veil_ui_badge_live.svg")}
 .status-badge.ready{background-image:url("/telegram/veil_ui_badge_ready.svg")}
+body[data-arena-phase="registration"] #stateBadge{
+  width:96px;
+  min-width:96px;
+  height:30px;
+  padding:0 8px;
+  transform:translate(-12px,48px);
+  font-size:8px;
+  letter-spacing:.1em;
+}
 .main-grid{
   display:grid;
   grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);
@@ -338,10 +347,10 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
 }
 .hero-panel.registration-mode .arena-title{
   display:block;
-  width:clamp(230px,60vw,310px);
-  max-width:82%;
-  margin:-22px auto -8px;
-  transform:translateX(clamp(2px,1vw,6px));
+  width:clamp(205px,53vw,270px);
+  max-width:72%;
+  margin:-14px auto -8px;
+  transform:translateX(0);
 }
 .hero-panel.registration-mode .arena-title .arena-mark,
 .hero-panel.registration-mode .arena-title h1{
@@ -351,7 +360,7 @@ body[data-arena-phase="running"][data-arena-view="arena"] #eventCard .section-he
   display:block;
   width:100%;
   height:auto;
-  max-height:118px;
+  max-height:96px;
   object-fit:contain;
   filter:drop-shadow(0 0 15px #bd64ff66);
 }
@@ -1239,8 +1248,9 @@ body[data-arena-phase="registration"][data-arena-view="arena"] .roster-panel .se
   #voteCard{padding:11px 9px}
   #hero.asset-panel-lobby .readout{min-height:38px;padding:6px 12px}
   .readout{padding:9px 16px}
-  .hero-panel.registration-mode .arena-title{width:250px;max-width:82%;margin:-28px auto -8px;transform:translateX(2px)}
-  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:118px}
+  body[data-arena-phase="registration"] #stateBadge{width:96px;min-width:96px;height:30px;padding:0 8px;transform:translate(-12px,48px);font-size:8px}
+  .hero-panel.registration-mode .arena-title{width:215px;max-width:72%;margin:-16px auto -8px;transform:translateX(0)}
+  .hero-panel.registration-mode .arena-live-logo{width:100%;height:auto;max-height:96px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .pregame-ready-stage{margin:-8px 0 -30px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-inline{left:8%;right:8%;top:20%;height:15%;gap:6px}
   body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode .registration-ready{font-size:7px;letter-spacing:.07em}
