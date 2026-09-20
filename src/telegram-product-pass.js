@@ -18,15 +18,15 @@ body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{
   font-size:8px;
   letter-spacing:.08em;
 }
-body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode #hostTrigger.show{
+body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{
   position:absolute;
-  z-index:120;
-  top:-108px;
-  left:52px;
+  z-index:20;
+  left:0;
+  bottom:6px;
   display:block;
   width:104px;
   min-width:104px;
-  min-height:32px;
+  min-height:30px;
   margin:0;
   padding:0 8px;
   border-radius:10px;
@@ -34,6 +34,7 @@ body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registratio
   letter-spacing:.08em;
   white-space:nowrap;
 }
+body[data-arena-phase="registration"]:not([data-arena-view="arena"]) .topline #hostTrigger{display:none}
 .results-stage{display:none}.results-stage.show{display:block}\nbody:not([data-arena-view="arena"]) .results-stage{display:none}
 body[data-arena-phase="finished"][data-arena-view="arena"] .main-grid,
 body[data-arena-phase="finished"][data-arena-view="arena"] .roster-panel,
@@ -47,7 +48,7 @@ body[data-arena-phase="finished"][data-arena-view="arena"] .footer-row{display:n
 .connection-chip.offline,.connection-chip:not(.live){border-color:#6a4b2d}
 body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;color:#ffd5dd}body.arena-network-offline .product-loading-dot{background:#ef526f;box-shadow:0 0 12px #ef526f88}
 @media(max-width:760px){.results-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.results-actions{grid-template-columns:1fr}.results-actions .wide-action{grid-column:auto}.drawer-actions{grid-template-columns:1fr}.results-hero{padding:22px 16px}}
-@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] #hero.registration-mode #hostTrigger.show{top:-108px;left:52px;width:104px;min-width:104px;min-height:32px;padding:0 8px;font-size:8px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
+@media(max-width:440px){body[data-arena-phase="running"] #hero.live-dashboard #hostTrigger{min-width:88px;min-height:30px;font-size:7px;padding:0 7px}body[data-arena-phase="registration"][data-arena-view="arena"] .topline #hostTrigger.show{left:0;bottom:4px;width:96px;min-width:96px;min-height:30px;padding:0 7px;font-size:7px}.results-stats{gap:5px}.results-stat{padding:9px 5px}.results-stat strong{font-size:16px}.player-sheet-grid{gap:5px}.player-sheet-stat{padding:9px 5px}.player-sheet-stat strong{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.product-loading-dot{animation:none}}
 </style>`;
 
@@ -116,6 +117,8 @@ body.arena-network-offline .product-loading{display:flex;border-color:#8f2c3e;co
 
   function renderHostDrawer(){
     const trigger=q('hostTrigger');if(!trigger||!state)return;
+    const hostTarget=state.status==='registration'?document.querySelector('.topline'):q('hero');
+    if(hostTarget&&trigger.parentElement!==hostTarget)hostTarget.appendChild(trigger);
     const host=Boolean(state.viewer?.isHost);
     trigger.classList.toggle('show',host&&['registration','running'].includes(state.status));
     if(!host)return;
